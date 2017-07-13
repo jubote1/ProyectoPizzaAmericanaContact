@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Maestro Excepciones Precio</title>
+		<meta charset="utf-8" />
+		  <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+		  <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.min.css">
+		  <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script> 
+		  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+		  <script type="text/javascript" charset="utf8" src="js/jquery.dataTables.min.js"></script>
+		  <script src="//oss.maxcdn.com/bootbox/4.2.0/bootbox.min.js"></script>
+		  <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.5.3/js/bootstrapValidator.min.js'></script>
+   		  <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.5.3/js/language/es_ES.min.js'></script>
+		  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.1.0/jquery-confirm.min.css">	
+	</head>
+	<body>
+
+		<link id="Menu-file" href="Menu.html" rel="import" />
+		<script type="text/javascript">
+			var getImport = document.querySelector('#Menu-file'); 
+			var getContent = getImport.import.querySelector('#menuprincipal');
+			document.body.appendChild(document.importNode(getContent, true));
+			console.log(getContent);
+		</script>
+
+	<div class="container">
+		<p></p>
+		<button class="btn btn-primary" data-toggle="modal" data-target="#addData">Crear Nueva Excepcion Precio</button>
+			
+
+			<!-- ESTO ES PARA LA ADICIÓN -->
+		<div class="modal fade" id="addData" tabindex="-1" role="dialog" aria-labelledby="addLabel">
+			 <div class="modal-dialog" role="document">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			        <h4 class="modal-title" id="addLabel">Insertar Información</h4>
+			      </div>
+			      <form>
+				      <div class="modal-body">
+				       		 <div class="form-group">
+							    <label for="labelProducto">Producto</label>
+							    <select id="selectProductos" class="form-control"></select>
+							 </div>
+							  <div class="form-group">
+							    <label for="labelPrecio">Precio</label>
+							    <input type="text" class="form-control" id="precio" placeholder="Precio">
+							  </div>
+							  <div class="form-group">
+							    <label for="labelDescripcion">Descripcion</label>
+							    <input type="text" class="form-control" id="descripcion" placeholder="Descripcion">
+							  </div>
+							 <div class="form-group">
+							    <label for="labelIncluye">Incluye Liquido</label>
+							    <select id="incluyeLiquido" class="form-control">
+								    <option value="S" id ="S">SI</option>
+								    <option value="N" id ="N">NO</option>
+							    </select>
+							 </div>
+							 <div class="form-group">
+							    <label for="labelTipoLiquido">Tipo Liquido</label>
+							    <select id="selectTipoLiquido" class="form-control"> </select>
+							 </div>
+							 
+				      </div>
+					      <div class="modal-footer">
+					        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+					        <button type="submit" onClick="guardarExcepcionPrecio()" class="btn btn-primary">Guardar Cambios</button>
+					      </div>
+			      </form>
+			    </div>
+			</div>
+		</div>
+
+<!-- ESTO ES PARA LA EDICIÓN -->
+<form id="userForm" method="get" class="form-horizontal" style="display: none;">
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Id Excepcion</label>
+        <div class="col-xs-3">
+            <input type="text" class="form-control" name="idexcepcionedit" disabled="disabled" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Producto</label>
+        <div class="col-xs-5">
+         	<select id="selectProductosedit" class="form-control"></select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Precio</label>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" name="precioedit" />
+        </div>
+    </div>
+
+     <div class="form-group">
+        <label class="col-xs-3 control-label">Descripcion</label>
+        <div class="col-xs-5">
+            <input type="text" class="form-control" name="descripcionedit" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Incluye Liquido</label>
+        <div class="col-xs-5">
+            <select id="incluyeLiquidoedit" class="form-control">
+					    <option value="S" id ="S">SI</option>
+					    <option value="N" id ="N">NO</option>
+			</select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Tipo Liquido</label>
+        <div class="col-xs-5">
+         	<select id="selectTipoLiquidoedit" class="form-control"></select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-xs-5 col-xs-offset-3">
+            <button type="submit" onClick="confirmarEditarExcepcionPrecio()" class="btn btn-default">Guardar</button>
+        </div>
+    </div>
+</form>
+
+		<table id="grid-excepcionPrecio" class="table table-condensed table-hover table-striped table-bordered" cellspacing="0" width="100%">
+								        <thead>
+								            <tr>
+								                <th data-column-id="idexcepcion">Id Excepcion</th>
+								                <th data-column-id="idproducto">Id Producto</th>
+								                <th data-column-id="producto">Producto</th>
+								                <th data-column-id="precio">Precio</th>
+								                <th data-column-id="descripcion">Descripcion</th>
+								                <th data-column-id="incluyeliquido">Incluye Liquido</th>
+								                <th data-column-id="idtipoliquido">Id Tipo Liquido</th>
+								                <th data-column-id="nombreliquido">Nombre Liquido</th>
+								                <th width="120">Editar/Eliminar</th>
+								            </tr>
+								        </thead>
+								      	
+								</table>
+	</div>
+	</body>
+			<script src="js/excepcionprecio.js" type="text/javascript"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.1.0/jquery-confirm.min.js"></script>
+	</html>

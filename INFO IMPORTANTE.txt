@@ -1,0 +1,92 @@
+http://www.desarrolloweb.com/articulos/eventos-jquery.html
+
+http://www.jquery-bootgrid.com/Documentation
+
+$.getJSON(server + 'GetCliente?telefono=' + telefono.value, function(data){
+		console.log(data);
+		$("#grid-clientes").bootgrid({
+	    ajax: true,
+	    data,
+	    url: "/api/data/basic",
+	    formatters: {
+	        "link": function(column, row)
+	        {
+	            return "<a href=\"#\">" + column.id + ": " + row.id + "</a>";
+	        }
+	    }
+		});
+
+	});
+
+
+
+http://localhost:8080/ProyectoPizzaAmericana/Pedidos.html
+
+BK FUNCIÓN VALIDAR TELEFONO
+
+function validarTelefono(){
+	$.getJSON(server + 'GetCliente?telefono=' + telefono.value, function(data){
+		console.log(data);
+	$("#grid-clientes").bootgrid({
+	    ajax: true,
+	    data,
+	    url: "/api/data/basic",
+	    formatters: {
+	        "link": function(column, row)
+	        {
+	            return "<a href=\"#\">" + column.id + ": " + row.id + "</a>";
+	        }
+	    }
+		});
+	
+
+	});
+}
+
+
+OJO 
+
+$('#grid-clientes').trigger('reloadGrid');
+
+INFORMACIÓN IMPORTANTE
+
+http://www.elwebmaster.com/articulos/15-plugins-jquery-para-manejar-tablas
+
+https://www.html5rocks.com/en/tutorials/speed/quick/
+
+Mejor que loa anteriores 
+https://datatables.net
+
+JSON-DATATABLE
+
+Una manera de hacerlo
+
+https://www.jqueryajaxphp.com/jquery-datatable-using-json/
+
+
+CÓDIGO PARA LOS EVENTOS
+
+$(document).ready(function() {
+    var table = $('#grid-clientes').DataTable();
+     
+    $('#grid-clientes tbody').on('click', 'tr', function () {
+        var data = table.row( this ).data();
+        alert( 'Diste clic en  '+data.nombre+'\'s row' );
+    } );
+} );
+
+
+22 de DICIEMBRE
+
+SITIOS INTERESANTES PARA LO QUE NECESITO DESPUEST
+
+http://www.actualidadjquery.es/2010/10/30/validando-direccion-e-mail-en-formularios-con-jquery/
+
+http://www.actualidadjquery.es/2010/10/29/validando-telefonos-en-formularios-con-jquery/
+
+
+COMO HACER REFERENCIA A LOS RADIOS QUE ESTÁN EN GRUPO CON JQUERY
+
+$("input[name=formapizza]:radio").attr('checked', false);
+
+	

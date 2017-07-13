@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Tomar Pedidos</title>
+		<meta charset="utf-8" />
+		  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		  <script type="text/ecmascript" src="js/jquery.jqGrid.min.js"></script>
+		  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+		  <link href="css/ui.jqgrid.css" rel="stylesheet">
+	</head>
+	<body>
+
+		<nav class="navbar navbar-inverse">
+		  <div class="container-fluid">
+		    <div class="navbar-header">
+		      <a class="navbar-brand" href="#">PEDIDOS PIZZA AMERICANA</a>
+		    </div>
+		    <ul class="nav navbar-nav">
+		      <li class="active"><a href="#">Home Pizza Americana</a></li>
+		      <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Page 1 <span class="caret"></span></a>
+		        <ul class="dropdown-menu">
+		          <li><a href="#">Page 1-1</a></li>
+		          <li><a href="#">Page 1-2</a></li>
+		          <li><a href="#">Page 1-3</a></li>
+		        </ul>
+		      </li>
+		      <li><a href="#">Page 2</a></li>
+		      <li><a href="#">Page 3</a></li>
+		    </ul>
+		  </div>
+		</nav>
+
+		<div class="container">
+
+			<h1>Tomar Pedidos</h1>
+			<div class="row">
+				<table class="table table-bordered">
+					<tbody>
+						<form>
+							<tr>
+								<div class="col-md-6">
+									<td class="active">Teléfono</td>
+								</div>
+								<div class="col-md-6">
+									<td id="encTelefono"><input type="text" id="telefono" name="telefono" class="form-control" placeholder="Telefono" onchange="validarTelefono();"></td>
+								</div>
+									
+							</tr>
+							<tr>
+								<div class="col-md-6">
+									<td class="active">Nombres</td>
+								</div>
+								<div class="col-md-6">
+									<td id="encNombres"><input type="text" id="nombres" name="nombres" class="form-control" placeholder="Nombres"></td>
+								</div>
+							</tr>
+							<tr>
+								<div class="col-md-6">
+									<td class="active">Dirección</td>
+								</div>
+								<div class="col-md-6">
+									<td id="encDireccion"><input type="text" id="direccion" name="direccion" class="form-control" placeholder="Direccion"></td>
+								</div>
+							</tr>
+							<tr>
+								<div class="col-md-6">
+									<td class="active">Zona</td>
+								</div>
+								<div class="col-md-6">
+									<td id="encZona"><input type="text" id="zona" name="zona" class="form-control" placeholder="Zona"></td>
+								</div>
+							</tr>
+							<tr>
+								<div class="col-md-6">
+									<td class="active">Observacion</td>
+								</div>
+								<div class="col-md-6">
+									<td id="encObservacion"><input type="text" id="observacion" name="zona" class="form-control" placeholder="Observacion"></td>
+								</div>
+							</tr>
+							<tr>
+								<div class="col-md-6">
+									<td class="active">Tienda</td>
+								</div>
+								<div class="col-md-6">
+									<td><select id="selectTiendas" class="form-control"></td>
+								</div>
+							</tr>
+							<tr>
+								<td>
+									<div class="col-md-6">
+										<input type="button" class="btn btn-primary" value="Tomar Pedidos" onclick="">
+									</div>
+								</td>
+							</tr>
+								<table id="grid-clientes" class="table table-condensed table-hover table-striped" cellspacing="0" width="100%">
+								        <thead>
+								            <tr>
+								                <th data-column-id="idCliente">idCliente</th>
+								                <th data-column-id="tienda">Tienda</th>
+								                <th data-column-id="nombre">Nombre</th>
+								                <th data-column-id="direccion">Dirección</th>
+								                <th data-column-id="zona">Zona</th>
+								                <th data-column-id="observacion">Observacion</th>
+								            </tr>
+								        </thead>
+								      
+								</table>
+
+						</form>
+					</tbody>
+				</table>
+			</div>
+
+		</div>
+	</body>
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  crossorigin="anonymous"></script>
+	<script src="js/pedidos.js" type="text/javascript"></script>
+</html>

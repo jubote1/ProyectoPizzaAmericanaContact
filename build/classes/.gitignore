@@ -1,0 +1,13 @@
+/capaControlador/
+/capaDAO/
+/capaModelo/
+/capaServicio/
+/conexion/
+/log4j-1.2.17.jar
+/log4j.properties
+/mysql-connector-java-5.0.8-bin.jar
+/org/
+/pixelpos/
+/sajdbc.jar
+/sybase/
+/web.xml

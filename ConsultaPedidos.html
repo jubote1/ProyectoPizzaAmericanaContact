@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>ConsultaPedidos</title>
+		<meta charset="utf-8" />
+		  <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+		  <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />		
+		  <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
+		  <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script> 
+		  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+		  <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.js"></script>
+		  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.1.0/jquery-confirm.min.css">	
+	</head>
+	<body>
+
+		<link id="Menu-file" href="Menu.html" rel="import" />
+		<script type="text/javascript">
+			var getImport = document.querySelector('#Menu-file'); 
+			var getContent = getImport.import.querySelector('#menuprincipal');
+			document.body.appendChild(document.importNode(getContent, true));
+		</script>
+
+		<div class="container">
+			<form>
+				<h1>INFORMACIÓN FILTRO PEDIDO</h1>
+				
+					<table class="table table-bordered">
+						<tbody>
+							
+								<tr>
+										<td class="active">Fecha Inicial</td>
+										<td><input type="text" id="fechainicial" name="fechainicial" class="form-control" placeholder="Fecha Inicial"></td>
+										<td class="active">Fecha Final</td>
+										<td><input type="text" id="fechafinal" name="fechafinal" class="form-control" placeholder="Fecha Final"></td>
+								</tr>
+								<tr>
+										<td class="active">Tienda</td>
+										<td>
+											<select id="selectTiendas" class="form-control"></select>
+										</td>
+										<td class="active">Número de Pedido</td>
+										<td><input type="text" id="numeropedido" name="zona" class="form-control" placeholder="Número de Pedido"></td>
+								</tr>
+								
+							
+						</tbody>
+					</table>
+						<input type="button" class="btn btn-primary btn-lg" value="Consultar" onclick="consultarPedido()">
+
+				
+			</form>
+		</div>
+				<div class="container">
+					<div>
+        				<table id="grid-encabezadopedido" class="table table-condensed table-hover table-striped" cellspacing="0" width="100%">
+								        <thead>
+								            <tr>
+								                <th data-column-id="idpedido">Id Pedido</th>
+								                <th data-column-id="tienda">Tienda</th>
+								                <th data-column-id="totalbruto">Total Bruto</th>
+								                <th data-column-id="impuesto">Impuesto</th>
+								                <th data-column-id="totalneto">Total Neto</th>
+								                <th data-column-id="idcliente">ID Cliente</th>
+								                <th data-column-id="cliente">Cliente</th>
+								                <th data-column-id="estadopedido">Estado Pedido</th>
+								                <th data-column-id="fechapedido">Fecha Pedido</th>
+								            </tr>
+								        </thead>
+								      	<tbody>
+								      			
+								      	</tbody>
+								</table>
+						</div>
+				</div>
+		<div class="container">
+			<form>
+				<h1>Cliente del Pedido</h1>
+				
+					<table class="table table-bordered">
+						<tbody>
+							
+								<tr>
+										<td class="active">Teléfono</td>
+										<td id="encTelefono"><input type="text" id="telefono" name="telefono" class="form-control" placeholder="Telefono" disabled></td>
+								</tr>
+								<tr>
+										<td class="active">Nombres</td>
+										<td id="encNombres"><input type="text" id="nombres" name="nombres" class="form-control" placeholder="Nombres" disabled></td>
+								</tr>
+								<tr>
+										<td class="active">Dirección</td>
+										<td id="encDireccion">
+										
+											<div class="col-md-6"> 
+												<input type="text" id="direccion" name="direccion" class="form-control" placeholder="Direccion" disabled>
+											</div>
+											<div class="col-md-2"> 
+												<input type="text" id="municipio" name="municipio" class="form-control" placeholder="Municipio" disabled>
+											</div>
+										</td>
+								</tr>
+								<tr>
+										<td class="active">Zona</td>
+										<td id="encZona"><input type="text" id="zona" name="zona" class="form-control" placeholder="Zona" disabled></td>
+								</tr>
+								<tr>
+										<td class="active">Observacion</td>
+										<td id="encObservacion"><input type="text" id="observacionDir" name="observacionDir" class="form-control" placeholder="Observacion" disabled></td>
+								</tr>
+								<tr>
+										<td class="active">Tienda</td>
+										<td>
+										<input type="text" id="tienda" name="tienda" class="form-control" placeholder="Tienda" disabled>
+										</td>
+								</tr>
+							
+															
+						</tbody>
+					</table>
+				
+			</form>
+		</div>
+			
+			
+		<div class="container">
+				
+						<br>
+							<table class='table table-bordered'>
+								<tbody>
+									<tr>
+										<td class="active">Número de Pedido</td>
+										<td class="active"><input type="text" class="form-control" id="NumPedido" placeholder="Número de pedido" disabled></td>
+										<td class="active">Número Id Cliente</td>
+										<td class="active"><input type="text" class="form-control" id="Cliente" placeholder="Cliente" disabled></td>
+									</tr>
+									<tr>
+										<td class="active">Estado del Pedido</td>
+										<td class="active"><input type="text" class="form-control" id="estadopedido" placeholder="Estado del Pedido" disabled></td>
+									</tr>
+								</tbody>
+							</table>
+						<div>
+        				<table id="grid-detallepedido" class="table table-condensed table-hover table-striped" cellspacing="0" width="100%">
+								        <thead>
+								            <tr>
+								                <th data-column-id="iddetallepedido">Id Detalle Pedido</th>
+								                <th data-column-id="nombreproducto">Producto</th>
+								                <th data-column-id="cantidad">Cantidad</th>
+								                <th data-column-id="especialidad1">Especialidad 1</th>
+								                <th data-column-id="especialidad2">Especialidad 2</th>
+								                <th data-column-id="valorunitario">Valor Unitario</th>
+								                <th data-column-id="valortotal">Valor Total</th>
+								                <th data-column-id="adicion">Adición</th>
+								                <th data-column-id="observacion">Observacion</th>
+								                <th data-column-id="liquido">Liquido</th>
+								                <th data-column-id="excepcion">Excepción</th>
+								            </tr>
+								        </thead>
+								      	<tbody>
+								      			
+								      	</tbody>
+								</table>
+						</div>
+
+								
+										
+		</div>
+	</body>
+	<script src="js/consultapedidos.js" type="text/javascript"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.1.0/jquery-confirm.min.js"></script>
+	</script>
+	<script src="js/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="js/datepicker.js"></script>
+	<script>
+		$("#fechainicial").datepicker($.datepicker.regional["es"]);
+		$("#fechafinal").datepicker($.datepicker.regional["es"]);
+	</script>
+</html>
