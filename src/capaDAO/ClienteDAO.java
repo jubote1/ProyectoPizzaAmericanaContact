@@ -171,6 +171,31 @@ public class ClienteDAO {
 		return(idClienteActualizado);
 	}
 	
+	public static int actualizarClienteMemcode(int idCliente, int memcode)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		int idClienteActualizado = 0;
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		try
+		{
+			//Para actualizar el cliente el idcliente debe ser diferente de vac�o.
+			Statement stm = con1.createStatement();
+			String update = "update cliente set memcode = " + memcode + "  where idcliente = " + idCliente; 
+			logger.info(update);
+			stm.executeUpdate(update);
+			idClienteActualizado = idCliente;
+			
+			stm.close();
+			con1.close();
+		}
+		catch (Exception e){
+			logger.error(e.toString());
+			return(0);
+		}
+		logger.info("id cliente actualizado" + idClienteActualizado);
+		return(idClienteActualizado);
+	}
 	
 
 }

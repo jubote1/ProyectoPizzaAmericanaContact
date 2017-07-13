@@ -466,7 +466,12 @@ public class PedidoDAO {
 		//Si memcode = 0 es porque hay que crear el cliente
 		//Si memcode <> 0 y indicador igual a true hay que actualizar
 		//Si memcode <> 0 y indicador igual a false hay que actualizar
+		int memcode = cliente.getMemcode();
 		principal.main(EnvioPixel, tiendaPedido.getDsnTienda(),cliente.getMemcode(),cliente, indicadorAct);
+		if (memcode == 0)
+		{
+			ClienteDAO.actualizarClienteMemcode(cliente.getIdcliente(), cliente.getMemcode());
+		}
 		return(true);
 	}
 	

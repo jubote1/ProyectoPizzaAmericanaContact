@@ -662,6 +662,8 @@ public class Main {
 					Member.execute();
 					Member.close();
 					
+					MiembroEnviado.setMemcode(MemCode);
+					
 				}else if (indicadorAct == true) {
 					Member = con.prepareStatement(SqlUpdateMember);
 					Member.setString(1, MiembroEnviado.getNombres());
