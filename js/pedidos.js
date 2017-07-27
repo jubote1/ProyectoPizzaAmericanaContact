@@ -993,6 +993,8 @@ function ConfirmarPedido()
 		    				async: false, 
 		    				success: function(data){ 
 									resultado = data[0];
+									var urlTienda = resultado.url;
+									console.log(urlTienda);
 									var strClr = "";
 									idPedido = 0;
 									memcode = 0;

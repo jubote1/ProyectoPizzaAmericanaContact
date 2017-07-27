@@ -28,26 +28,26 @@
 							
 								<tr>
 										<td class="active">Teléfono</td>
-										<td id="encTelefono"><input type="text" id="telefono" name="telefono" class="form-control" placeholder="Telefono" onchange="validarTelefono();"></td>
+										<td id="encTelefono"><input type="text" id="telefono" name="telefono" class="form-control" placeholder="Telefono" onchange="validarTelefono();" maxlength="10"></td>
 								</tr>
 								<tr>
 										<td class="active">Nombres</td>
-										<td id="encNombres"><input type="text" id="nombres" name="nombres" class="form-control" placeholder="Nombres"></td>
+										<td id="encNombres"><input type="text" id="nombres" name="nombres" class="form-control" placeholder="Nombres" maxlength="20"></td>
 								</tr>
 								<tr>
 										<td class="active">Apellidos</td>
-										<td id="encApellidos"><input type="text" id="apellidos" name="apellidos" class="form-control" placeholder="Apellidos"></td>
+										<td id="encApellidos"><input type="text" id="apellidos" name="apellidos" class="form-control" placeholder="Apellidos" maxlength="20"></td>
 								</tr>
 								<tr>
 										<td class="active">Nombre Compañia</td>
-										<td id="encNombreCompania"><input type="text" id="nombreCompania" name="nombreCompania" class="form-control" placeholder="Nombre Compañia"></td>
+										<td id="encNombreCompania"><input type="text" id="nombreCompania" name="nombreCompania" class="form-control" placeholder="Nombre Compañia" maxlength="50"></td>
 								</tr>
 								<tr>
 										<td class="active">Dirección</td>
 										<td id="encDireccion">
 										
 											<div class="col-md-6"> 
-												<input type="text" id="direccion" name="direccion" class="form-control" placeholder="Direccion">
+												<input type="text" id="direccion" name="direccion" class="form-control" placeholder="Direccion" maxlength="30">
 											</div>
 											<div class="col-md-2"> 
 												<select id="selectMunicipio" class="form-control"></select>
@@ -59,8 +59,8 @@
 										</td>
 								</tr>
 								<tr>
-										<td class="active">Zona</td>
-										<td id="encZona"><input type="text" id="zona" name="zona" class="form-control" placeholder="Zona"></td>
+										<td class="active">Complemento Dirección</td>
+										<td id="encZona"><input type="text" id="zona" name="zona" class="form-control" placeholder="Zona" maxlength="30"></td>
 								</tr>
 								<tr>
 										<td class="active">Observacion</td>
@@ -77,7 +77,7 @@
 						</tbody>
 					</table>
 
-					<input type="button" class="btn btn-default btn-sm" id="buscar" value="Limpiar Selección Cliente" onclick="limpiarSeleccionCliente()"/>
+					<input type="button" class="btn btn-default btn-sm" id="limpiar" value="Limpiar Selección Cliente" onclick="limpiarSeleccionCliente()"/>
 
 					<table id="grid-clientes" class="table table-condensed table-hover table-striped" cellspacing="0" width="100%">
 									        <thead>
@@ -257,6 +257,7 @@
 								        <thead>
 								            <tr>
 								                <th data-column-id="iddetallepedido">Id Detalle Pedido</th>
+								                <th data-column-id="numitem">Num item</th>
 								                <th data-column-id="pizza">Pizza</th>
 								                <th data-column-id="otroprod">Otro Producto</th>
 								                <th data-column-id="cantidad">Cantidad</th>
@@ -292,6 +293,7 @@
 								</tbody>
 							</table>
 								<input type="button" class="btn btn-primary btn-lg" value="Confimar Pedido" onclick="ConfirmarPedido()">
+								<input type="button" class="btn btn-primary btn-lg" value="Reiniciar Pedido" onclick="ReiniciarPedido()">
 										
 		</div>
 	</body>

@@ -48,11 +48,17 @@ public class ConexionBaseDatos {
 		Connection con = null;
 		try {
 
+			 //Class.forName("sybase.jdbc.sqlanywhere.IDriver");
+			 //con = DriverManager.getConnection("jdbc:sqlanywhere:dsn="+dsn+";uid=admin;pwd=xxx");//SystemPos
+			
+			//Cambiamos para la versión 12 del driver en teoria no es necesario registrar el driver lo comentamos
+			System.out.println("pase 1");
 			DriverManager.registerDriver( (Driver)
 					 Class.forName( "sybase.jdbc.sqlanywhere.IDriver" ).newInstance() );
+			System.out.println("pase 2");
 			con = DriverManager.getConnection("jdbc:sqlanywhere:dsn="+dsn+";uid=admin;pwd=xxx");//SystemPos
-						 
-
+			//con = DriverManager.getConnection("jdbc:sqlanywhere:uid=admin;pwd=xxx;eng=PixelSqlbase;database=PixelSqlbase;links=tcpip(host=192.168.0.37;port=2638)");//SystemPos
+			System.out.println("pase 3");
 		} catch (Exception ex) {
 
 		    // Mantener el control sobre el tipo de error

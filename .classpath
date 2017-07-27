@@ -12,5 +12,6 @@
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry exported="true" kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/lib/servlet-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/lib/tomcat-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/JuanDavid/git/Proyecto/WEB-INF/lib/sajdbc.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

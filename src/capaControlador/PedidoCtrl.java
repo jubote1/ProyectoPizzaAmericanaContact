@@ -193,12 +193,25 @@ public class PedidoCtrl {
 	public String FinalizarPedido(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado)
 	{
 		boolean resultado = PedidoDAO.finalizarPedido(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado);
+		String tiendaPixel = PedidoDAO.obtenerUrlTienda(idpedido);
 		JSONArray listJSON = new JSONArray();
 		JSONObject Respuesta = new JSONObject();
 		Respuesta.put("insertado", resultado);
+		Respuesta.put("url", tiendaPixel);
 		listJSON.add(Respuesta);
 		return(listJSON.toJSONString());
 	}
+	
+	public String eliminarPedidoSinConfirmar(int idpedido)
+	{
+		boolean resultado = PedidoDAO.eliminarPedidoSinConfirmar(idpedido);
+		JSONArray listJSON = new JSONArray();
+		JSONObject Respuesta = new JSONObject();
+		Respuesta.put("respuesta", resultado);
+		listJSON.add(Respuesta);
+		return(listJSON.toJSONString());
+	}
+	
 	
 	public String obtenerTotalPedido(int idpedido)
 	{

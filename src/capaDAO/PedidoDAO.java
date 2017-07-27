@@ -1,6 +1,8 @@
 package capaDAO;
 
 import conexion.ConexionBaseDatos;
+import pixelpos.Main;
+
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ import capaModelo.Pedido;
 import capaModelo.DetallePedidoPixel;
 import capaModelo.DetallePedidoAdicion;
 import org.apache.log4j.Logger;
-import pixelpos.Main;
+//import pixelpos.Main;
 import capaModelo.DetallePedidoPixel;
 import capaModelo.ModificadorDetallePedido;
 
@@ -418,6 +420,36 @@ public class PedidoDAO {
 		return(valorTotal);
 	}
 	
+	public static boolean eliminarPedidoSinConfirmar(int idpedido)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		try
+		{
+			Statement stm = con1.createStatement();
+			String delete = "delete from modificador_detalle_pedido  where iddetallepedidopadre in (select iddetalle_pedido from detalle_pedido where idpedido = "+ idpedido +")";
+			logger.info(delete);
+			stm.executeUpdate(delete);
+			delete = "delete from adicion_detalle_pedido  where iddetallepedidopadre in (select iddetalle_pedido from detalle_pedido where idpedido = "+ idpedido +")";
+			logger.info(delete);
+			stm.executeUpdate(delete);
+			delete = "delete from detalle_pedido  where idpedido = "+ idpedido ;
+			logger.info(delete);
+			stm.executeUpdate(delete);
+			delete = "delete from pedido  where idpedido = "+ idpedido ;
+			logger.info(delete);
+			stm.executeUpdate(delete);
+			stm.close();
+			con1.close();
+		}
+		catch (Exception e){
+			logger.error(e.toString());
+			return(false);
+		}
+		return(true);
+	}
+	
 	public static boolean finalizarPedido(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -454,8 +486,8 @@ public class PedidoDAO {
 		//Llamado Inserciï¿½n Pixel
 		ArrayList <DetallePedidoPixel> EnvioPixel = PedidoDAO.InsertarPedidoPixel(idpedido);
 		
-		//Main.main(args, EnvioPixel);
-		Main principal = new Main();
+		//La invocación del pedido ya no se realizará así
+		//Main principal = new Main();
 		Cliente cliente = ClienteDAO.obtenerClienteporID(idcliente);
 		boolean indicadorAct = false;
 		if(insertado == 0)
@@ -467,7 +499,7 @@ public class PedidoDAO {
 		//Si memcode <> 0 y indicador igual a true hay que actualizar
 		//Si memcode <> 0 y indicador igual a false hay que actualizar
 		int memcode = cliente.getMemcode();
-		principal.main(EnvioPixel, tiendaPedido.getDsnTienda(),cliente.getMemcode(),cliente, indicadorAct);
+		//principal.main(EnvioPixel, tiendaPedido.getDsnTienda(),cliente.getMemcode(),cliente, indicadorAct);
 		if (memcode == 0)
 		{
 			ClienteDAO.actualizarClienteMemcode(cliente.getIdcliente(), cliente.getMemcode());
@@ -735,6 +767,41 @@ public class PedidoDAO {
 			}	
 		}
 		return(pedidoDefinitivoPixel);
+	}
+	
+	public static String obtenerUrlTienda(int idpedido)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		int idtienda = 0;
+		String url = "";
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		try
+		{
+			Statement stm = con1.createStatement();
+			String consulta = "select idtienda from pedido where idpedido = " + idpedido ; 
+			logger.info(consulta);
+			ResultSet rs = stm.executeQuery(consulta);
+			while(rs.next()){
+				idtienda = rs.getInt("idtienda");
+				break;
+			}
+			consulta = "select url from tienda where idtienda = " + idtienda;
+			logger.info(consulta);
+			rs = stm.executeQuery(consulta);
+			while(rs.next()){
+				url = rs.getString("url");
+				break;
+			}
+			rs.close();
+			stm.close();
+			con1.close();
+		}
+		catch (Exception e){
+			logger.error(e.toString());
+			
+		}
+		return(url);
 	}
 	
 	public static int RetornarIdproductoExterno(int idproductoint, int idespecialidadint)

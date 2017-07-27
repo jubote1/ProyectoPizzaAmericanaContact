@@ -23,6 +23,7 @@ var radioEsp1Ant= 0;
 var radioEsp1 = 0;
 var radioEsp2Ant= 0;
 var radioEsp2 = 0;
+var contadorItem = 1;
 
 
 
@@ -89,6 +90,7 @@ server = loc.href.substring(0, loc.href.length - ((loc.pathname + loc.search + l
     dtpedido = $('#grid-pedido').DataTable( {
     		"aoColumns": [
     		{ "mData": "iddetallepedido" },
+    		{ "mData": "numitem" , "visible": false },
             { "mData": "pizza" },
             { "mData": "otroprod" },
             { "mData": "cantidad" },
@@ -104,7 +106,32 @@ server = loc.href.substring(0, loc.href.length - ((loc.pathname + loc.search + l
                 className: "center",
                 defaultContent: '<input type="button" class="btn btn-default btn-xs" onclick="eliminarDetallePedido()" value="Eliminar"></button>'
             }
-        ]
+        ],
+        	"order": [[ 0, "desc" ]],
+        	"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+        		switch(aData.numitem){
+		            case 1:
+		                $(nRow).css('background-color', '#DEFCFF')
+		                break;
+		            case 2:
+		                $(nRow).css('background-color', '40E0D0')
+		                break;
+		            case 3:
+		                $(nRow).css('background-color', '#DEFCFF')
+		                break;
+		            case 4:
+		                $(nRow).css('background-color', '40E0D0')
+		                break;
+		            case 5:
+		                $(nRow).css('background-color', '#DEFCFF')
+		                break;
+		            case 6:
+		                $(nRow).css('background-color', '40E0D0')
+		                break;
+		            
+		        }
+    		}
+
     	} );
 
      
@@ -276,6 +303,7 @@ function eliminarDetallePedido(iddetallepedido)
 								    	}
 								    	$.getJSON(server + 'ObtenerTotalPedido?idpedido=' + idPedido, function(data){
 											var valorTotalDespues = data[0];
+											totalpedido = valorTotalDespues.valortotal;
 											$('#totalpedido').val(valorTotalDespues.valortotal);
 	    									$("#valordevolver").val($("#valorpago").val() - $("#totalpedido").val() );
 										});
@@ -971,29 +999,37 @@ function ocultarModalAdiciones()
 }*/
 
 //Procedimiento Ejecutado con todas las validaciones necesarias previo a realizar la insercion del  pedido en la base de datos
-function ConfirmarPedido()
+
+function ReiniciarPedido()
 {
-	
-	var valordevolver =  $("#valordevolver").val();
-	if(valordevolver >= 0)
-	{
-		$.confirm({
-				'title'		: 'Confirmacion de Creación de Pedido',
-				'content'	: 'Desea confirmar el Pedido Número ' + idPedido + '<br />El Pedido pasará a estado  Finalizado?',
+	$.confirm({
+				'title'		: 'Confirmacion para Cancelar Pedido',
+				'content'	: 'Desea confirmar la Cancelación del pedido?',
 				'buttons'	: {
 					'Si'	: {
 						'class'	: 'blue',
 						'action': function(){
-						
-							var resultado
-							var idformapago =  $("#selectformapago").val();
-							var valorformapago =  $("#valorpago").val();
-							$.ajax({ 
-		    				url: server + 'FinalizarPedido?idpedido=' + idPedido + "&idformapago=" + idformapago + "&valortotal=" + totalpedido + "&valorformapago=" + valorformapago + "&idcliente=" + idCliente + "&insertado=" + insertado , 
-		    				dataType: 'json', 
-		    				async: false, 
-		    				success: function(data){ 
-									resultado = data[0];
+							if (idPedido != 0)
+							{
+								//Es porque ya hemos realizado la inserción de algún item por lo tanto consumimos servicio para eliminar lo agregado del pedido
+								$.ajax({ 
+				    				url: server + 'EliminarPedidoSinConfirmar?idpedido=' + idPedido , 
+				    				dataType: 'json', 
+				    				async: false, 
+				    				success: function(data){
+				    					var resul =  data[0];
+				    					if (resul.respuesta == "true")
+				    					{
+
+				    					}
+				    				},
+									error: function(){
+									    alert('Se produjo un error en la Eliminación del pedido');
+									 } 
+
+								});
+							}
+									//Limpieza de las variables y campos del formulario												
 									var strClr = "";
 									idPedido = 0;
 									memcode = 0;
@@ -1027,7 +1063,7 @@ function ConfirmarPedido()
 							    		table.clear().draw();
 							    	}
 
-							    	if ( $.fn.dataTable.isDataTable( '#grid-clientes' ) ) {
+							    	if ( $.fn.dataTable.isDataTable( '#grid-pedido' ) ) {
 							    		table = $('#grid-pedido').DataTable();
 							    		table.clear().draw();
 							    	}
@@ -1037,7 +1073,106 @@ function ConfirmarPedido()
 									$("#valorpago").val('0');
 									$("#valordevolver").val('0');
 									
-								} 
+								
+							
+
+
+						}
+					},
+					'No'	: {
+						'class'	: 'gray',
+						'action': function(){}	// Nothing to do in this case. You can as well omit the action property.
+					}
+				}
+			});
+
+}
+
+function ConfirmarPedido()
+{
+	
+	var valordevolver =  $("#valordevolver").val();
+	if(valordevolver >= 0)
+	{
+		$.confirm({
+				'title'		: 'Confirmacion de Creación de Pedido',
+				'content'	: 'Desea confirmar el Pedido Número ' + idPedido + '<br />El Pedido pasará a estado  Finalizado?',
+				'buttons'	: {
+					'Si'	: {
+						'class'	: 'blue',
+						'action': function(){
+						
+							var resultado
+							var idformapago =  $("#selectformapago").val();
+							var valorformapago =  $("#valorpago").val();
+							$.ajax({ 
+		    				url: server + 'FinalizarPedido?idpedido=' + idPedido + "&idformapago=" + idformapago + "&valortotal=" + totalpedido + "&valorformapago=" + valorformapago + "&idcliente=" + idCliente + "&insertado=" + insertado , 
+		    				dataType: 'json', 
+		    				async: false, 
+		    				success: function(data){ 
+
+									resultado = data[0];
+									var urlTienda = resultado.url;
+									console.log(urlTienda);
+									//Ejecutamos el servicio para insertar en Pixel
+									$.ajax({ 
+				    				url: urlTienda + 'FinalizarPedidoPixel?idpedido=' + idPedido + "&idformapago=" + idformapago + "&valortotal=" + totalpedido + "&valorformapago=" + valorformapago + "&idcliente=" + idCliente + "&insertado=" + insertado , 
+				    				dataType: 'json', 
+				    				async: false, 
+				    				success: function(data){ 
+
+				    				}
+				    				});
+
+									var strClr = "";
+									idPedido = 0;
+									memcode = 0;
+									idCliente = 0;
+									contadorItem = 1;
+								    $('#otrosproductos').html(strClr);
+								    $('#especialidades').html(strClr);
+								    $('#pintarAdiciones').html(strClr);
+								    $('input:text[name=cantidad]').val('');
+								    //Se reinician valores por defecto
+								    $('input:radio[name=adicion]:nth(1)').attr('checked',true);
+								    $('input:radio[name=tamanoPizza]').attr('checked',false);
+								    $('input:radio[name=formapizza]').attr('checked',false);
+								    $('input:radio[name=liquido]').attr('checked',false);
+								    $("#selectExcepcion").val('vacio');
+								    $('#observacionDir').val('');
+								    $('#observacion').val('');
+								    //Adicional al clareo de todo el pedido
+								    $("#NumPedido").val('');
+									$("#IdCliente").val('');
+									$("#estadopedido").val('');
+									$('#telefono').val('');
+									$('#nombres').val('');
+									$('#apellidos').val('');
+									$('#nombreCompania').val('');
+							        $('#direccion').val('');
+							        $('#zona').val('');
+							        $('#observacionDir').val('');
+							        $("#selectTiendas").val('');
+							          if ( $.fn.dataTable.isDataTable( '#grid-clientes' ) ) {
+							    		table = $('#grid-clientes').DataTable();
+							    		table.clear().draw();
+							    	}
+
+							    	if ( $.fn.dataTable.isDataTable( '#grid-pedido' ) ) {
+							    		table = $('#grid-pedido').DataTable();
+							    		table.clear().draw();
+							    	}
+							    	$('input:radio[name=adicion]')[1].checked = true;
+							    	totalpedido = 0;
+							    	$("#totalpedido").val('0');
+									$("#valorpago").val('0');
+									$("#valordevolver").val('0');
+									
+								},
+								error: function(){
+								    alert('Se produjo un error en la inserción del Pedido');
+								 } 
+
 							});
 							
 
@@ -1288,6 +1423,7 @@ function agregarProducto()
 							
 							table.row.add( {
 								"iddetallepedido": idDetallePedido,
+								"numitem": contadorItem,
 						        "pizza":       pizza,
 						        "otroprod":   otroProd,
 						        "cantidad":    cantidad,
@@ -1345,6 +1481,7 @@ function agregarProducto()
 							
 							table.row.add( {
 								"iddetallepedido": idDetallePedido,
+								"numitem": contadorItem,
 						        "pizza":       pizza,
 						        "otroprod":   otroProd,
 						        "cantidad":    cantidad,
@@ -1403,6 +1540,7 @@ function agregarProducto()
 							
 							table.row.add( {
 								"iddetallepedido": idDetallePedido,
+								"numitem": contadorItem,
 						        "pizza":       pizza,
 						        "otroprod":   otroProd,
 						        "cantidad":    cantidad,
@@ -1641,6 +1779,7 @@ function agregarProducto()
 	{
 		table.row.add( {
 			"iddetallepedido": idDetallePedido,
+			"numitem": contadorItem,
 	        "pizza":       pizza,
 	        "otroprod":   otroProd,
 	        "cantidad":    cantidad,
@@ -1696,6 +1835,7 @@ function agregarProducto()
 	    marcadorAdiciones = 0;
 	    marcardorProductoCon = 0;
 		marcardorProductoSin = 0;
+		contadorItem = contadorItem + 1;
 	    var strClr = "";
 	    $('#otrosproductos').html(strClr);
 	    $('#especialidades').html(strClr);
@@ -2036,4 +2176,9 @@ function limpiarSeleccionCliente()
         $("#selectTiendas").val("");
         $("#selectMunicipio").val("");
         memcode = 0;
+        if ( $.fn.dataTable.isDataTable( '#grid-clientes' ) ) 
+        {
+			table = $('#grid-clientes').DataTable();
+			table.clear().draw();
+		}
 }
