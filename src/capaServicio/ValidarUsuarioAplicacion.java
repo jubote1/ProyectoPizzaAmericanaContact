@@ -15,6 +15,8 @@ import capaModelo.Usuario;
 
 /**
  * Servlet implementation class ValidarUsuarioAplicacion
+ * Servicio que es invocado siempre que es cargada una página con el fin de validar si quien accede esta logueado en el sistema
+ * en caso negativo se redirecciona a la URL de logueo a la aplicació.
  */
 @WebServlet("/ValidarUsuarioAplicacion")
 public class ValidarUsuarioAplicacion extends HttpServlet {
@@ -30,6 +32,9 @@ public class ValidarUsuarioAplicacion extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Este servicio retorna el atributo de tipo usuario y con base en este valida si el usuario si está logueado.Se 
+	 * retornan tres posibles valores NOK si la validación del usuario no es correcta, OKA si es un usuario administrador
+	 * y OK si es un usuario normal
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
@@ -37,7 +42,7 @@ public class ValidarUsuarioAplicacion extends HttpServlet {
 				Logger logger = Logger.getLogger("log_file");
 				HttpSession miSesion = (HttpSession) request.getSession();
 				Usuario usuario = (Usuario) miSesion.getAttribute("usuario");
-				boolean resultado;
+				String resultado ="" ;
 				//Al no existir el usuario logueado es posible que produza una excepcion
 				try
 				{
@@ -50,17 +55,21 @@ public class ValidarUsuarioAplicacion extends HttpServlet {
 				}catch(Exception e)
 				{
 					logger.error(e.toString());
-					resultado = false;
+					
 				}
 		        PrintWriter out = response.getWriter();
-		        if (resultado){
+		        if (resultado.equals(new  String ("N")) ){
 		        		out.write("OK");
 		        		//response.sendRedirect("http://localhost:8080/ProyectoPizzaAmericana/Pedidos.html");
-		        }
-		        else{
-		        	   	out.write("NOK");
+		        } 
+		        else if(resultado.equals(new  String ("S"))){
+		        	   	out.write("OKA");
 		        	
+		        }else
+		        {
+		        	out.write("NOK");
 		        }
+		        	
 	}
 
 	/**

@@ -11,22 +11,7 @@ $(document).ready(function() {
 	
 
 		//Lo primero que realizaremos es validar si está logueado
-	$.ajax({ 
-	    	url: server + 'ValidarUsuarioAplicacion', 
-	    	dataType: 'text',
-	    	type: 'post', 
-	    	async: false, 
-	    	success: function(data){ 
-		    	if(data == 'OK')
-		    	{
-		    	}
-		    	else
-		    	{
-		    		location.href ="http://localhost:8080/ProyectoPizzaAmericana/Index.html";
-		    	}
-		    	console.log("OJO" + data);
-			} 
-		});
+	
 		
 	    table = $('#grid-tiendas').DataTable( {
     		"aoColumns": [

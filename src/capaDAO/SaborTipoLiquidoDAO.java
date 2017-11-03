@@ -1,6 +1,7 @@
 package capaDAO;
 
 import java.sql.Connection;
+
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -8,8 +9,17 @@ import java.util.ArrayList;
 import capaModelo.SaborLiquido;
 import conexion.ConexionBaseDatos;
 import org.apache.log4j.Logger;
+/**
+ * Clase que implementa toda la interacción con la base de datos para la entidad Sabor Tipo Liquido.
+ * @author JuanDavid
+ *
+ */
 public class SaborTipoLiquidoDAO {
 	
+	/**
+	 * Método que se encarga de retornar todos los sabores tipo liquido definidos en el sistema.
+	 * @return Se retorna un ArrayList con todos los sabores Tipo Liquido definidos en el sistema.
+	 */
 	public static ArrayList<SaborLiquido> obtenerSaborLiquidos()
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -29,13 +39,27 @@ public class SaborTipoLiquidoDAO {
 				SaborLiquido saborliquido = new SaborLiquido(idsaborxtipoliquido,descripcion,idtipoliquido);
 				saborliquidos.add(saborliquido);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(saborliquidos);
 		
 	}
 	
+	/**
+	 * Método que se encarga de retornar todos los sabores tipo liquido definidos en el sistema, en el formato básico
+	 * para el GRID que implementa el CRUD de la entidad en la capa de presentación.
+	 * @return Se retorna un ArrayList con todas las entidades sabor tipo liquido definidas en el sistema.
+	 */
 	public static ArrayList<SaborLiquido> obtenerSaborLiquidosGrid()
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -56,13 +80,28 @@ public class SaborTipoLiquidoDAO {
 				SaborLiquido saborliquido = new SaborLiquido(idsaborxtipoliquido,descripcion,idtipoliquido,nombreliquido);
 				saborliquidos.add(saborliquido);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.info(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(saborliquidos);
 		
 	}
 	
+	/**
+	 * Método que se encarga de insertar un sabor tipo liquido de acuerdo a los valores ingresados como parámetro
+	 * @param pro Se recibe como parámetro un objeto de Modelo Sabor Tipo Liquido con base en el cual se realiza
+	 * la inserción de la entidad.
+	 * @return Se retorna un valor entero con el id sabor tipo liquido creado en la base de datos.
+	 */
 	public static int insertarSaborTipoLiquido(SaborLiquido pro)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -85,11 +124,21 @@ public class SaborTipoLiquidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			return(0);
 		}
 		return(idSaborLiquidoIns);
 	}
 
+	/**
+	 * Método que se encarga de la eliminación de un sabor tipo líquido de la base de datos, con base en la información recibida como parámetro.
+	 * @param idsabortipoliquido Se recibe como parámetro el idsabortipoliquido, con base en el cual se realiza la eliminación.
+	 */
 	public static void eliminarSaborTipoLiquido(int idsabortipoliquido)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -106,11 +155,22 @@ public class SaborTipoLiquidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
-			
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		
 	}
 
+	/**
+	 * Método mediante el cual se realiza la consulta de un sabor tipo liquido con base el parámetro recibido.
+	 * @param idsabortipoliquido Se recibe como parámetro valor entero que indica el sabor tipo liquido que se requiere 
+	 * consultar.
+	 * @return Se retorna objeto de Modelo SaborTipoLiquido en el cual se retorna la entidad sabor tipo liquido consultada.
+	 */
 	public static SaborLiquido retornarSaborTipoLiquido(int idsabortipoliquido)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -138,11 +198,23 @@ public class SaborTipoLiquidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			
 		}
 		return(Pro);
 	}
 
+	/**
+	 * Método que permite la edición de un sabor tipo liquido con base en la información enviada como parámetro.
+	 * @param Pro Se recibe como párametro un objeto Modelo SaborTipoLiquido que contiene la información básica
+	 * para la modificación.
+	 * @return Se retorna un valor String que indica el resultado del proceso.
+	 */
 	public static String editarSaborTipoLiquido(SaborLiquido Pro)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -158,10 +230,16 @@ public class SaborTipoLiquidoDAO {
 			resultado = "exitoso";
 			stm.close();
 			con1.close();
-			System.out.println(update);
+			
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			resultado = "error";
 		}
 		return(resultado);

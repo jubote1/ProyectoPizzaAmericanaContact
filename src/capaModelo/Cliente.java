@@ -1,6 +1,10 @@
 package capaModelo;
 
-
+/**
+ * Clase que implementa la entidad Cliente en el sistema
+ * @author JuanDavid
+ *
+ */
 public class Cliente {
 
 	private int idcliente;

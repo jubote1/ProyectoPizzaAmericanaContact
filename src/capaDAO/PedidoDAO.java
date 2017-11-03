@@ -5,9 +5,15 @@ import pixelpos.Main;
 
 import java.sql.Connection;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import capaModelo.Especialidad;
+import capaModelo.ExcepcionPrecio;
+import capaModelo.FormaPago;
+import capaModelo.HomologaGaseosaIncluida;
+import capaModelo.InsertarPedidoPixel;
 import capaModelo.Producto;
 import capaModelo.SaborLiquido;
 import capaModelo.Tienda;
@@ -21,12 +27,17 @@ import org.apache.log4j.Logger;
 //import pixelpos.Main;
 import capaModelo.DetallePedidoPixel;
 import capaModelo.ModificadorDetallePedido;
+import capaModelo.ProductoIncluido;
 
 import java.sql.ResultSet;
+import java.util.Date;
 
 public class PedidoDAO {
 	
-	
+	/**
+	 * Método que se encarga de obtener todas especialidades de Pizza definidos en el sistema.
+	 * @return Se retorna un ArrayList con todas las especialidades definidas en la base de datos.
+	 */
 	public static ArrayList<Especialidad> obtenerEspecialidad()
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -36,7 +47,7 @@ public class PedidoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select e.idespecialidad, e.nombre, e.abreviatura from especialidad e";
+			String consulta = "select e.idespecialidad, e.nombre, e.abreviatura from especialidad e order by nombre asc";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idespecialidad;
@@ -49,13 +60,29 @@ public class PedidoDAO {
 				Especialidad espec = new Especialidad( idespecialidad, nombre, abreviatura);
 				especialidades.add(espec);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
+			
 		}catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+				
+			}
 		}
 		return(especialidades);
 		
 	}
 	
+	/**
+	 * Método que se encarga de retornar un ArrayList con objetos de Modelo Producto que correspongan a la tipología
+	 * otro productos
+	 * @return Se retorna ArrayList con objetos de Modelo Producto que correspongan a la tipología otros productos.
+	 */
 	public static ArrayList<Producto> obtenerOtrosProductos()
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -86,14 +113,26 @@ public class PedidoDAO {
 				Producto prod = new Producto(idProducto, idReceta, nombre, descripcion,impuesto, tipo,precio);
 				otrosProducto.add(prod);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.error(e.toString());
-			
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(otrosProducto);
 		
 	}
 	
+	/**
+	 * Método que se encarga de retornar los productos tipo adición.
+	 * @return Se retorna un ArrayLista con entidades MOdelo Producto de la tipología de producto Adición.
+	 */
 	public static ArrayList<Producto> obtenerAdicionProductos()
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -124,13 +163,26 @@ public class PedidoDAO {
 				Producto prod = new Producto(idProducto, idReceta, nombre, descripcion,impuesto, tipo,precio);
 				adicionProducto.add(prod);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(adicionProducto);
 		
 	}
 
+	/**
+	 * Método que se encarga de retornar todos los prodcutos definidos en el sistema
+	 * @return Se retorna un arrayList con objetos Modelo Producto, todos los definidos en el sistema.
+	 */
 	public static ArrayList<Producto> obtenerTodosProductos() {
 		Logger logger = Logger.getLogger("log_file");
 		ArrayList<Producto> todosProducto = new ArrayList();
@@ -139,7 +191,7 @@ public class PedidoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select p.idproducto, p.idreceta, p.nombre, p.descripcion, p.impuesto, p.tipo, p.producto_asocia_adicion, p.preciogeneral, p.incluye_liquido, p.idtipo_liquido from producto p  ";
+			String consulta = "select p.idproducto, p.idreceta, p.nombre, p.descripcion, p.impuesto, p.tipo, p.producto_asocia_adicion, p.preciogeneral, p.incluye_liquido, p.idtipo_liquido, p.manejacantidad from producto p order by nombre asc ";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idProducto;
@@ -152,6 +204,7 @@ public class PedidoDAO {
 			double precio;
 			String incluye_liquido;
 			int idtipo_liquido;
+			String manejacantidad;
 			while(rs.next()){
 				idProducto = rs.getInt("idproducto");
 				idReceta = rs.getInt("idreceta");
@@ -163,16 +216,32 @@ public class PedidoDAO {
 				precio = rs.getDouble("preciogeneral");
 				incluye_liquido = rs.getString("incluye_liquido");
 				idtipo_liquido = rs.getInt("idtipo_liquido");
-				Producto prod = new Producto(idProducto, idReceta, nombre, descripcion,impuesto, tipo,productoasociaadicion, precio, incluye_liquido, idtipo_liquido);
+				manejacantidad = rs.getString("manejacantidad");
+				Producto prod = new Producto(idProducto, idReceta, nombre, descripcion,impuesto, tipo,productoasociaadicion, precio, incluye_liquido, idtipo_liquido, manejacantidad);
 				todosProducto.add(prod);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(todosProducto);
 		
 	}
 	
+	/**
+	 * Método que se encarga de retornar los sabores líquido definidos para un producto.
+	 * @param idProdu Se recibe como parámetro el id producto del cual se desean consultar los sabores tipo liquidos
+	 * disponibles por parametrización.
+	 * @return Se retorna un ArrayList con objetos Modelo SaborLiquido con la información según los parámetros recibidos.
+	 */
 	public static ArrayList<SaborLiquido> ObtenerSaboresLiquidoProducto(int idProdu)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -202,15 +271,30 @@ public class PedidoDAO {
 				SaborLiquido saborLiq = new SaborLiquido(idSaborTipoLiquido, descripcionSabor,idLiquido,descripcionLiquido,idProducto,nombreProducto);
 				saboresLiquido.add(saborLiq);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 			
 		}
 			catch (Exception e){
 				logger.error(e.toString());
+				try
+				{
+					con1.close();
+				}catch(Exception e1)
+				{
+				}
 		}
 		return(saboresLiquido);
 	}
 	
-	
+	/**
+	 * Método que retorna los sabores tipo liquido que tiene disponible un excepción de precio.
+	 * @param idExce Se recibe como parámetro un entero con el idexcepcion del cual se quiere consultar
+	 * los sabores de liquido disponible
+	 * @return Se retorna un ArrayList con objetos MOdelo SaborLiquido de acuerdo a la excepcion pasada como 
+	 * parámetro.
+	 */
 	public static ArrayList<SaborLiquido> ObtenerSaboresLiquidoExcepcion(int idExce)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -240,26 +324,56 @@ public class PedidoDAO {
 				SaborLiquido saborLiq = new SaborLiquido(idSaborTipoLiquido, descripcionSabor,idLiquido,descripcionLiquido,nombreExcepcion, idExcepcion);
 				saboresLiquido.add(saborLiq);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 			
 		}
 			catch (Exception e){
 				logger.error(e.toString());
+				try
+				{
+					con1.close();
+				}catch(Exception e1)
+				{
+				}
 		}
 		
 		return(saboresLiquido);
 	}
 	
 	
-	public static int InsertarEncabezadoPedido(int idtienda, int idcliente)
+	/**
+	 * Método que se encarga de insertar el encabezado de un pedido.
+	 * @param idtienda Se recibe la tienda a la cual pertenecerá el pedido.
+	 * @param idcliente Se recibe el idcliente para el cual se tomará el pedido
+	 * @param fechaPedido Se inserta la fecha del pedido.
+	 * @return Se retorna el idpedido retornado en por la base de datos en la inserción.
+	 */
+	public static int InsertarEncabezadoPedido(int idtienda, int idcliente, String fechaPedido, String user)
 	{
 		Logger logger = Logger.getLogger("log_file");
 		int idPedidoInsertado = 0;
 		ConexionBaseDatos con = new ConexionBaseDatos();
 		Connection con1 = con.obtenerConexionBDPrincipal();
+		Date fechaTemporal = new Date();
+		DateFormat formatoFinal = new SimpleDateFormat("yyyy-MM-dd");
+		String fechaPedidoFinal ="";
+		try
+		{
+			fechaTemporal = new SimpleDateFormat("dd/MM/yyyy").parse(fechaPedido);
+			fechaPedidoFinal = formatoFinal.format(fechaTemporal);
+			
+		}catch(Exception e){
+			logger.error(e.toString());
+			return(0);
+		}
+		
+		
 		try
 		{
 			Statement stm = con1.createStatement();
-			String insert = "insert into pedido (idtienda,idcliente, idestadopedido) values (" + idtienda + ", " + idcliente + ", 1" + ")"; 
+			String insert = "insert into pedido (idtienda,idcliente, idestadopedido,fechapedido, usuariopedido) values (" + idtienda + ", " + idcliente + ", 1 , '" + fechaPedidoFinal  + "' , '" + user + "')"; 
 			logger.info(insert);
 			stm.executeUpdate(insert);
 			ResultSet rs = stm.getGeneratedKeys();
@@ -273,12 +387,24 @@ public class PedidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			return(0);
 		}
 		return(idPedidoInsertado);
 	}
 	
 	
+	/**
+	 * Método que se encarga de ir insertando uno a uno los item pedido solicitados por el cliente.
+	 * @param detPedido Se recibe como parámetro en un objeto Modelo DetallePedido la información de cada detalle pedido
+	 * y se va insertando en base de datos
+	 * @return Con respuesta se va obteniendo un número entero con el iddetallepedido
+	 */
 	public static int InsertarDetallePedido(DetallePedido detPedido)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -302,11 +428,24 @@ public class PedidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			return(0);
 		}
 		return(idDetallePedidoInsertado);
 	}
 	
+	/**
+	 * Método que se encarga de insertar el detalle de la adición en otra tabla relacional que involucra un iddetallepedido
+	 * un idadición
+	 * @param detPedidoAdicion Se recibe objeto Modelo DetallePedidoAdicion con base en el cual se realiza la inserción
+	 * del detalle de adición para un producto determinado
+	 * @return Se retorna el id asociado a la inserción realizada
+	 */
 	public static int InsertarDetalleAdicion(DetallePedidoAdicion detPedidoAdicion)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -332,11 +471,23 @@ public class PedidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			return(0);
 		}
 		return(idAdicion);
 	}
 	
+	/**
+	 * Método que se encarga de insertar la información de un modificador CON/SIN de un detalle pedido en particular
+	 * @param modDetallePedido Recibe como parámetro el objeto Modelo ModificadorDetallePedido con la información
+	 * a insertar
+	 * @return Retorne en un entero el idmodificador retornado luego de la inserción en base de datos.
+	 */
 	public static int InsertarModificadorDetallePedido(ModificadorDetallePedido modDetallePedido)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -346,9 +497,9 @@ public class PedidoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String insert = "insert modificador_detalle_pedido (iddetallepedidopadre, idproductoespecialidad1,idproductoespecialidad2,cantidad) "
+			String insert = "insert modificador_detalle_pedido (iddetallepedidopadre, idproductoespecialidad1,idproductoespecialidad2,cantidad,iddetallepedidoasociado) "
 					+ "values (" + modDetallePedido.getIddetallepedidopadre() + " , " + modDetallePedido.getIdproductoespecialidad1() + " , "
-							+  modDetallePedido.getIdproductoespecialidad2() + " , " + modDetallePedido.getCantidad() + ")"; 
+							+  modDetallePedido.getIdproductoespecialidad2() + " , " + modDetallePedido.getCantidad() + " , " + modDetallePedido.getIddetallepedidoasociado() + ")"; 
 			logger.info(insert);
 			stm.executeUpdate(insert);
 			ResultSet rs = stm.getGeneratedKeys();
@@ -362,11 +513,22 @@ public class PedidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			return(0);
 		}
 		return(idModificador);
 	}
 	
+	/**
+	 * Método que permite retornar un idespecialidad, con base en el nombre especialidad pasado como parámetro
+	 * @param especialidad Se recibe como parámetro un String el nombre de la especialidad.
+	 * @return Se retorna el idespecialidad asociado a la especialidad enviada como parámetro.
+	 */
 	public static int obtenerIdEspecialidad(String especialidad)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -389,11 +551,23 @@ public class PedidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			return(0);
 		}
 		return(idespecialidad);
 	}
 	
+	/**
+	 * Método que se encarga de obtener el valor total de un pedido, con base en todos los detalles asociados a un pedido
+	 * en particular.
+	 * @param idpedido Se recibe como parámetro el idpedido del cual se requiere obtener el total.
+	 * @return Se retorna un valor doble que tiene el total del valor del pedido pasado como parámetro.
+	 */
 	public static double obtenerTotalPedido(int idpedido)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -411,15 +585,64 @@ public class PedidoDAO {
 				valorTotal = rs.getDouble(1);
 				break;
 			}
+			
+			rs.close();
+			stm.close();
+			con1.close();
 		}
 		catch (Exception e){
 			logger.error(e.toString());
 			valorTotal = 0;
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
-		System.out.println(valorTotal);
+		
 		return(valorTotal);
 	}
 	
+	/**
+	 * Método que se encarga de actualizar un pedido con el número de pedido el cual le fue asignado en la tienda correspondiente.
+	 * @param idpedido Se recibe como parámetro el idpedido en el sistema de Contact Center.
+	 * @param numPedidoPixel Se recibe el número de pedido que le fue asignado al pedido en la tienda correspondiente.
+	 * @return Se retorna un valor booleano que indica si la actualización fue exitosa(true) o no fue exitosa(false).
+	 */
+	public static boolean actualizarEstadoNumeroPedidoPixel(int idpedido, int numPedidoPixel)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		try
+		{
+			Statement stm = con1.createStatement();
+			// Actualizamos la tabla pedido con el numero pedido pixel y le ponemos estado al pedido = 1, indicando que ya fue enviado a la tienda.
+			String update = "update pedido set numposheader = " + numPedidoPixel + " , enviadoPixel = 1  where idpedido = "+ idpedido;
+			logger.info(update);
+			stm.executeUpdate(update);
+			stm.close();
+			con1.close();
+		}
+		catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+			return(false);
+		}
+		return(true);
+	}
+	
+	/**
+	 * Método que se encarga de eliminar un pedido que no ha sido confirmado en el sistema.
+	 * @param idpedido Se recibe como parámetro el idpedido que se desea eliminar.
+	 * @return Se retorna valor booleano indicando si el proceso fue exitoso (true) o si no fue exitoso (false).
+	 */
 	public static boolean eliminarPedidoSinConfirmar(int idpedido)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -445,12 +668,56 @@ public class PedidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			return(false);
 		}
 		return(true);
 	}
 	
-	public static boolean finalizarPedido(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado)
+	public static boolean actualizarJSONPedido(int idpedido, String resultadoJSON)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		try
+		{
+			Statement stm = con1.createStatement();
+			String update = "update pedido set stringpixel = '" + resultadoJSON + "' where idpedido = "+ idpedido;
+			logger.info(update);
+			stm.executeUpdate(update);
+			stm.close();
+			con1.close();
+		}
+		catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+			return(false);
+		}
+		return(true);
+	}
+	
+	/**
+	 * Método que se encarga de cerrar un pedido, para no poder adicionarle más detalles, con el cual se totaliza la 
+	 * información.
+	 * @param idpedido El id pedido que se finalizará.
+	 * @param idformapago La forma pago que tendrá el pedido que se va finalizar.
+	 * @param valorformapago Valor con el cual se pagará el pedido.
+	 * @param valortotal
+	 * @param idcliente idcliente asociado al pedido.
+	 * @param insertado Marcación que indica si el cliente fue actualizado o insertado.
+	 * @return Se retorna un valor booleano con el resultado del proceso exitoso (true) o no exitoso (false).
+	 */
+	public static InsertarPedidoPixel finalizarPedido(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado)
 	{
 		Logger logger = Logger.getLogger("log_file");
 		ConexionBaseDatos con = new ConexionBaseDatos();
@@ -478,14 +745,24 @@ public class PedidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
-			return(false);
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+			
 		}
 		//Debemos obtener el idTienda del Pedido que vamos a finalizar
 		Tienda tiendaPedido = PedidoDAO.obtenerTiendaPedido(idpedido);
 		
-		//Llamado Inserciï¿½n Pixel
-		ArrayList <DetallePedidoPixel> EnvioPixel = PedidoDAO.InsertarPedidoPixel(idpedido);
 		
+		//Recuperar la formapago de la tienda homologada
+		int idformapagotienda = PedidoDAO.obtenerFormaPagoHomologadaTienda(tiendaPedido.getIdTienda(), idformapago);
+		
+		//Llamado Inserciï¿½n Pixel
+		
+				
 		//La invocación del pedido ya no se realizará así
 		//Main principal = new Main();
 		Cliente cliente = ClienteDAO.obtenerClienteporID(idcliente);
@@ -495,280 +772,51 @@ public class PedidoDAO {
 			indicadorAct = true;
 		}
 		
-		//Si memcode = 0 es porque hay que crear el cliente
-		//Si memcode <> 0 y indicador igual a true hay que actualizar
-		//Si memcode <> 0 y indicador igual a false hay que actualizar
-		int memcode = cliente.getMemcode();
-		//principal.main(EnvioPixel, tiendaPedido.getDsnTienda(),cliente.getMemcode(),cliente, indicadorAct);
-		if (memcode == 0)
-		{
-			ClienteDAO.actualizarClienteMemcode(cliente.getIdcliente(), cliente.getMemcode());
-		}
-		return(true);
+		// Recolectamos todos los datos para realizar la inserción en el POS tienda
+		InsertarPedidoPixel pedidoPixel = PedidoPixelDAO.confirmarPedidoPixel(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado, idformapagotienda);
+		return(pedidoPixel);
 	}
 	
-	public static ArrayList<DetallePedidoPixel> InsertarPedidoPixel(int idpedido)
+	/**
+	 * Método que se encarga de ciertas acciones propias de la confirmación del pedido en el sistema tienda, dado que en el sistema
+	 * de contact center ya fue confirmada la información.
+	 * @param idpedido
+	 * @param idformapago
+	 * @param valorformapago
+	 * @param valortotal
+	 * @param idcliente
+	 * @param insertado
+	 * @return
+	 */
+	public static InsertarPedidoPixel finalizarPedidoReenvio(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado)
 	{
 		Logger logger = Logger.getLogger("log_file");
-		logger.info("Se inicia la homologaciï¿½n para base de datos Pixel, para el pedido " + idpedido);
-		//Tener en cuenta que tenemos en homologaciï¿½n el producto 10000 interno que harï¿½ el simil al producto de mensaje en Pixel
-		ArrayList <DetallePedido> pedidoPixel = PedidoDAO.ConsultarDetallePedidoSinAdiciones(idpedido);
-		ArrayList <DetallePedidoPixel> pedidoDefinitivoPixel = new ArrayList();
-		double cantidadPixel;
-		int idproductoext;
-		int idproductomaestroext;
-		int idproductoextsep;
-		int idSaborTipoLiquido;
-		//extraemos el cï¿½digo producto pixel de la gaseosa para las que van dentro de los combos
-		int idproductogasext;
-		ArrayList<DetallePedidoAdicion> adicionDetallePedido = new ArrayList();
-		ArrayList<ModificadorDetallePedido> modificadoresDetallePedido = new ArrayList();
-		for (DetallePedido cadaDetallePedido: pedidoPixel)
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		
+		//Debemos obtener el idTienda del Pedido que vamos a finalizar
+		Tienda tiendaPedido = PedidoDAO.obtenerTiendaPedido(idpedido);
+		
+		
+		//Recuperar la formapago de la tienda homologada
+		int idformapagotienda = PedidoDAO.obtenerFormaPagoHomologadaTienda(tiendaPedido.getIdTienda(), idformapago);
+		Cliente cliente = ClienteDAO.obtenerClienteporID(idcliente);
+		boolean indicadorAct = false;
+		if(insertado == 0)
 		{
-			adicionDetallePedido = PedidoDAO.ObtenerAdicionDetallePedido(cadaDetallePedido.getIddetallepedido());
-			modificadoresDetallePedido = PedidoDAO.ObtenerModificadorDetallePedido(cadaDetallePedido.getIddetallepedido());
-			//Aqui tendremos la lï¿½gica para generar un array list
-			//Definimos la cantidad del item que se va a pasar al otro sistema
-			int cantidad = (int) cadaDetallePedido.getCantidad();
-			// si no se tiene especialidad ni en uno ni en dos no serï¿½a un producto no pizza
-			if(cadaDetallePedido.getIdespecialidad1() == 0 && cadaDetallePedido.getIdespecialidad2() == 0)
-			{
-				cantidadPixel = cadaDetallePedido.getCantidad();
-				idSaborTipoLiquido = cadaDetallePedido.getIdsabortipoliquido();
-				idproductoext = PedidoDAO.RetornarIdproductoExterno(cadaDetallePedido.getIdproducto(), 0);
-				pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cantidadPixel));
-				logger.debug(idproductoext + " , " + cantidadPixel);
-				for(DetallePedidoAdicion cadaAdicion: adicionDetallePedido)
-				{
-					if(cadaAdicion.getCantidad1() > 0)
-					{
-						idproductoext = PedidoDAO.RetornarIdproductoExterno(cadaAdicion.getIdproducto(), 0);
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad1()));
-						logger.debug(idproductoext + " , " + cadaAdicion.getCantidad1());
-					}
-					else if(cadaAdicion.getCantidad2() > 0)
-					{
-						idproductoext = PedidoDAO.RetornarIdproductoExterno(cadaAdicion.getIdproducto(), 0);
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad2()));
-						logger.debug(idproductoext + " , " + cadaAdicion.getCantidad2());
-					}
-					
-				}
-				//Recorremos los modificadores
-				
-				for(ModificadorDetallePedido cadaModificador: modificadoresDetallePedido)
-				{
-					if(cadaModificador.getIdproductoespecialidad1()>0)
-					{
-						idproductoext = PedidoDAO.RetornarIdproductoExterno(cadaModificador.getIdproductoespecialidad1(), 0);
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()));
-						logger.debug(idproductoext + " , " + cadaModificador.getCantidad());
-					}
-					
-					if(cadaModificador.getIdproductoespecialidad2()>0)
-					{
-						idproductoext = PedidoDAO.RetornarIdproductoExterno(cadaModificador.getIdproductoespecialidad2(), 0);
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()));
-						logger.debug(idproductoext + " , " + cadaModificador.getCantidad());
-					}
-					
-				}
-				
-				//Debemos revisar si el producto lleva gaseosa, en cuyo caso en el detalle del pedido debe ir un valor diferente a cero
-				if (idSaborTipoLiquido > 0)
-				{
-					idproductoext = PedidoDAO.RetornarIdprodGaseosaPromo(idSaborTipoLiquido);
-					pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cantidadPixel));
-					logger.debug(idproductoext + " , " + cantidadPixel);
-					
-				}
-				//Poner separador 0,0
-				pedidoDefinitivoPixel.add(new DetallePedidoPixel(0, 0));
-				logger.debug(0 + " , " + 0);
-				
-			}
-			else
-			{
-				//Requerimos de un ciclo for para dividir la pizza si es el caso en varias
-				for(int i = 1; i <= cantidad; i++)
-				{
-					if((cadaDetallePedido.getIdespecialidad1() > 0)&&(cadaDetallePedido.getIdespecialidad2() == 0))
-					{
-						//En las pizzas y con base en la pizza que se estï¿½ facturando, al principio debo de tener un master item
-						//Master ITEM Se harï¿½ la homologaciï¿½n entre el cï¿½digo producto y la excepciï¿½n de precio
-						idproductomaestroext = PedidoDAO.RetornarIdproductoMaestroExterno(cadaDetallePedido.getIdproducto(), cadaDetallePedido.getIdexcepcion());
-						int idproductopizza = 0;
-						cantidadPixel = 0.5;
-						idSaborTipoLiquido = cadaDetallePedido.getIdsabortipoliquido();
-						//Adicionamos el producto maestro con cantidad 1
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductomaestroext, 1));
-						logger.debug(idproductomaestroext + " , " + cantidadPixel);
-						
-						idproductoextsep = PedidoDAO.RetornarIdproductoExterno(10000, 0);
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoextsep, cantidadPixel));
-						logger.debug(idproductoextsep + " , " + cantidadPixel);
-						
-						idproductopizza = PedidoDAO.RetornarIdproductoExterno(cadaDetallePedido.getIdproducto(), cadaDetallePedido.getIdespecialidad1());
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductopizza, cantidadPixel));
-						logger.debug(idproductopizza + " , " + cantidadPixel);
-						
-						//Aqui se ingresan la adiciones y los modificadores
-						for(DetallePedidoAdicion cadaAdicion: adicionDetallePedido)
-						{
-							if(cadaAdicion.getIdespecialidad1() > 0)
-							{
-								idproductoext = PedidoDAO.RetornarIdproductoExterno(cadaAdicion.getIdproducto(), 0);
-								pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad1()));
-								logger.debug(idproductoext + " , " + cadaAdicion.getCantidad1());
-							}
-						}
-						
-						//Recorremos los modificadores
-						
-						for(ModificadorDetallePedido cadaModificador: modificadoresDetallePedido)
-						{
-							if(cadaModificador.getIdproductoespecialidad1()>0)
-							{
-								idproductoext = PedidoDAO.RetornarIdproductoExterno(cadaModificador.getIdproductoespecialidad1(), 0);
-								pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()/2));
-								logger.debug(idproductoext + " , " + cadaModificador.getCantidad()/2);
-							}
-							
-						}
-						
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoextsep, cantidadPixel));
-						logger.debug(idproductoextsep + " , " + cantidadPixel);
-						
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductopizza, cantidadPixel));
-						logger.debug(idproductopizza + " , " + cantidadPixel);
-						
-						for(DetallePedidoAdicion cadaAdicion: adicionDetallePedido)
-						{
-							if(cadaAdicion.getIdespecialidad2() > 0)
-							{
-								idproductoext = PedidoDAO.RetornarIdproductoExterno(cadaAdicion.getIdproducto(), 0);
-								pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad2()));
-								logger.debug(idproductoext + " , " + cadaAdicion.getCantidad2());
-							}
-						}
-						
-						for(ModificadorDetallePedido cadaModificador: modificadoresDetallePedido)
-						{
-							if(cadaModificador.getIdproductoespecialidad1()>0)
-							{
-								idproductoext = PedidoDAO.RetornarIdproductoExterno(cadaModificador.getIdproductoespecialidad1(), 0);
-								pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()/2));
-								logger.debug(idproductoext + " , " + cadaModificador.getCantidad()/2);
-							}
-							
-						}
-						
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoextsep, cantidadPixel));
-						logger.debug(idproductoextsep + " , " + cantidadPixel);
-						
-						//Debemos revisar si el producto lleva gaseosa, en cuyo caso en el detalle del pedido debe ir un valor diferente a cero
-						if (idSaborTipoLiquido > 0)
-						{
-							idproductoext = PedidoDAO.RetornarIdprodGaseosaPromo(idSaborTipoLiquido);
-							pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, 1));
-							logger.debug(idproductoext + " , " + cantidadPixel);
-							
-						}
-						//Poner separador 0,0
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(0, 0));
-						logger.debug(0 + " , " + 0);
-						
-					}else
-					{
-						//En las pizzas y con base en la pizza que se estï¿½ facturando, al principio debo de tener un master item
-						//Master ITEM Se harï¿½ la homologaciï¿½n entre el cï¿½digo producto y la excepciï¿½n de precio
-						idproductomaestroext = PedidoDAO.RetornarIdproductoMaestroExterno(cadaDetallePedido.getIdproducto(), cadaDetallePedido.getIdexcepcion());
-						cantidadPixel = 0.5;
-						idSaborTipoLiquido = cadaDetallePedido.getIdsabortipoliquido();
-						//Adicionamos el producto maestro con cantidad 1
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductomaestroext, 1));
-						logger.debug(idproductomaestroext + " , " + cantidadPixel);
-						
-						idproductoextsep = PedidoDAO.RetornarIdproductoExterno(10000, 0);
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoextsep, cantidadPixel));
-						logger.debug(idproductoextsep + " , " + cantidadPixel);
-						
-						idproductoext = PedidoDAO.RetornarIdproductoExterno(cadaDetallePedido.getIdproducto(), cadaDetallePedido.getIdespecialidad1());
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cantidadPixel));
-						logger.debug(idproductoext + " , " + cantidadPixel);
-						
-						for(DetallePedidoAdicion cadaAdicion: adicionDetallePedido)
-						{
-							if(cadaAdicion.getIdespecialidad1() > 0)
-							{
-								idproductoext = PedidoDAO.RetornarIdproductoExterno(cadaAdicion.getIdproducto(), 0);
-								pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad1()));
-								logger.debug(idproductoext + " , " + cadaAdicion.getCantidad1());
-							}
-						}
-						
-						for(ModificadorDetallePedido cadaModificador: modificadoresDetallePedido)
-						{
-							if(cadaModificador.getIdproductoespecialidad1()>0)
-							{
-								idproductoext = PedidoDAO.RetornarIdproductoExterno(cadaModificador.getIdproductoespecialidad1(), 0);
-								pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()/2));
-								logger.debug(idproductoext + " , " + cadaModificador.getCantidad()/2);
-							}
-							
-						}
-						
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoextsep, cantidadPixel));
-						logger.debug(idproductoextsep + " , " + cantidadPixel);
-						
-						idproductoext = PedidoDAO.RetornarIdproductoExterno(cadaDetallePedido.getIdproducto(), cadaDetallePedido.getIdespecialidad2());
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cantidadPixel));
-						logger.debug(idproductoext + " , " + cantidadPixel);
-						
-						for(DetallePedidoAdicion cadaAdicion: adicionDetallePedido)
-						{
-							if(cadaAdicion.getIdespecialidad2() > 0)
-							{
-								idproductoext = PedidoDAO.RetornarIdproductoExterno(cadaAdicion.getIdproducto(), 0);
-								pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad2()));
-								logger.debug(idproductoext + " , " + cadaAdicion.getCantidad2());
-							}
-						}
-						
-						for(ModificadorDetallePedido cadaModificador: modificadoresDetallePedido)
-						{
-							if(cadaModificador.getIdproductoespecialidad2()>0)
-							{
-								idproductoext = PedidoDAO.RetornarIdproductoExterno(cadaModificador.getIdproductoespecialidad2(), 0);
-								pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()/2));
-								logger.debug(idproductoext + " , " + cadaModificador.getCantidad()/2);
-							}
-							
-						}
-						
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoextsep, cantidadPixel));
-						logger.debug(idproductoextsep + " , " + cantidadPixel);
-						
-						//Debemos revisar si el producto lleva gaseosa, en cuyo caso en el detalle del pedido debe ir un valor diferente a cero
-						if (idSaborTipoLiquido > 0)
-						{
-							idproductoext = PedidoDAO.RetornarIdprodGaseosaPromo(idSaborTipoLiquido);
-							pedidoDefinitivoPixel.add(new DetallePedidoPixel(idproductoext, 1));
-							logger.debug(idproductoext + " , " + cantidadPixel);
-							
-						}
-						//Poner separador 0,0
-						pedidoDefinitivoPixel.add(new DetallePedidoPixel(0, 0));
-						logger.debug(0 + " , " + 0);
-						
-					}
-
-				}
-			}	
+			indicadorAct = true;
 		}
-		return(pedidoDefinitivoPixel);
+		
+		// Recolectamos todos los datos para realizar la inserción en el POS tienda
+		InsertarPedidoPixel pedidoPixel = PedidoPixelDAO.confirmarPedidoPixel(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado, idformapagotienda);
+		return(pedidoPixel);
 	}
 	
+	/**
+	 * Método que se encarga de retornar la url de una tienda, dado un idpedido	
+	 * @param idpedido Se recibe como parámetro  el idpedido, del cual se requiere extrear la URL de la tienda
+	 * @return Se retorna un String con la URL del servicio de la tienda
+	 */
 	public static String obtenerUrlTienda(int idpedido)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -799,93 +847,55 @@ public class PedidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			
 		}
 		return(url);
 	}
 	
-	public static int RetornarIdproductoExterno(int idproductoint, int idespecialidadint)
+	public static int obtenerFormaPagoHomologadaTienda(int idtienda, int idformapago)
 	{
 		Logger logger = Logger.getLogger("log_file");
-		int idProductoExt = 0;
+		int idformapagohomo = 0;
 		ConexionBaseDatos con = new ConexionBaseDatos();
 		Connection con1 = con.obtenerConexionBDPrincipal();
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select idproductoext from homologacion_producto where idproductoint = " + idproductoint + " and  idespecialidadint = " + idespecialidadint ; 
+			String consulta = "select idformapagotienda from homologacion_forma_pago where idtienda = " + idtienda + " and idforma_pago = " + idformapago ; 
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			while(rs.next()){
-				idProductoExt = rs.getInt("idproductoext");
+				idformapagohomo = rs.getInt("idformapagotienda");
 				break;
 			}
-	        rs.close();
+			rs.close();
 			stm.close();
 			con1.close();
 		}
 		catch (Exception e){
 			logger.error(e.toString());
-			return(-1);
-		}
-		return(idProductoExt);
-	}
-	
-	
-	public static int RetornarIdproductoMaestroExterno(int idproductoint, int idexcepcion)
-	{
-		Logger logger = Logger.getLogger("log_file");
-		int idProductoExt = 0;
-		ConexionBaseDatos con = new ConexionBaseDatos();
-		Connection con1 = con.obtenerConexionBDPrincipal();
-		try
-		{
-			Statement stm = con1.createStatement();
-			String consulta = "select idproductoext from homologacion_producto where idproductoint = " + idproductoint + " and  idexcepcion = " + idexcepcion ; 
-			logger.info(consulta);
-			ResultSet rs = stm.executeQuery(consulta);
-			while(rs.next()){
-				idProductoExt = rs.getInt("idproductoext");
-				break;
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
 			}
-	        rs.close();
-			stm.close();
-			con1.close();
+			
 		}
-		catch (Exception e){
-			logger.error(e.toString());
-			return(-1);
-		}
-		return(idProductoExt);
+		return(idformapagohomo);
 	}
 	
-	public static int RetornarIdprodGaseosaPromo(int idsabortipoliquidoint)
-	{
-		Logger logger = Logger.getLogger("log_file");
-		int idProductoExt = 0;
-		ConexionBaseDatos con = new ConexionBaseDatos();
-		Connection con1 = con.obtenerConexionBDPrincipal();
-		try
-		{
-			Statement stm = con1.createStatement();
-			String consulta = "select idproductoext from homologacion_producto where idsabortipoliquidoint = " + idsabortipoliquidoint  ; 
-			logger.info(consulta);
-			ResultSet rs = stm.executeQuery(consulta);
-			while(rs.next()){
-				idProductoExt = rs.getInt("idproductoext");
-				break;
-			}
-	        rs.close();
-			stm.close();
-			con1.close();
-		}
-		catch (Exception e){
-			logger.error(e.toString());
-			return(-1);
-		}
-		return(idProductoExt);
-	}
 	
+	/**
+	 * Método que se encarga de retornar los tipos Liquidos existentes en el sistema.
+	 * @return Se retorna un ArrayList con los objetos Modelo TipoLiquido existentes en el sistema.
+	 */
 	public static ArrayList<TipoLiquido> ObtenerTiposLiquido()
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -909,33 +919,61 @@ public class PedidoDAO {
 				TipoLiquido tipliq = new TipoLiquido(idtipo_liquido,nombre, capacidad);
 				tiposLiquido.add(tipliq);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
+
 			
 		}
 			catch (Exception e){
 				logger.error(e.toString());
+				try
+				{
+					con1.close();
+				}catch(Exception e1)
+				{
+				}
 		}
 		
 		return(tiposLiquido);
 	}
 	
+	/**
+	 * Método que permite la consulta de pedidos de acuerdo a los parámetros enviados para la consulta
+	 * @param fechainicial Fecha inicial de los pedidos a consultar.
+	 * @param fechafinal Fecha final de los pedidos a consultar.
+	 * @param tienda nombre de la tienda que se desea filtrar para la consulta de los pedidos.
+	 * @param numeropedido En caso de desearlo se puede filtrar por un número de pedido en específico.
+	 * @return Se retorna un ArrayList con objetos de tipo pedido con la información de los pedidos consultados.
+	 */
 	public static ArrayList<Pedido> ConsultaIntegradaPedidos(String fechainicial, String fechafinal, String tienda, int numeropedido)
 	{
 		Logger logger = Logger.getLogger("log_file");
 		ArrayList <Pedido> consultaPedidos = new ArrayList();
 		int idtienda = 0;
 		String consulta = "";
-		
+		String fechaini = fechainicial.substring(6, 10)+"-"+fechainicial.substring(3, 5)+"-"+fechainicial.substring(0, 2);	
+		String fechafin = fechafinal.substring(6, 10)+"-"+fechafinal.substring(3, 5)+"-"+fechafinal.substring(0, 2);	
 		if((fechainicial.length()>0) && (fechafinal.length()>0) && (tienda.length()>0) && (numeropedido != 0))
 		{
-			idtienda = TiendaDAO.obteneridTienda(tienda);
-			consulta = "select a.idpedido, b.nombre, a.total_bruto, a.impuesto, a.total_neto, c.nombre nombrecliente, d.descripcion, a.fechapedido, c.idcliente from pedido a, tienda b, cliente c, estado_pedido d where a.idtienda = b.idtienda and a.idcliente = c.idcliente and a.idestadopedido = d.idestadopedido and DATE_FORMAT(a.fechapedido, '%d/%m/%Y') >=  '" + fechainicial +"' and DATE_FORMAT(a.fechapedido, '%d/%m/%Y') <= '"+ fechafinal +"' and a.idtienda =" + idtienda + " and a.idpedido = " + numeropedido;
+			if (tienda.equals("TODAS"))
+			{
+				consulta = "select a.idpedido, b.nombre, a.total_bruto, a.impuesto, a.total_neto, concat (c.nombre , '-' , c.apellido) nombrecliente, c.direccion, c.telefono, d.descripcion, a.fechapedido, c.idcliente, a.enviadopixel, a.numposheader, b.idtienda, b.url, a.stringpixel, a.fechainsercion, a.usuariopedido, e.nombre formapago, e.idforma_pago from pedido a, tienda b, cliente c, estado_pedido d, forma_pago e, pedido_forma_pago f where a.idtienda = b.idtienda and a.idcliente = c.idcliente and a.idestadopedido = d.idestadopedido and e.idforma_pago = f.idforma_pago and f.idpedido = a.idpedido and a.fechapedido >=  '" + fechaini +"' and a.fechapedido <= '"+ fechafin +"'"  + " and a.numposheader = " + numeropedido;
+			}else
+			{
+				idtienda = TiendaDAO.obteneridTienda(tienda);
+				consulta = "select a.idpedido, b.nombre, a.total_bruto, a.impuesto, a.total_neto, concat (c.nombre , '-' , c.apellido) nombrecliente, c.direccion, c.telefono, d.descripcion, a.fechapedido, c.idcliente, a.enviadopixel, a.numposheader, b.idtienda, b.url, a.stringpixel, a.fechainsercion, a.usuariopedido, e.nombre formapago, e.idforma_pago from pedido a, tienda b, cliente c, estado_pedido d, forma_pago e, pedido_forma_pago f where a.idtienda = b.idtienda and a.idcliente = c.idcliente and a.idestadopedido = d.idestadopedido and e.idforma_pago = f.idforma_pago and f.idpedido = a.idpedido and a.fechapedido >=  '" + fechaini +"' and a.fechapedido <= '"+ fechafin +"' and a.idtienda =" + idtienda + " and a.numposheader = " + numeropedido;
+			}
 		}else if((fechainicial.length()>0) && (fechafinal.length()>0) && (tienda.length()>0))
 		{
-			idtienda = TiendaDAO.obteneridTienda(tienda);
-			consulta = "select a.idpedido, b.nombre, a.total_bruto, a.impuesto, a.total_neto, c.nombre nombrecliente, d.descripcion, a.fechapedido, c.idcliente from pedido a, tienda b, cliente c, estado_pedido d where a.idtienda = b.idtienda and a.idcliente = c.idcliente and a.idestadopedido = d.idestadopedido and DATE_FORMAT(a.fechapedido, '%d/%m/%Y')>=  '" + fechainicial +"' and DATE_FORMAT(a.fechapedido, '%d/%m/%Y') <= '"+ fechafinal +"' and a.idtienda =" + idtienda ;
-			
-			
-			
+			if (tienda.equals("TODAS"))
+			{
+				consulta = "select a.idpedido, b.nombre, a.total_bruto, a.impuesto, a.total_neto, concat (c.nombre , '-' , c.apellido) nombrecliente, c.direccion, c.telefono, d.descripcion, a.fechapedido, c.idcliente, a.enviadopixel, a.numposheader, b.idtienda, b.url, a.stringpixel, a.fechainsercion, a.usuariopedido, e.nombre formapago, e.idforma_pago from pedido a, tienda b, cliente c, estado_pedido d, forma_pago e, pedido_forma_pago f where a.idtienda = b.idtienda and a.idcliente = c.idcliente and a.idestadopedido = d.idestadopedido and e.idforma_pago = f.idforma_pago and f.idpedido = a.idpedido and a.fechapedido >=  '" + fechaini +"' and a.fechapedido <= '"+ fechafin + "'";
+			}else
+			{
+				idtienda = TiendaDAO.obteneridTienda(tienda);
+				consulta = "select a.idpedido, b.nombre, a.total_bruto, a.impuesto, a.total_neto, concat (c.nombre , '-' , c.apellido) nombrecliente, c.direccion, c.telefono, d.descripcion, a.fechapedido, c.idcliente, a.enviadopixel, a.numposheader, b.idtienda, b.url, a.stringpixel, a.fechainsercion, a.usuariopedido, e.nombre formapago, e.idforma_pago from pedido a, tienda b, cliente c, estado_pedido d, forma_pago e, pedido_forma_pago f where a.idtienda = b.idtienda and a.idcliente = c.idcliente and a.idestadopedido = d.idestadopedido and e.idforma_pago = f.idforma_pago and f.idpedido = a.idpedido and a.fechapedido >=  '" + fechaini +"' and a.fechapedido <= '"+ fechafin +"' and a.idtienda =" + idtienda ;
+			}
 		}
 		logger.info(consulta);
 		ConexionBaseDatos con = new ConexionBaseDatos();
@@ -953,6 +991,16 @@ public class PedidoDAO {
 			String estadoPedido;
 			String fechaPedido;
 			int idcliente;
+			int enviadopixel;
+			int numposheader;
+			String url;
+			String stringpixel;
+			String fechainsercion;
+			String usuariopedido;
+			String telefono;
+			String direccion;
+			String formapago;
+			int idformapago;
 			while(rs.next())
 			{
 				idpedido = rs.getInt("idpedido");
@@ -964,18 +1012,45 @@ public class PedidoDAO {
 				estadoPedido = rs.getString("descripcion");
 				fechaPedido = rs.getString("fechapedido");
 				idcliente = rs.getInt("idcliente");
+				enviadopixel = rs.getInt("enviadopixel");
+				numposheader = rs.getInt("numposheader");
+				stringpixel = rs.getString("stringpixel");
+				fechainsercion = rs.getString("fechainsercion");
+				usuariopedido = rs.getString("usuariopedido");
+				direccion = rs.getString("direccion");
+				telefono = rs.getString("telefono");
+				url = rs.getString("url");
+				formapago = rs.getString("formapago");
+				idformapago = rs.getInt("idforma_pago");
+				Tienda tiendapedido = new Tienda(idtienda, nombreTienda, "", url);
 				Pedido cadaPedido = new Pedido(idpedido,  nombreTienda,totalBruto, impuesto, totalNeto,
-						estadoPedido, fechaPedido, nombreCliente, idcliente);
+						estadoPedido, fechaPedido, nombreCliente, idcliente, enviadopixel,numposheader, tiendapedido, stringpixel, fechainsercion, usuariopedido, direccion, telefono, formapago, idformapago);
 				consultaPedidos.add(cadaPedido);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
+
 		}catch(Exception e){
 			logger.error(e.toString());
-			
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			
 		}
 		return(consultaPedidos);
 	}
 	
+	/**
+	 * Método que se encarga de eliminar un detalle pedido de acuerdo al parámetro recibido.
+	 * @param iddetallepedido Se recibe como parámetro el iddetallepedido que se desea eliminar
+	 * @return Se retorna un ArrayList de números enteros qeu responden a los iddetallepedido eliminados los cuales 
+	 * pueden ser varios debido a que si eliminamos un detalle pedido que tenga asociadas adiciones, tambien
+	 * deberemos de eliminar las adiciones.
+	 */
 	public static ArrayList<Integer> EliminarDetallePedido(int iddetallepedido)
 	{
 		ArrayList<Integer> idDetallePedidosBorrados = new ArrayList();
@@ -991,8 +1066,10 @@ public class PedidoDAO {
 			logger.info(consulta);
 			Statement stm = con1.createStatement();
 			Statement stm1 = con1.createStatement();
+			Statement stm2 = con1.createStatement();
 			ResultSet rs = stm.executeQuery(consulta);
 			String delete = "";
+			String consultaModDetPed = "";
 			while (rs.next())
 			{
 				//debemos borrar tambien el detalle de la adiciï¿½n
@@ -1000,36 +1077,65 @@ public class PedidoDAO {
 				delete = "delete from adicion_detalle_pedido  where iddetallepedidoadicion = " + valorEliminar;
 				logger.info(delete);
 				stm1.executeUpdate(delete);
-				//borramos el detalle pedido
+				//borramos el detalle pedido asociado a ada adición
 				delete = "delete from detalle_pedido  where iddetalle_pedido = " + valorEliminar;
 				logger.info(delete);
 				stm1.executeUpdate(delete);
 				idDetallePedidosBorrados.add(new Integer(valorEliminar));
 			}
-			//borrado en detalle de adiciones en caso de que sea una adicion
+			//borrado en detalle de adiciones en caso de que sea una adicion, en caso que solo estemos eliminando una adición
 			delete = "delete from adicion_detalle_pedido  where iddetallepedidoadicion = " + iddetallepedido; 
 			logger.info(delete);
 			stm1.executeUpdate(delete);
-			//
+			//borrado de la tabla de modificadores sacamos los modificadores que tienen detalle pedido porqeu tienen precio
+			consultaModDetPed = "select iddetallepedidoasociado from modificador_detalle_pedido  where iddetallepedidopadre = " + iddetallepedido + " and iddetallepedidoasociado <> 0";
+			logger.info(consultaModDetPed);
+			rs = stm2.executeQuery(consultaModDetPed);
+			while (rs.next())
+			{
+				//debemos borrar tambien el detalle de la adiciï¿½n
+				int valorEliminarMod = Integer.parseInt( rs.getString("iddetallepedidoasociado"));
+				delete = "delete from detalle_pedido  where iddetalle_pedido = " + valorEliminarMod;
+				logger.info(delete);
+				stm1.executeUpdate(delete);
+				idDetallePedidosBorrados.add(new Integer(valorEliminarMod));
+			}
+			delete = "delete from modificador_detalle_pedido  where iddetallepedidopadre = " + iddetallepedido; 
+			logger.info(delete);
+			stm1.executeUpdate(delete);
+			// Se hace la eliminación final del detalle pedido pasado como parametro.
 			delete = "delete from detalle_pedido  where iddetalle_pedido = " + iddetallepedido; 
 			logger.info(delete);
 			idDetallePedidosBorrados.add(new Integer(iddetallepedido));
 			stm1.executeUpdate(delete);
 			stm.close();
 			stm1.close();
+			stm2.close();
 			con1.close();
 			//Debemos de ejecutar una reconstrucciï¿½n del campo adiciï¿½n del ippedido
 			
 		}
 		catch (Exception e){
 			logger.error(e.toString());
-			
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			
 		}
 		return(idDetallePedidosBorrados);
 		
 	}
 	
+
+	/**
+	 * Método que se encarga de dado un iddetallepedido, retornar todas las adiciones asociados a dicho Item.
+	 * @param iddetallepedido Se recibe como parámetro el iddetallepedido del cual se requiere saber las adiciones.
+	 * @return Se retorna un ArrayList con objetos Modelo DetallePedidoAdicion asociados al iddetallepedido pasado
+	 * como parámetro.
+	 */
 	public static ArrayList<DetallePedidoAdicion> ObtenerAdicionDetallePedido (int iddetallepedido)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -1063,20 +1169,35 @@ public class PedidoDAO {
 				detAdicion.setIdproducto(idproducto);
 				consultaAdiciones.add(detAdicion);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch(Exception e)
 		{
 			logger.error(e.toString());
-			
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(consultaAdiciones);
 	}
 	
+	/**
+	 * Método que se encarga de retornar todos los modificadores asociados a un iddetallepedido, enviado como parámetro.
+	 * @param iddetallepedido Se recibe como parámetro un iddetallepedido con base en el cual se retornarán todos los
+	 * modificadores CON/SIN asociados al detallepedido.
+	 * @return Se retorna un ArrayList con objetos tipo ModificadorDetallePedido asociados al iddetallepedido
+	 * pasado como parámetro.
+	 */
 	public static ArrayList<ModificadorDetallePedido> ObtenerModificadorDetallePedido (int iddetallepedido)
 	{
 		Logger logger = Logger.getLogger("log_file");
 		ArrayList<ModificadorDetallePedido> consultaModificadores = new ArrayList();
 		String consulta = "select a.iddetallepedidopadre,  a.idproductoespecialidad1, a.idproductoespecialidad2, "
-				+ "a.cantidad from modificador_detalle_pedido a where a.iddetallepedidopadre =" + iddetallepedido; 
+				+ "a.cantidad, a.iddetallepedidoasociado from modificador_detalle_pedido a where a.iddetallepedidopadre =" + iddetallepedido; 
 		logger.info(consulta);
 		ConexionBaseDatos con = new ConexionBaseDatos();
 		Connection con1 = con.obtenerConexionBDPrincipal();
@@ -1087,6 +1208,7 @@ public class PedidoDAO {
 			int iddetallepedidopadre;
 			int idproductoespecialidad1;
 			int idproductoespecialidad2;
+			int iddetallepedidoasociado;
 			double cantidad;
 			while(rs.next())
 			{
@@ -1094,22 +1216,36 @@ public class PedidoDAO {
 				idproductoespecialidad1 = Integer.parseInt(rs.getString("idproductoespecialidad1"));
 				idproductoespecialidad2 = Integer.parseInt(rs.getString("idproductoespecialidad2"));
 				cantidad = Double.parseDouble(rs.getString("cantidad"));
-				ModificadorDetallePedido detModificador = new ModificadorDetallePedido(0,iddetallepedidopadre,idproductoespecialidad1, idproductoespecialidad2, cantidad);
+				iddetallepedidoasociado = Integer.parseInt(rs.getString("iddetallepedidoasociado"));
+				ModificadorDetallePedido detModificador = new ModificadorDetallePedido(0,iddetallepedidopadre,idproductoespecialidad1, idproductoespecialidad2, cantidad, iddetallepedidoasociado);
 				consultaModificadores.add(detModificador);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch(Exception e)
 		{
 			logger.error(e.toString());
-			
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(consultaModificadores);
 	}
 	
+	/**
+	 * Método que se encarga de retornar el detalle de un pedido, con base en el id pedido recibido como parámetro
+	 * @param numeropedido Se recibe como parámetro del idpedido con base en el cual se retornará la información.
+	 * @return Se retorna un ArrayList con objetos tipo DetallePedido de acuerdo alos parámetros recibidos.
+	 */
 	public static ArrayList<DetallePedido> ConsultarDetallePedido(int numeropedido)
 	{
 		Logger logger = Logger.getLogger("log_file");
 		ArrayList <DetallePedido> consultaDetallePedidos = new ArrayList();
-		String consulta = "select a.iddetalle_pedido, a.idproducto, b.nombre, a.cantidad, a.idespecialidad1, a.idespecialidad2, c.nombre especialidad1, d.nombre especialidad2, "
+		String consulta = "select a.iddetalle_pedido, a.idproducto, b.nombre, a.cantidad, a.idespecialidad1, a.idespecialidad2, concat(c.nombre , a.modespecialidad1) especialidad1, concat(d.nombre , a.modespecialidad2) especialidad2, "
 				+ "a.valorUnitario, a.valorTotal, a.adicion, a.observacion, e.descripcion liquido , f.descripcion excepcion, a.idexcepcion, a.idsabortipoliquido  from detalle_pedido a left outer join especialidad "
 				+ "c on a.idespecialidad1 = c.idespecialidad left outer join especialidad d on a.idespecialidad2 = d.idespecialidad"
 				+ " left outer join sabor_x_tipo_liquido e on a.idsabortipoliquido = e.idsabor_x_tipo_liquido "
@@ -1156,11 +1292,20 @@ public class PedidoDAO {
 				excepcion = rs.getString("excepcion");
 				idexcepcion = rs.getInt("idexcepcion");
 				idsabortipoliquido = rs.getInt("idsabortipoliquido");
-				DetallePedido cadaDetallePedido = new DetallePedido(iddetallepedido, nombreproducto, idproducto, cantidad,especialidad1, idespecialidad1, especialidad2, idespecialidad2,valorunitario, valortotal,adicion,observacion,liquido, excepcion, numeropedido, idexcepcion, idsabortipoliquido);
+				DetallePedido cadaDetallePedido = new DetallePedido(iddetallepedido, nombreproducto, idproducto, cantidad,especialidad1, idespecialidad1, especialidad2, idespecialidad2,valorunitario, valortotal,adicion,observacion,liquido, excepcion, numeropedido, idexcepcion, idsabortipoliquido,"");
 				consultaDetallePedidos.add(cadaDetallePedido);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch(Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			
 			
 		}
@@ -1168,6 +1313,13 @@ public class PedidoDAO {
 	}
 
 	
+	/**
+	 * Método que recibe como parámetro un id pedido y con base en el retorna todos lo detallespedidos asociados, sin 
+	 * incluir las adiciones.
+	 * @param numeropedido Se recibe como parámetro un número de pedido con base en el cual se realiza la consulta.
+	 * @return Se retorna un ArrayList con objetos Modelo DetallePedido asociados al pedido pasado como parámetro y excluyendo
+	 * las adiciones.
+	 */
 	public static ArrayList<DetallePedido> ConsultarDetallePedidoSinAdiciones(int numeropedido)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -1219,17 +1371,117 @@ public class PedidoDAO {
 				excepcion = rs.getString("excepcion");
 				idexcepcion = rs.getInt("idexcepcion");
 				idsabortipoliquido = rs.getInt("idsabortipoliquido");
-				DetallePedido cadaDetallePedido = new DetallePedido(iddetallepedido, nombreproducto, idproducto, cantidad,especialidad1, idespecialidad1, especialidad2, idespecialidad2,valorunitario, valortotal,adicion,observacion,liquido, excepcion, numeropedido, idexcepcion, idsabortipoliquido);
+				DetallePedido cadaDetallePedido = new DetallePedido(iddetallepedido, nombreproducto, idproducto, cantidad,especialidad1, idespecialidad1, especialidad2, idespecialidad2,valorunitario, valortotal,adicion,observacion,liquido, excepcion, numeropedido, idexcepcion, idsabortipoliquido,"");
 				consultaDetallePedidos.add(cadaDetallePedido);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch(Exception e){
 			logger.error(e.toString());
-			
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			
 		}
 		return(consultaDetallePedidos);
 	}
 	
+	/**
+	 * Método que retornar dado un idpedidopadre, retorna lo detalles de pedido asociados a este, como adiciones, productos
+	 * o modificadores con precio
+	 * @param iddetpedidopadre se recibe como paramétro el iddetalle pedido que deberá ser un productos de la tipología
+	 * PIZZA u OTROS.
+	 * @return
+	 */
+	public static ArrayList<DetallePedido> ConsultarDetallePedidoPorPadre(int iddetpedidopadre)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ArrayList <DetallePedido> consultaDetallePedidos = new ArrayList();
+		String consulta = "select a.iddetalle_pedido, a.idpedido, a.idproducto, b.nombre, a.cantidad, a.idespecialidad1, a.idespecialidad2, c.nombre especialidad1, d.nombre especialidad2, "
+				+ "a.valorUnitario, a.valorTotal, a.adicion, a.observacion, e.descripcion liquido , f.descripcion excepcion, a.idexcepcion, a.idsabortipoliquido, b.tipo  from detalle_pedido a left outer join especialidad "
+				+ "c on a.idespecialidad1 = c.idespecialidad left outer join especialidad d on a.idespecialidad2 = d.idespecialidad"
+				+ " left outer join sabor_x_tipo_liquido e on a.idsabortipoliquido = e.idsabor_x_tipo_liquido "
+				+ "left outer join excepcion_precio f on a.idexcepcion = f.idexcepcion"
+				+ ",producto b where a.idproducto = b.idproducto and a.iddetalle_pedido in  " 
+				+ " (select iddetalle_pedido from detalle_pedido where iddetalle_pedido = " + iddetpedidopadre 
+				+ " union select iddetalle_pedido from detalle_pedido where observacion = '"+ "Producto Incluido-" + iddetpedidopadre +"'"
+				+ " union select iddetallepedidoadicion from adicion_detalle_pedido where iddetallepedidopadre = " + iddetpedidopadre
+				+ " union select iddetallepedidoasociado from modificador_detalle_pedido where iddetallepedidopadre = " + iddetpedidopadre + ")"; 
+		logger.info(consulta);
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		try
+		{
+			Statement stm = con1.createStatement();
+			ResultSet rs = stm.executeQuery(consulta);
+			int idpedido;
+			int iddetallepedido;
+			int idproducto;
+			String nombreproducto;
+			double cantidad;
+			String especialidad1;
+			int idespecialidad1;
+			String especialidad2;
+			int idespecialidad2;
+			double valorunitario;
+			double valortotal;
+			String adicion;
+			String observacion;
+			String liquido;
+			String excepcion;
+			int idexcepcion;
+			int idsabortipoliquido;
+			String tipoProducto;
+			while(rs.next())
+			{
+				iddetallepedido = rs.getInt("iddetalle_pedido");
+				idpedido = rs.getInt("idpedido");
+				idproducto = rs.getInt("idproducto");
+				nombreproducto = rs.getString("nombre");
+				cantidad = rs.getDouble("cantidad");
+				especialidad1 = rs.getString("especialidad1");
+				idespecialidad1 = rs.getInt("idespecialidad1");
+				especialidad2 = rs.getString("especialidad2");
+				idespecialidad2 = rs.getInt("idespecialidad2");
+				valorunitario = rs.getDouble("valorUnitario");
+				valortotal = rs.getDouble("valorTotal");
+				adicion = rs.getString("adicion");
+				observacion = rs.getString("observacion");
+				liquido = rs.getString("liquido");
+				excepcion = rs.getString("excepcion");
+				idexcepcion = rs.getInt("idexcepcion");
+				idsabortipoliquido = rs.getInt("idsabortipoliquido");
+				tipoProducto = rs.getString("tipo");
+				DetallePedido cadaDetallePedido = new DetallePedido(iddetallepedido, nombreproducto, idproducto, cantidad,especialidad1, idespecialidad1, especialidad2, idespecialidad2,valorunitario, valortotal,adicion,observacion,liquido, excepcion, idpedido , idexcepcion, idsabortipoliquido,tipoProducto);
+				consultaDetallePedidos.add(cadaDetallePedido);
+			}
+			rs.close();
+			stm.close();
+			con1.close();
+		}catch(Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+			
+		}
+		return(consultaDetallePedidos);
+	}
+	
+	/**
+	 * mPetodo que se encarga de retornar la información de una entidad Tienda, con base en la información recibida como 
+	 * parámetro.
+	 * @param idpedido Se recibe como parámetro el idpedido con base en el cual se retornará la informacion de la tienda
+	 * asociada al pedido.
+	 * @return Se retorna un objeto de tipo Modelo Tienda con base en el idpedido recibido como parámetro.
+	 */
 	public static Tienda obtenerTiendaPedido(int idpedido)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -1247,12 +1499,186 @@ public class PedidoDAO {
 				idTienda = rs.getInt("idtienda");
 				tienda = TiendaDAO.retornarTienda(idTienda);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.error(e.toString());
-			
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(tienda);
 		
+	}
+	
+	/**
+	 * Método que se encarga de retornar la forma de pago dado un id pedido.
+	 * @param idPedido Se recibe como parámetro el idpedido, del cual se retorna la forma de pago
+	 * @return Se retorna un objeto Modelo FormaPago asociado al pedido pasado como parámetro.
+	 */
+	public static FormaPago obtenerFormaPagoPedido(int idPedido)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		FormaPago formaPago = new FormaPago();
+		try
+		{
+			Statement stm = con1.createStatement();
+			String consulta = "select a.idpedido_forma_pago, a.idforma_pago,valortotal, a.valorformapago, b.nombre from pedido_forma_pago a, forma_pago b where a.idforma_pago = b.idforma_pago and a.idpedido = " + idPedido;
+			logger.info(consulta);
+			ResultSet rs = stm.executeQuery(consulta);
+			int idpedidoformapago;
+			int idformapago;
+			double valortotal;
+			double valorformapago;
+			String nombre;
+			while(rs.next()){
+				idpedidoformapago = rs.getInt("idpedido_forma_pago");
+				idformapago = rs.getInt("idforma_pago");
+				valortotal = rs.getDouble("valortotal");
+				valorformapago = rs.getDouble("valorformapago");
+				nombre = rs.getString("nombre");
+			formaPago = new FormaPago(idformapago,nombre,"",valortotal, valorformapago);
+			}
+			rs.close();
+			stm.close();
+			con1.close();
+		}catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+		}
+		return(formaPago);
+	}
+	
+	/**
+	 * Método que se encarga de retornar un ArrayList con todos los productos incluidos en el sistema, con el objetivo
+	 * que en la capa de presentación, se controle la adición de un producto que tenga productos adicionales.
+	 * @return Se retorna un arrayList con los productos incluidos parametrizados en el sistema.
+	 */
+	public static ArrayList<ProductoIncluido> obtenerProductosIncluidos()
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		ArrayList<ProductoIncluido> productosIncluidos = new ArrayList();
+		try
+		{
+			Statement stm = con1.createStatement();
+			String consulta = "select a.idproductoincluido, a.idproductopadre, a.idproductohijo, a.cantidad, b.nombre, b.preciogeneral "
+					+ "from producto_incluido a , producto b "
+					+ " where a.idproductohijo = b.idproducto";
+			logger.info(consulta);
+			ResultSet rs = stm.executeQuery(consulta);
+			int idproductoincluido;
+			int idproductopadre;
+			int idproductohijo;
+			double cantidad;
+			String nombre;
+			double preciogeneral;
+			while(rs.next()){
+				idproductoincluido = rs.getInt("idproductoincluido");
+				idproductopadre = rs.getInt("idproductopadre");
+				idproductohijo = rs.getInt("idproductohijo");
+				cantidad= rs.getDouble("cantidad");
+				nombre = rs.getString("nombre");
+				preciogeneral = rs.getDouble("preciogeneral");
+				productosIncluidos.add(new ProductoIncluido(idproductoincluido,idproductopadre,idproductohijo,cantidad,nombre, preciogeneral));
+			}
+			rs.close();
+			stm.close();
+			con1.close();
+		}catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+		}
+		return(productosIncluidos);
+	}
+	
+	public static int actualizarClienteMemcode(int idCliente, int memcode)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		int idClienteActualizado = 0;
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		try
+		{
+			//Para actualizar el cliente el idcliente debe ser diferente de vacï¿½o.
+			Statement stm = con1.createStatement();
+			String update = "update cliente set memcode = " + memcode + "  where idcliente = " + idCliente; 
+			logger.info(update);
+			stm.executeUpdate(update);
+			idClienteActualizado = idCliente;
+			
+			stm.close();
+			con1.close();
+		}
+		catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+			return(0);
+		}
+		logger.info("id cliente actualizado" + idClienteActualizado);
+		return(idClienteActualizado);
+	}
+	
+	/**
+	 * Método que se encarga de retornar todas las gaseosas incluidas en productos homologadas en todas las tiendas
+	 * @return Se retorna un arrayList con objetos HomologaGaseosaIncluida los cuales basicamente traen las propiedades
+	 * de idtienda e idsabortipoliquido definido para las homologaciones.
+	 */
+	public static ArrayList<HomologaGaseosaIncluida> obtenerHomologacionGaseosaIncluida()
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		ArrayList<HomologaGaseosaIncluida> gaseosaHomologada = new ArrayList();
+		try
+		{
+			Statement stm = con1.createStatement();
+			String consulta = "select a.idtienda, a.idsabortipoliquidoint "
+					+ "from homologacion_producto a where a.idsabortipoliquidoint  > 0  " ;
+			logger.info(consulta);
+			ResultSet rs = stm.executeQuery(consulta);
+			int idtienda;
+			int idsabortipoliquido;
+			while(rs.next()){
+				idtienda = rs.getInt("idtienda");
+				idsabortipoliquido = rs.getInt("idsabortipoliquidoint");
+				gaseosaHomologada.add(new HomologaGaseosaIncluida(idtienda, idsabortipoliquido));
+			}
+			rs.close();
+			stm.close();
+			con1.close();
+		}catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+		}
+		return(gaseosaHomologada);
 	}
 	
 }

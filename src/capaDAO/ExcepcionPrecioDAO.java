@@ -10,9 +10,17 @@ import capaModelo.ExcepcionPrecio;
 import capaModelo.Tienda;
 import conexion.ConexionBaseDatos;
 import org.apache.log4j.Logger;
-
+/**
+ * Clase que implementa todos los métodos de acceso a la base de datos para la administración de la entidad Excepcion de Precio.
+ * @author JuanDavid
+ *
+ */
 public class ExcepcionPrecioDAO {
 	
+	/**
+	 * Método que se encarga de obtener todas la excepciones de precio parametrizadas en base de datos
+	 * @return Retorna un ArrayList con objetos de Modelo Excepción Precio.
+	 */
 	public static ArrayList<ExcepcionPrecio> obtenerExcepcionesPrecio()
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -22,7 +30,7 @@ public class ExcepcionPrecioDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select * from excepcion_precio";
+			String consulta = "select * from excepcion_precio order by descripcion asc";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			while(rs.next()){
@@ -32,16 +40,33 @@ public class ExcepcionPrecioDAO {
 				String descripcion = rs.getString("descripcion");
 				String incluye_liquido  = rs.getString("incluye_liquido");
 				int idtipoliquido = rs.getInt("idtipoliquido");
-				ExcepcionPrecio excepcion = new ExcepcionPrecio(idExcepcion, idProducto, precio, descripcion);
+				String controlaCantidadIngredientes = rs.getString("controla_cantidad_ingredientes");
+				int cantidadIngredientes = rs.getInt("cantidad_ingredientes");
+				String partiradiciones = rs.getString("partiradiciones");
+				ExcepcionPrecio excepcion = new ExcepcionPrecio(idExcepcion, idProducto, precio, descripcion,controlaCantidadIngredientes,cantidadIngredientes,"",0,partiradiciones);
 				excepciones.add(excepcion);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(excepciones);
 		
 	}
 	
+	/**
+	 * Método que se encarga de todos las excepciones Precio de la base de datos,en el formato que lo requiere el grid
+	 * de la capa de Presentación
+	 * @return Retorna un ArrayList con objetos de Modelo ExcepcionPrecio.
+	 */
 	public static ArrayList<ExcepcionPrecio> obtenerExcepcionesPrecioGrid()
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -66,13 +91,29 @@ public class ExcepcionPrecioDAO {
 				ExcepcionPrecio excepcion = new ExcepcionPrecio(idExcepcion, idProducto, producto, precio, descripcion, incluye_liquido, idtipoliquido, nombreliquido);
 				excepciones.add(excepcion);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(excepciones);
 		
 	}
 	
+	/**
+	 * Método que se encarga de realizar la inserción de una ExcepcionPrecio con base en la información recibida como 
+	 * parámetro.
+	 * @param Exc Recibe como parámetro un objeto de Modelo ExcepcionPrecio con base en el cual se realiza la inserción
+	 * de la información.
+	 * @return Se retorna un número entero con el idexcepcion retornado en la inserción a la base de datos.
+	 */
 	public static int insertarExcepcionPrecio(ExcepcionPrecio Exc)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -95,11 +136,21 @@ public class ExcepcionPrecioDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			return(0);
 		}
 		return(idExcepcionPrecioIns);
 	}
 
+	/**
+	 * Método qeu se encarga de eliminar una excepción de precio con base en la información enviadad como parámetro.
+	 * @param idexcepcion Recibe como parámetro el idexcepcion que desea ser eliminado.
+	 */
 	public static void eliminarExcepcionPrecio(int idexcepcion)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -116,11 +167,21 @@ public class ExcepcionPrecioDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
-			
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		
 	}
 
+	/**
+	 * Método que se encarga de consultar una excepcion Precio con base en el parámetro recibido.
+	 * @param idexcepcion Se recibe como parámetro el idexcepcion que desea ser consultado.
+	 * @return Se retorna un objeto Modelo ExcepcionPrecio que contiene la información el excepcion Precio consultada.
+	 */
 	public static ExcepcionPrecio retornarExcepcionPrecio(int idexcepcion)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -154,11 +215,21 @@ public class ExcepcionPrecioDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
-			
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(Esc);
 	}
 
+	/**
+	 * Método que permite editar una excepción Precio con base en la información enviada como parámetro.
+	 * @param Esc Recibe como parámetro un objeto Modelo ExcepcionPrecio con base en el cual se realiza la edición.
+	 * @return Retorna un string con el resultado del proceso de edición.
+	 */
 	public static String editarExcepcionPrecio(ExcepcionPrecio Esc)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -174,10 +245,16 @@ public class ExcepcionPrecioDAO {
 			resultado = "exitoso";
 			stm.close();
 			con1.close();
-			System.out.println(update);
+			
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			resultado = "error";
 		}
 		return(resultado);

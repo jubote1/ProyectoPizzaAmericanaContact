@@ -15,6 +15,7 @@ import capaControlador.ParametrosCtrl;
 import org.apache.log4j.Logger;
 /**
  * Servlet implementation class CRUDEspecialidad
+ * Servicio que encarga de implementar los servicios CRUD para la entidad Especialidad.
  */
 @WebServlet("/CRUDEspecialidad")
 public class CRUDEspecialidad extends HttpServlet {
@@ -30,6 +31,8 @@ public class CRUDEspecialidad extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Este servicio recibe un idoperación que puede ser 1 insertar 2 editar 3 Eliminar  4 Consultar
+	 * dependiendo el valor de idoperacion, se recibirán los diferentes parámetros de la entidad especialidad.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 			//Operación idoperacion 1 insertar 2 editar 3 Eliminar  4 Consultar

@@ -1,5 +1,9 @@
 package capaModelo;
-
+/**
+ * Clase que implementa la entidad Tipo Liquido
+ * @author JuanDavid
+ *
+ */
 public class TipoLiquido {
 
 	private int idtipo_liquido;

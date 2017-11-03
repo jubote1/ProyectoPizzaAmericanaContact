@@ -10,8 +10,17 @@ import capaModelo.ExcepcionPrecio;
 import capaModelo.Municipio;
 import conexion.ConexionBaseDatos;
 
+/**
+ * Clase que se encarga de la implementación de toda la interacción con la base de datos para la entidad Municipio.
+ * @author JuanDavid
+ *
+ */
 public class MunicipioDAO {
 	
+	/**
+	 * Método que se encarga de retornar la información de todos los municipios definidos en el sistema.
+	 * @return Se retorna un ArrayList con todos los municipios definidos en el sistema
+	 */
 	public static ArrayList<Municipio> obtenerMunicipios()
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -30,13 +39,27 @@ public class MunicipioDAO {
 				Municipio municipio = new Municipio(idMunicipio,nombre);
 				municipios.add(municipio);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(municipios);
 		
 	}
 	
+	/**
+	 * Método qeu se encarga de retornar el id de un Municipio dado el nombre de un Munipio
+	 * @param municipio Se recibe como parámetro un String con el nombre del Municipio.
+	 * @return Se retorna un entero con el id del municipio según el nombre del Municipio enviado como parámetro.
+	 */
 	public static int obteneridMunicipio(String municipio)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -53,8 +76,17 @@ public class MunicipioDAO {
 				idmunicipio = rs.getInt("idmunicipio");
 				break;
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(idmunicipio);
 	}

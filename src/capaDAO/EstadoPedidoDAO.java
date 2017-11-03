@@ -8,9 +8,18 @@ import java.util.ArrayList;
 import capaModelo.Especialidad;
 import capaModelo.EstadoPedido;
 import java.sql.ResultSet;
-
+/**
+ * Clase que se encarga de hacer la comunicaicón con la base de datos, en todo lo relacionado con la entidad Estado Pedio
+ * @author JuanDavid
+ *
+ */
 public class EstadoPedidoDAO {
 	
+	/**
+	 * Método que se encarga de la inserción de la entidad Estado Pedido.
+	 * @param Est recibe como parámetro un objeto Modelo Estado Pedido con base en el cual realiza la inserción en base de datos.
+	 * @return Retorna un Entero con el idestadopedido creado por el método.
+	 */
 	public static int insertarEstadoPedido(EstadoPedido Est)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -34,11 +43,21 @@ public class EstadoPedidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			return(0);
 		}
 		return(idEstadoPedidoIns);
 	}
 
+	/**
+	 * Método que se encarga de la eliminación de un estado pedido
+	 * @param idestadopedido Se recibe como parámetro el idestadopedido que se sea eliminar.
+	 */
 	public static void eliminarEstadoPedido(int idestadopedido)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -55,11 +74,21 @@ public class EstadoPedidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
-			
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		
 	}
 
+	/**
+	 * Método que se encarga de consultar un estado pedido con base en el parámetro recibido.
+	 * @param idestadopedido Se recibe un entero con el idestadopedido que se desea consultar
+	 * @return Se retorna un objeto Modelo estadoPedido con la información del estado pedido que se desea consultar.
+	 */
 	public static EstadoPedido retornarEstadoPedido(int idestadopedido)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -86,11 +115,21 @@ public class EstadoPedidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
-			
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(Est);
 	}
 
+	/**
+	 * Método que se encarga de editar un estado pedido con base en la información enviada como parámetro.
+	 * @param Est Recibe como parámetro un objeto Modleo Estado pedido con base en el cual se realiza la edición
+	 * @return Se retorna un string con el resultado del proceso de edición.
+	 */
 	public static String editarEstadoPedido(EstadoPedido Est)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -109,11 +148,21 @@ public class EstadoPedidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			resultado = "error";
 		}
 		return(resultado);
 	}
 	
+	/**
+	 * Método que se encarga de retornar un ArrayList la información de los estados pedidos creados en el sistema.
+	 * @return ArrayList con los objetos de Modelo EstadoPedido creados en el sistema.
+	 */
 	public static ArrayList<EstadoPedido> obtenerEstadosPedido()
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -134,8 +183,17 @@ public class EstadoPedidoDAO {
 				EstadoPedido est = new EstadoPedido( idestadopedido, descripcion);
 				estadosPedidos.add(est);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(estadosPedidos);
 		

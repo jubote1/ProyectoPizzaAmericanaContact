@@ -1,5 +1,10 @@
 package capaModelo;
 
+/**
+ * Clase que implementa la entidad pedido.
+ * @author JuanDavid
+ *
+ */
 public class Pedido {
 	
 	private int idpedido;
@@ -13,7 +18,78 @@ public class Pedido {
 	private String fechapedido;
 	private int idcliente;
 	private String nombrecliente;
+	private int enviadoPixel;
+	private int numposheader;
+	private Tienda tienda;
+	private String stringpixel;
+	private String fechainsercion;
+	private String usuariopedido;
+	private String direccion;
+	private String telefono;
+	private String formapago;
+	private int idformapago;
 	
+	
+	public int getIdformapago() {
+		return idformapago;
+	}
+	public void setIdformapago(int idformapago) {
+		this.idformapago = idformapago;
+	}
+	public String getFormapago() {
+		return formapago;
+	}
+	public void setFormapago(String formapago) {
+		this.formapago = formapago;
+	}
+	public String getDireccion() {
+		return direccion;
+	}
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+	public String getTelefono() {
+		return telefono;
+	}
+	public void setTelefono(String telefono) {
+		this.telefono = telefono;
+	}
+	public String getFechainsercion() {
+		return fechainsercion;
+	}
+	public void setFechainsercion(String fechainsercion) {
+		this.fechainsercion = fechainsercion;
+	}
+	public String getUsuariopedido() {
+		return usuariopedido;
+	}
+	public void setUsuariopedido(String usuariopedido) {
+		this.usuariopedido = usuariopedido;
+	}
+	public String getStringpixel() {
+		return stringpixel;
+	}
+	public void setStringpixel(String stringpixel) {
+		this.stringpixel = stringpixel;
+	}
+	public Tienda getTienda() {
+		return tienda;
+	}
+	public void setTienda(Tienda tienda) {
+		this.tienda = tienda;
+	}
+	public int getEnviadoPixel() {
+		return enviadoPixel;
+	}
+	public void setEnviadoPixel(int enviadoPixel) {
+		this.enviadoPixel = enviadoPixel;
+	}
+	public int getNumposheader() {
+		return numposheader;
+	}
+	public void setNumposheader(int numposheader) {
+		this.numposheader = numposheader;
+	}
 	public int getIdpedido() {
 		return idpedido;
 	}
@@ -84,7 +160,7 @@ public class Pedido {
 		this.nombrecliente = nombrecliente;
 	}
 	public Pedido(int idpedido, String nombretienda, double totalbruto, double impuesto, double total_neto,
-			String estadopedido, String fechapedido, String nombrecliente, int idcliente) {
+			String estadopedido, String fechapedido, String nombrecliente, int idcliente, int enviadopixel, int numposheader) {
 		super();
 		this.idpedido = idpedido;
 		this.nombretienda = nombretienda;
@@ -95,6 +171,32 @@ public class Pedido {
 		this.fechapedido = fechapedido;
 		this.nombrecliente = nombrecliente;
 		this.idcliente = idcliente;
+		this.enviadoPixel = enviadopixel;
+		this.numposheader = numposheader;
+	}
+	
+	public Pedido(int idpedido, String nombretienda, double totalbruto, double impuesto, double total_neto,
+			String estadopedido, String fechapedido, String nombrecliente, int idcliente, int enviadopixel, int numposheader, Tienda tienda, String stringpixel, String fechainsercion, String usuariopedido, String direccion, String telefono, String formapago, int idformapago) {
+		super();
+		this.idpedido = idpedido;
+		this.nombretienda = nombretienda;
+		this.totalbruto = totalbruto;
+		this.impuesto = impuesto;
+		this.total_neto = total_neto;
+		this.estadopedido = estadopedido;
+		this.fechapedido = fechapedido;
+		this.nombrecliente = nombrecliente;
+		this.idcliente = idcliente;
+		this.enviadoPixel = enviadopixel;
+		this.numposheader = numposheader;
+		this.tienda = tienda;
+		this.stringpixel = stringpixel;
+		this.fechainsercion = fechainsercion;
+		this.usuariopedido = usuariopedido;
+		this.direccion = direccion;
+		this.telefono = telefono;
+		this.formapago = formapago;
+		this.idformapago = idformapago;
 	}
 	
 	

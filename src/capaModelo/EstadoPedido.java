@@ -1,5 +1,10 @@
 package capaModelo;
 
+/**
+ * Clase que implementa la entidad EstadoPedido
+ * @author JuanDavid
+ *
+ */
 public class EstadoPedido {
 	
 	private int idestadopedido;

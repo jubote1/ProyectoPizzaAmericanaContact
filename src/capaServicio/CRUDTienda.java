@@ -14,6 +14,7 @@ import capaControlador.ParametrosCtrl;
 
 /**
  * Servlet implementation class CRUDTienda
+ * Servicio que implementa los métodos para soportar el CRUD de la entidad Tienda.
  */
 @WebServlet("/CRUDTienda")
 public class CRUDTienda extends HttpServlet {
@@ -29,6 +30,9 @@ public class CRUDTienda extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Se recibe como parámetro principal el idoperacion con base en lo siguiente: 
+	 * 1 insertar 2 editar 3 Eliminar  4 Consultar, de acuerdo a la operación seleccionada se 
+	 * solicitarán ciertos parámetros y posteriormente se invocará al método correspondiente en la capa controlador.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//Operación idoperacion 1 insertar 2 editar 3 Eliminar  4 Consultar

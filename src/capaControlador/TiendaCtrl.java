@@ -23,5 +23,14 @@ public class TiendaCtrl {
 		}
 		return listJSON.toJSONString();
 	}
+	public String obtenerUrlTienda(int idtienda){
+		JSONArray listJSON = new JSONArray();
+		Tienda tienda = TiendaDAO.obtenerUrlTienda(idtienda);
+		JSONObject urlJSON = new JSONObject();
+		urlJSON.put("urltienda", tienda.getUrl());
+		urlJSON.put("dsnodbc", tienda.getDsnTienda());
+		listJSON.add(urlJSON);
+		return listJSON.toJSONString();
+	}
 
 }

@@ -8,8 +8,19 @@ import capaModelo.Cliente;
 import capaModelo.Tienda;
 import java.sql.ResultSet;
 import org.apache.log4j.Logger;
+/**
+ * Clase que se encarga de todo lo relacionado con clientes y la interacción con la base de datos
+ * @author JuanDavid
+ *
+ */
 public class ClienteDAO {
 	
+	/**
+	 * 
+	 * @param tel Dado el telefóno de un cliente se encarga de retornar en un array list de objetos tipo liente
+	 * la información de los registros que coincidente con dicho teléfono.
+	 * @return ArrayList de tipo cliente con la información de clientes que coinciden con el teléfono dado.
+	 */
 	public static ArrayList<Cliente> obtenerCliente(String tel)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -54,13 +65,27 @@ public class ClienteDAO {
 				Cliente clien = new Cliente( idcliente, telefono, nombreCliente,apellido, nombreCompania, direccion,municipio,latitud, longitud, zona, observacion, nombreTienda, idTienda, memcode);
 				clientes.add(clien);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(clientes);
 		
 	}
 	
+	/**
+	 * Método que se encarga de insertar en la base de datos un cliente
+	 * @param clienteInsertar Se recibe como parámetro un objeto Modelo Cliente con base en el cual se inserta el cliente.
+	 * @return  Se retorna un int con el valor del idcliente insertado en la base de datos.
+	 */
 	public static int insertarCliente(Cliente clienteInsertar)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -79,16 +104,27 @@ public class ClienteDAO {
 				
 	        }
 			stm.close();
+			rs.close();
 			con1.close();
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			return(0);
 		}
 		return(idClienteInsertado);
 	}
 	
-	
+	/**
+	 * Método que se encarga de retonar un objeto Modelo CLiente, con base en un id que envía como parámetro.
+	 * @param id Se recibe un id cliente y con base en este se busca en base de datos.
+	 * @return Se retorna un objeto Modelo Cliente con la información del cliente.
+	 */
 	public static Cliente obtenerClienteporID(int id)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -133,13 +169,27 @@ public class ClienteDAO {
 				clienteConsultado = new Cliente( idcliente, telefono, nombreCliente, apellido, nombreCompania, direccion,municipio,latitud, longitud, zona, observacion, nombreTienda, idTienda,memcode);
 				
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(clienteConsultado);
 		
 	}
 	
+	/**
+	 * Método que busca actualizar la información de un cliente con base en un objeto Modelo Cliente enviado como parámetro.
+	 * @param clienteAct Se envía como parámetro un tipo de Modelo Cliente con base en el cual se hace la actualización.
+	 * @return Se retorna un valor entero con el valor del id cliente actualizado en el sistema.
+	 */
 	public static int actualizarCliente(Cliente clienteAct)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -165,12 +215,26 @@ public class ClienteDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			return(0);
 		}
 		logger.info("id cliente actualizado" + idClienteActualizado);
 		return(idClienteActualizado);
 	}
 	
+	/**
+	 * El campo memcode corresponde al consecutivo cliente que tiene en la base de datos de la tienda, como la inserción
+	 * es asincrona, se requiere que luego de insertado el cliente en nuestro sistema y luego de insertado el pedido en la tienda
+	 * donde el cliente nuevo tiene un memcode, venimos y actualizamos el memcode en nuestro sistema.
+	 * @param idCliente Se recibe como parámetro el idcliente al cual se le va a actualizar el memcode.
+	 * @param memcode Valor de memcode a actualizar.
+	 * @return Se retorna un entero con el idcliente actualizado.
+	 */
 	public static int actualizarClienteMemcode(int idCliente, int memcode)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -191,6 +255,12 @@ public class ClienteDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			return(0);
 		}
 		logger.info("id cliente actualizado" + idClienteActualizado);

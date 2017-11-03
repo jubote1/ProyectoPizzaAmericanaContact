@@ -14,7 +14,9 @@ import capaControlador.PedidoCtrl;
 
 /**
  * Servlet implementation class GetAdicionProducto
- */
+ * Servicio que se encarga de retornar en formato JSON todas los productos con la marca de tipo adicion, cone el fin
+ * de que la capa de presentación se encargue de desplegarlos según sea la necesidad.
+ */ 
 @WebServlet("/GetAdicionProducto")
 public class GetAdicionProducto extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -29,6 +31,8 @@ public class GetAdicionProducto extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * El método GET no recibe parámetros, pues retorna todos los productos tipo adición, invocando a la capa Pedido
+	 * controlador al método obtenerAdicionProductos();
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try{

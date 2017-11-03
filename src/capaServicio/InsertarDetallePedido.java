@@ -14,6 +14,8 @@ import capaControlador.PedidoCtrl;
 
 /**
  * Servlet implementation class InsertarDetallePedido
+ * Servicio que es consumido en la inserción del pedido, cada vez que se agrega un detalle al pedido, para lo cual recibe 
+ * la información clave para la inserción.
  */
 @WebServlet("/InsertarDetallePedido")
 public class InsertarDetallePedido extends HttpServlet {
@@ -29,6 +31,9 @@ public class InsertarDetallePedido extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Este servicio recibe como parámetros el idproducto qeu se va a agregar, el idpedido al cual estará relacionado
+	 * el detalle de pedido, se ingresa la información del detalle pedido, como las especialidades, la cantidad, observaciones, excepciones de precio etc.
+	 * 
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
@@ -49,7 +54,15 @@ public class InsertarDetallePedido extends HttpServlet {
         String observacion = request.getParameter("observacion");
         modespecialidad1 = request.getParameter("modespecialidad1");
         modespecialidad2 = request.getParameter("modespecialidad2");
-        int idsabortipoliquido = Integer.parseInt(request.getParameter("idsabortipoliquido"));
+        int idsabortipoliquido;
+        try
+        {
+        	idsabortipoliquido = Integer.parseInt(request.getParameter("idsabortipoliquido"));
+        }catch(Exception e)
+        {
+        	idsabortipoliquido = 0;
+        }
+        
         int idexcepcion;
         try
         {

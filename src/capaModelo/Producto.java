@@ -1,5 +1,10 @@
 package capaModelo;
 
+/**
+ * Clase que implementa la entidad Producto.
+ * @author JuanDavid
+ *
+ */
 public class Producto {
 
 	private int idProducto;
@@ -14,10 +19,18 @@ public class Producto {
 	private String incluye_liquido;
 	private int idtipo_liquido;
 	private String nombreliquido;
+	private String manejacantidad;
 	
 	
 	
 	
+	
+	public String getManejacantidad() {
+		return manejacantidad;
+	}
+	public void setManejacantidad(String manejacantidad) {
+		this.manejacantidad = manejacantidad;
+	}
 	public int getProductoasociaadicion() {
 		return productoasociaadicion;
 	}
@@ -100,7 +113,7 @@ public class Producto {
 		this.tipo = tipo;
 		this.preciogeneral = preciogeneral;
 	}
-	public Producto(int idProducto, int idReceta, String nombre, String descripcion, float impuesto, String tipo, int productoasociaadicion ,double preciogeneral, String incluye_liquido, int idtipo_liquido) {
+	public Producto(int idProducto, int idReceta, String nombre, String descripcion, float impuesto, String tipo, int productoasociaadicion ,double preciogeneral, String incluye_liquido, int idtipo_liquido, String manejacantidad) {
 		super();
 		this.idProducto = idProducto;
 		this.idReceta = idReceta;
@@ -112,6 +125,7 @@ public class Producto {
 		this.preciogeneral = preciogeneral;
 		this.incluye_liquido = incluye_liquido;
 		this.idtipo_liquido = idtipo_liquido;
+		this.manejacantidad = manejacantidad;
 	}
 	
 	public Producto(int idProducto, int idReceta, String nombrereceta, String nombre, String descripcion, float impuesto, String tipo,double preciogeneral, String incluye_liquido, int idtipo_liquido, String nombreliquido) {

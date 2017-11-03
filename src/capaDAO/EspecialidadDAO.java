@@ -8,10 +8,20 @@ import capaModelo.Cliente;
 import capaModelo.Especialidad;
 import java.sql.ResultSet;
 import org.apache.log4j.Logger;
+/**
+ * Clase que se encarga de implementar todos aquellos métodos que tienen una interacción directa con la base de datos
+ * @author JuanDavid
+ *
+ */
 public class EspecialidadDAO {
 	
 	
-
+/**
+ * Método que se encarga de insertar en base de datos la información de la entidad Especialidad
+ * @param Espe recibe como parámetro un objeto Modelo Especialidad con base en el cual se realiza la inserción de la
+ * especialidad.
+ * @return Se retonra valor entero con el id de la especiliadad insertada.
+ */
 public static int insertarEspecialidad(Especialidad Espe)
 {
 	Logger logger = Logger.getLogger("log_file");
@@ -34,11 +44,21 @@ public static int insertarEspecialidad(Especialidad Espe)
 	}
 	catch (Exception e){
 		logger.error(e.toString());
+		try
+		{
+			con1.close();
+		}catch(Exception e1)
+		{
+		}
 		return(0);
 	}
 	return(idEspecialidadIns);
 }
 
+/**
+ * Método que se encarga de eliminar una especialidad en la base de datos.
+ * @param idespecialidad Se recibe como parámetro el id especialidad qeu se desea eliminar.
+ */
 public static void eliminarEspecialidad(int idespecialidad)
 {
 	Logger logger = Logger.getLogger("log_file");
@@ -55,11 +75,22 @@ public static void eliminarEspecialidad(int idespecialidad)
 	}
 	catch (Exception e){
 		logger.error(e.toString());
-		
+		try
+		{
+			con1.close();
+		}catch(Exception e1)
+		{
+		}
 	}
 	
 }
 
+/**
+ * Método que se encarga de retornar una especialidad dado un idespecialidad
+ * @param idespecialidad recibe como parámetro un intero id especialidad y con base en esto, realiza la consulta
+ * en base de datos y retorna la información.
+ * @return Se retorna la información de la especialidad en un objeto Modelo Especialidad.
+ */
 public static Especialidad retornarEspecialidad(int idespecialidad)
 {
 	Logger logger = Logger.getLogger("log_file");
@@ -88,11 +119,21 @@ public static Especialidad retornarEspecialidad(int idespecialidad)
 	}
 	catch (Exception e){
 		logger.error(e.toString());
-		
+		try
+		{
+			con1.close();
+		}catch(Exception e1)
+		{
+		}
 	}
 	return(Espe);
 }
 
+/**
+ * Método que tiene como objetivo modificar una especialidad.
+ * @param Espe Recibe como parámetro un objeto Modelo Especiliadad con base en la cual se hará la modificación.
+ * @return Se retorna un string indicadno si el proceso fue exitoso o no.
+ */
 public static String editarEspecialidad(Especialidad Espe)
 {
 	Logger logger = Logger.getLogger("log_file");
@@ -111,9 +152,54 @@ public static String editarEspecialidad(Especialidad Espe)
 	}
 	catch (Exception e){
 		logger.error(e.toString());
+		try
+		{
+			con1.close();
+		}catch(Exception e1)
+		{
+		}
 		resultado = "error";
 	}
 	return(resultado);
+}
+
+/**
+ * Método que se encarga de retornar el precio en base de datos de un producto y especialidad determinada
+ * que tengan una excepción de precio.
+ * @param idespecialidad El idespecialidad que esta asociado a la excepción especialidad
+ * @param idproducto El idproducto asociado a la excepción de especialidad.
+ * @return Se retornará un valor double con el precio asociado a los parámetros de idespecialidad e idproducto enviados.
+ */
+public static double obtenerPrecioExcepcionEspecialidad(int idespecialidad, int idproducto)
+{
+	Logger logger = Logger.getLogger("log_file");
+	int idEspecialidadEli = 0;
+	ConexionBaseDatos con = new ConexionBaseDatos();
+	Connection con1 = con.obtenerConexionBDPrincipal();
+	double precio= 0;
+	try
+	{
+		Statement stm = con1.createStatement();
+		String consulta = "select precio from  especialidad_excepcion  where idespecialidad = " + idespecialidad + " and idproducto = " + idproducto; 
+		logger.info(consulta);
+		ResultSet rs = stm.executeQuery(consulta);
+		while(rs.next()){
+			precio = rs.getDouble("precio");
+			break;
+		}
+		stm.close();
+		con1.close();
+	}
+	catch (Exception e){
+		logger.error(e.toString());
+		try
+		{
+			con1.close();
+		}catch(Exception e1)
+		{
+		}
+	}
+	return(precio);
 }
 
 }

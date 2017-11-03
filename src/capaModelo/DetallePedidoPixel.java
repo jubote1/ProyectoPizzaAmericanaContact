@@ -1,5 +1,10 @@
 package capaModelo;
 
+/**
+ * Clase que implementa la entidad DetallePedidoPixel la cual tiene los parámetros para detallar al sistema Pos el pedido
+ * @author JuanDavid
+ *
+ */
 public class DetallePedidoPixel {
 	
 	private int idproductoext;

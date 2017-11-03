@@ -15,6 +15,7 @@ import capaControlador.PedidoCtrl;
 
 /**
  * Servlet implementation class GetTipoLiquido
+ * Servicio que se encarga de retornar en formato JSON los tipos liquidos parámetrizados en el sistema.
  */
 @WebServlet("/GetTipoLiquido")
 public class GetTipoLiquido extends HttpServlet {
@@ -30,6 +31,8 @@ public class GetTipoLiquido extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Servicio que no recibe parámetros e invoca al método ObtenerTiposLiquido de la capa Parametros Controlador, retorna
+	 * en formato JSON los tipos liquidos parametrizados en el sistema.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub

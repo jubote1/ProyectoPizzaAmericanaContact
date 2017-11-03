@@ -1,4 +1,6 @@
-/conexion/
-/capaDAO/
 /capaControlador/
+/capaDAO/
+/capaModelo/
 /capaServicio/
+/conexion/
+/org/

@@ -1,5 +1,10 @@
 package capaModelo;
 
+/**
+ * Clase que implementa la entidad Detalle Pedido Adición.
+ * @author JuanDavid
+ *
+ */
 public class DetallePedidoAdicion {
 	
 	private int idadicion;

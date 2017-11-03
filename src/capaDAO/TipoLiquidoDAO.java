@@ -9,8 +9,17 @@ import capaModelo.TipoLiquido;
 import conexion.ConexionBaseDatos;
 import org.apache.log4j.Logger;	
 
+/**
+ * Clase que se encarga de implementar toda la interacción con la base de datos para la entidad tipoLiquido
+ * @author JuanDavid
+ *
+ */
 public class TipoLiquidoDAO {
 	
+	/**
+	 * Método que se encarga de retornar todos las entidades tipo liquido definidos en la base de datos.
+	 * @return Se retorna un ArrayList con todos los tipo Liquido definidos en el sistema.
+	 */
 	public static ArrayList<TipoLiquido> obtenerTiposLiquido()
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -30,14 +39,28 @@ public class TipoLiquidoDAO {
 				TipoLiquido liquido = new TipoLiquido(idtipoliquido,nombre,capacidad);
 				tipos.add(liquido);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(tipos);
 		
 	}
 	
-		
+	/**	
+	 * Método que se encarga de insertar un tipo liquido con base en la información recibida como parámetro.
+	 * @param pro Se recibe parámetro objeto Modelo TipoLiquido con base en el cual se realizará la inserción de la
+	 * nueva entidad en la base de datos.
+	 * @return Se retorna un valor entero con el idtipoliquido asignado al objeto nuevo insertado en la base de datos.
+	 */
 	public static int insertarTipoLiquido(TipoLiquido pro)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -60,11 +83,22 @@ public class TipoLiquidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			return(0);
 		}
 		return(idTipoLiquidoIns);
 	}
 
+	/**
+	 * Método que se encarga de eliminar un tipo Liquido con base en la información enviada como parámetro
+	 * @param idtipoliquido Se recibe como parámetro un entero con la información del tipo liquido que se desea
+	 * eliminar, el método no tiene ningún retorno.
+	 */
 	public static void eliminarTipoLiquido(int idtipoliquido)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -81,11 +115,22 @@ public class TipoLiquidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
-			
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		
 	}
 
+	/**
+	 * Método que se encarga de retornar una entidad TipoLIquido con base en la información enviada como parámetro.
+	 * @param idtipoliquido Se recibe como parámetro un entero idtipoliquido, el cual indicia el id del tipo liquido que se
+	 * se desea consultar.
+	 * @return Se retorna un objeto Modelo TipoLiquido con la información del tipo liquido que se desea consultar.
+	 */
 	public static TipoLiquido retornarTipoProducto(int idtipoliquido)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -109,15 +154,27 @@ public class TipoLiquidoDAO {
 			}
 			Pro = new TipoLiquido(idtipliq,nombre,capacidad);
 			stm.close();
+			rs.close();
 			con1.close();
 		}
 		catch (Exception e){
 			logger.error(e.toString());
-			
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(Pro);
 	}
 
+	/**
+	 * Método que se encarga de editar un tipo liquido con base en la información envíada como parámetro.
+	 * @param Pro Se recibe como parámetro un objeto Modelo TipoLiquido el cual contiene la base de la información
+	 * a modificar.
+	 * @return Se retorna una variable String con el resultado del proceso de actualización.
+	 */
 	public static String editarTipoLiquido(TipoLiquido Pro)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -137,6 +194,12 @@ public class TipoLiquidoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			resultado = "error";
 		}
 		return(resultado);

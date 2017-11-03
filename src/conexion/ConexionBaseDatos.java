@@ -1,6 +1,14 @@
 package conexion;
 import java.sql.*;
+/**
+ * Clase que se encarga de la implementación de la conexión a las bases de datos del sistema contact center y la
+ * base de datos de cada tienda.
+ * @author JuanDavid
+ *
+ */
 public class ConexionBaseDatos {
+	
+	
 	
 	public static void main(String args[]){
 		
@@ -8,8 +16,15 @@ public class ConexionBaseDatos {
 		cn.obtenerConexionBDTienda("PixelSqlbase");
 	}
 
+	/**
+	 * Método que implementa la conexión a la base de datos del sistema principal de contact center
+	 * @return
+	 */
 	public Connection obtenerConexionBDPrincipal(){
 		try {
+			/**
+			 * Se realiza el registro del drive de Mysql
+			 */
 		    Class.forName("com.mysql.jdbc.Driver").newInstance();
 		    
 
@@ -24,10 +39,10 @@ public class ConexionBaseDatos {
 
 		try {
 
-			//con = DriverManager.getConnection(
-		    //        "jdbc:mysql://localhost/pizzaamericana?"
-		    //        + "user=root&password=naillive");
 			
+			/**
+			 * Se realiza la creación de la conexión a la base de datos
+			 */
 			con = DriverManager.getConnection(
 		            "jdbc:mysql://localhost/pizzaamericana?"
 		            + "user=root&password=4m32017");
@@ -43,6 +58,11 @@ public class ConexionBaseDatos {
 		return(con);
 	}
 	
+	/**
+	 * Método que se encarga de implementar la conexion a la base de datos de cada teinda
+	 * @param dsn Recibe como parámetro el valor del Datasource Name
+	 * @return Se retorna un objeto de la clase conexión.
+	 */
 	public Connection obtenerConexionBDTienda(String dsn){
 		
 		Connection con = null;
@@ -51,14 +71,18 @@ public class ConexionBaseDatos {
 			 //Class.forName("sybase.jdbc.sqlanywhere.IDriver");
 			 //con = DriverManager.getConnection("jdbc:sqlanywhere:dsn="+dsn+";uid=admin;pwd=xxx");//SystemPos
 			
-			//Cambiamos para la versión 12 del driver en teoria no es necesario registrar el driver lo comentamos
-			System.out.println("pase 1");
+			/**
+			 * Cambiamos para la versión 12 del driver en teoria no es necesario registrar el driver lo comentamos
+			 */
 			DriverManager.registerDriver( (Driver)
 					 Class.forName( "sybase.jdbc.sqlanywhere.IDriver" ).newInstance() );
-			System.out.println("pase 2");
+			
+			/**
+			 * Se crea el ojbeto conexión para sqlanyhwere
+			 */
 			con = DriverManager.getConnection("jdbc:sqlanywhere:dsn="+dsn+";uid=admin;pwd=xxx");//SystemPos
 			//con = DriverManager.getConnection("jdbc:sqlanywhere:uid=admin;pwd=xxx;eng=PixelSqlbase;database=PixelSqlbase;links=tcpip(host=192.168.0.37;port=2638)");//SystemPos
-			System.out.println("pase 3");
+			
 		} catch (Exception ex) {
 
 		    // Mantener el control sobre el tipo de error

@@ -1,6 +1,11 @@
 package capaModelo;
 
-public class DetallePedido {
+/**
+ * Clase que implementa la entidad Detalle Pedido
+ * @author JuanDavid
+ *
+ */
+public class DetallePedido implements Cloneable {
 	
 	private int iddetallepedido;
 	private int idproducto;
@@ -21,11 +26,26 @@ public class DetallePedido {
 	private String excepcion;
 	private String modespecialidad1;
 	private String modespecialidad2;
+	private String tipoProducto;
 	
 	
 	
+	public Object clone(){
+        Object obj=null;
+        try{
+            obj=super.clone();
+        }catch(CloneNotSupportedException ex){
+            System.out.println(" no se puede duplicar");
+        }
+        return obj;
+    }
 	
-	
+	public String getTipoProducto() {
+		return tipoProducto;
+	}
+	public void setTipoProducto(String tipoProducto) {
+		this.tipoProducto = tipoProducto;
+	}
 	public String getModespecialidad1() {
 		return modespecialidad1;
 	}
@@ -170,6 +190,30 @@ public class DetallePedido {
 		this.modespecialidad1 = modespecialidad1;
 		this.modespecialidad2 = modespecialidad2;
 	}
+	public DetallePedido(int iddetallepedido, String nombreproducto, int idproducto, double cantidad, String nombreespecialidad1, int idespecialidad1,
+			String nombreespecialidad2, int idespecialidad2, double valorunitario, double valortotal, String adicion, String observacion,
+			String liquido, String excepcion, int idpedido, int idexcepcion, int idsabortipoliquido, String tipoProducto) {
+		super();
+		this.iddetallepedido = iddetallepedido;
+		this.nombreproducto = nombreproducto;
+		this.idproducto = idproducto;
+		this.cantidad = cantidad;
+		this.nombreespecialidad1 = nombreespecialidad1;
+		this.idespecialidad1 = idespecialidad1;
+		this.nombreespecialidad2 = nombreespecialidad2;
+		this.idespecialidad2 = idespecialidad2;
+		this.valorunitario = valorunitario;
+		this.valortotal = valortotal;
+		this.adicion = adicion;
+		this.observacion = observacion;
+		this.liquido = liquido;
+		this.excepcion = excepcion;
+		this.idpedido = idpedido;
+		this.idexcepcion = idexcepcion; 
+		this.idsabortipoliquido = idsabortipoliquido;
+		this.tipoProducto =  tipoProducto;
+	}
+	
 	public DetallePedido(int iddetallepedido, String nombreproducto, int idproducto, double cantidad, String nombreespecialidad1, int idespecialidad1,
 			String nombreespecialidad2, int idespecialidad2, double valorunitario, double valortotal, String adicion, String observacion,
 			String liquido, String excepcion, int idpedido, int idexcepcion, int idsabortipoliquido) {

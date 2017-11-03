@@ -14,6 +14,7 @@ import capaControlador.PedidoCtrl;
 
 /**
  * Servlet implementation class InsertarDetalleAdicion
+ * Este servicio se encarga de insertar en el sistema la información de adición a un producto especifico.
  */
 @WebServlet("/InsertarDetalleAdicion")
 public class InsertarDetalleAdicion extends HttpServlet {
@@ -29,6 +30,9 @@ public class InsertarDetalleAdicion extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Este servicio recibe como parámetro el iddetallepedido al cual se le realizó la adicion, adicionalmente se 
+	 * envía el iddetallepedido relacionado a la adicion, la adición relacionada a la especialidad 1 o la especialidad 2 y 
+	 * las cantidades. Lo anterior invocando al método InsertarDetalleAdicion de la capa Pedido Controlador.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub

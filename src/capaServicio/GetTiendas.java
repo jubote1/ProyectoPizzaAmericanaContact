@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import capaControlador.TiendaCtrl;
 /**
  * Servlet implementation class GetTiendas
+ * Servicio que se encarga de retornar las tiendas o puntos de venta para los cuales se podrá tomar un pedido, 
+ * la información será retornada en formato JSON.
  */
 @WebServlet("/GetTiendas")
 public class GetTiendas extends HttpServlet {
@@ -26,6 +28,8 @@ public class GetTiendas extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Este servicio no recibe parámetros dado que no filtra la información, simplemente retorna en formato JSON 
+	 * las tiendas o puntos de venta parametrizados en el sistema, invocando el método obtenerTiendas de la capa Tienda Controlador.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub

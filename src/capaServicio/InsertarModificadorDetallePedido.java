@@ -16,6 +16,8 @@ import capaControlador.PedidoCtrl;
 
 /**
  * Servlet implementation class InsertarModificadorDetallePedido
+ * Este servicio se encarga de la inserción de lo llamado como modificadores de pedido, los cuales se refieren aquellos, 
+ * productos con y sin que se le desean agregar a un producto.
  */
 @WebServlet("/InsertarModificadorDetallePedido")
 public class InsertarModificadorDetallePedido extends HttpServlet {
@@ -31,6 +33,9 @@ public class InsertarModificadorDetallePedido extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Este servicio recibe como parámetros el iddetalle pedido padre al cual va asociado el modificador, adicionalmente
+	 * se recibe para que mitad y en que cantidad es la modificación. Lo anterior invocando al método InsertarModificadorDetallePedido
+	 * de la capa Pedido Controlador.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
@@ -62,11 +67,19 @@ public class InsertarModificadorDetallePedido extends HttpServlet {
         {
         	cantidad = 0;
         }
+        int iddetallepedido;
+        try
+        {
+        	iddetallepedido =  Integer.parseInt(request.getParameter("iddetallepedido"));
+        }catch(Exception e)
+        {
+        	iddetallepedido = 0;
+        }
         logger.info("Llamado a servicio InsertarModificadorDetallePedido con parámetros iddetallepedidopadre: "
         		+ iddetallepedidopadre +  " idproductoespecialidad1: " + idproductoespecialidad1
         		+ " idproductoespecialidad2: " + idproductoespecialidad2 + " cantidad: " + cantidad );
         PedidoCtrl PedidoCtrl = new PedidoCtrl();
-        String respuesta = PedidoCtrl.InsertarModificadorDetallePedido(iddetallepedidopadre, idproductoespecialidad1, idproductoespecialidad2, cantidad);
+        String respuesta = PedidoCtrl.InsertarModificadorDetallePedido(iddetallepedidopadre, idproductoespecialidad1, idproductoespecialidad2, cantidad, iddetallepedido);
         System.out.println(respuesta);
         PrintWriter out = response.getWriter();
 		out.write(respuesta);

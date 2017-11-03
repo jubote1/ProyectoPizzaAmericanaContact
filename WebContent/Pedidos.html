@@ -4,28 +4,65 @@
 		<title>Tomar Pedidos</title>
 		<meta charset="utf-8" />
 		  <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+		  <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />	
 		  <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
 		  <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script> 
 		  <script type="text/javascript" src="js/bootstrap.min.js"></script>
 		  <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.js"></script>
+		  <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.5.3/js/bootstrapValidator.min.js'></script>
+   		  <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.5.3/js/language/es_ES.min.js'></script>
 		  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.1.0/jquery-confirm.min.css">	
 	</head>
 	<body>
 
 		<link id="Menu-file" href="Menu.html" rel="import" />
+		<link id="MenuAdm-file" href="MenuAdm.html" rel="import" />
 		<script type="text/javascript">
-			var getImport = document.querySelector('#Menu-file'); 
-			var getContent = getImport.import.querySelector('#menuprincipal');
-			document.body.appendChild(document.importNode(getContent, true));
+			
+			var getImport; 
+			var getContent;
+			//Obtenemos el valor de la variable server, con base en la URL digitada
+			var loc = window.location;
+			var pathName = loc.pathname.substring(0, loc.pathname.lastIndexOf('/') + 1);
+			server = loc.href.substring(0, loc.href.length - ((loc.pathname + loc.search + loc.hash).length - pathName.length));
+			var respuesta ='';
+			$.ajax({ 
+		    	url: server + 'ValidarUsuarioAplicacion', 
+		    	dataType: 'text',
+		    	type: 'post', 
+		    	async: false, 
+		    	success: function(data){
+						    respuesta =  data;		
+				} 
+			});
+			switch(respuesta)
+		    		{
+		    			case 'OK':
+		    				getImport = document.querySelector('#Menu-file');
+		    				break;
+		    			case 'OKA':
+		    				getImport = document.querySelector('#MenuAdm-file');
+		    				break;	
+		    			default:
+		    				location.href = server +"Index.html";
+		    				break;
+		    		}
+		    		getContent = getImport.import.querySelector('#menuprincipal');
+			    	document.body.appendChild(document.importNode(getContent, true));
+
 		</script>
 
 		<div class="container">
-			<form>
+			<form id="cliente">
 				<h1>Tomar Pedidos</h1>
 				
 					<table class="table table-bordered">
 						<tbody>
-							
+								
+								<tr>
+										<td class="active">Fecha Pedido</td>
+										<td><input type="text" id="fechapedido" name="fechapedido" class="form-control" placeholder="Fecha Pedido"></td>
+								</tr>
 								<tr>
 										<td class="active">Teléfono</td>
 										<td id="encTelefono"><input type="text" id="telefono" name="telefono" class="form-control" placeholder="Telefono" onchange="validarTelefono();" maxlength="10"></td>
@@ -77,7 +114,7 @@
 						</tbody>
 					</table>
 
-					<input type="button" class="btn btn-default btn-sm" id="limpiar" value="Limpiar Selección Cliente" onclick="limpiarSeleccionCliente()"/>
+					<input type="button" class="btn btn-default btn-sm" id="limpiar" name="limpiar" value="Limpiar Selección Cliente" onclick="limpiarSeleccionCliente()"/>
 
 					<table id="grid-clientes" class="table table-condensed table-hover table-striped" cellspacing="0" width="100%">
 									        <thead>
@@ -105,12 +142,22 @@
 				
 			</div>
 			
-		<div class="container"><h2>Tamaño Pizza / Otro Producto</h2>
+		<div class="container"><h2><b>Tamaño Pizza / Otro Producto</b></h2>
 				<form  id='FormTamanoPizza'>
 				</form>
 				<table class="table table-bordered">
+					<tr>
+									<td class="active">
+										Excepción Precio
+									</td>
+									<td>
+										<select id="selectExcepcion" name="selectExcepcion" class="form-control" placeholder="Excepcion Precio"></select>
+									</td>
+					<tr>
+				</table>
+				<table class="table table-bordered">
 					<thead>
-						<h2>División Pizza</h2>
+						<h2><b>División Pizza</b></h2>
 					</thead>
 					<tbody>
 						<tr>
@@ -131,45 +178,48 @@
 						</tr>
 					</tbody>
 				</table>
-					<h2>Especialidades</h2>
+					<h2><b>Especialidades</b></h2>
 					<form  id='especialidades'>
 					</form>
-					<h2>Otros Productos</h2>
+					<h2><b>Otros Productos</b></h2>
 					<form  id='otrosproductos'>
 					</form>
 					<form  id='pedido'>
 						<table class='table table-bordered'>
 							<tbody>
+																
 								<tr>
 									<td class="active">
-										Cantidad Producto
+									<h2><b>ADICIONES</b></h2>
+									</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>
+										 <label><input type="radio" aria-label="..." value="siadicion" id="siadicion" name="adicion">Si Adición</label>
 									</td>
 									<td>
-										
-											
-												<div class="input-group">
-													<input type="button" class="btn btn-primary btn-lg" value="   -   " onclick="javascript:changeQuantity(-1)">
-													<div class="col-md-6">
-													<input type="text" id="cantidad" name="cantidad" class="form-control" placeholder="Cantidad">
-													</div>
-													<input type="button" class="btn btn-primary btn-lg" value="   +   " onclick="javascript:changeQuantity(1)">
-												</div>	
-											
+										 <label><input type="radio" aria-label="..." value="noadicion" id="noadicion" name="adicion">No Adición</label>
 									</td>
 								</tr>
 								<tr>
 									<td class="active">
-										Excepción Precio
+									<h2><b>MODIFICADORES</b></h2>
+									</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>
+										<input type="button" class="btn btn-success btn-md" value="PRODUCTO CON" onclick="ProductoCon()">
 									</td>
 									<td>
-										<select id="selectExcepcion" name="selectExcepcion" class="form-control" placeholder="Excepcion Precio"></select>
+										<input type="button" class="btn btn-warning btn-md" value="PRODUCTO SIN" onclick="ProductoSin()">
 									</td>
 								</tr>
 							</tbody>
 						</table>
-											 <label><input type="radio" aria-label="..." value="siadicion" id="siadicion" name="adicion">Si Adición</label>
-										     <label><input type="radio" aria-label="..." value="noadicion" id="noadicion" name="adicion">No Adición</label>
-									
+											
+										     
 								
 							
 						</table>
@@ -191,36 +241,70 @@
 						</div>
 					<!-- ESTO ES PARA LA ADICIÓN -->
 
-					<!-- ESTO ES PARA LA CONINGREDIENTE -->
-					<input type="button" class="btn btn-primary btn-md" value="PRODUCTO CON" onclick="ProductoCon()">
-						<div class="modal fade" id="conProducto" tabindex="-1" role="dialog" aria-labelledby="addLabel">
+					<!-- ESTO ES PARA LA GASEOSA -->
+						<div class="modal fade" id="addGaseosa" tabindex="-1" role="dialog" aria-labelledby="addLabel">
 							 <div class="modal-dialog modal-lg" role="document">
 							    <div class="modal-content">
 							      <div class="modal-header">
 							        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-							        <h4 class="modal-title" id="addLabel">Producto CON</h4>
+							        <h4 class="modal-title" id="addLabel">Seleccionar Gaseosa</h4>
 							      </div>
-							      <form id='pintarCon'>
+							      <form id='pintarGaseosa'>
 								  </form>
 							    </div>
 							</div>
 						</div>
-					<!-- ESTO ES PARA LA CONINGREDIENTE -->
+					<!-- ESTO ES PARA GASEOSA -->
 
-					<!-- ESTO ES PARA LA SININGREDIENTE -->
-					<input type="button" class="btn btn-primary btn-md" value="PRODUCTO SIN" onclick="ProductoSin()">
-						<div class="modal fade" id="sinProducto" tabindex="-1" role="dialog" aria-labelledby="addLabel">
+					<!-- ESTO ES PARA ADICIONALES -->
+						<div class="modal fade" id="addAdicionales" tabindex="-1" role="dialog" aria-labelledby="addLabel">
 							 <div class="modal-dialog modal-lg" role="document">
 							    <div class="modal-content">
 							      <div class="modal-header">
 							        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-							        <h4 class="modal-title" id="addLabel">Producto SIN</h4>
+							        <h4 class="modal-title" id="addLabel">Seleccionar Adicionales</h4>
 							      </div>
-							      <form id='pintarSin'>
+							      <form id='pintarAdicionales'>
 								  </form>
 							    </div>
 							</div>
 						</div>
+					<!-- ESTO ES PARA ADICIONALES -->
+					
+
+					<!-- ESTO ES PARA LA CONINGREDIENTE -->
+					
+								
+									<div class="modal fade" id="conProducto" tabindex="-1" role="dialog" aria-labelledby="addLabel">
+										 <div class="modal-dialog modal-lg" role="document">
+										    <div class="modal-content">
+										      <div class="modal-header">
+										        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+										        <h4 class="modal-title" id="addLabel">Producto CON</h4>
+										      </div>
+										      <form id='pintarCon'>
+											  </form>
+										    </div>
+										</div>
+									</div>
+							<!-- ESTO ES PARA LA CONINGREDIENTE -->
+
+							<!-- ESTO ES PARA LA SININGREDIENTE -->
+							
+								
+									<div class="modal fade" id="sinProducto" tabindex="-1" role="dialog" aria-labelledby="addLabel">
+										 <div class="modal-dialog modal-lg" role="document">
+										    <div class="modal-content">
+										      <div class="modal-header">
+										        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+										        <h4 class="modal-title" id="addLabel">Producto SIN</h4>
+										      </div>
+										      <form id='pintarSin'>
+											  </form>
+										    </div>
+										</div>
+									</div>
+							
 					<!-- ESTO ES PARA LA SININGREDIENTE -->
 						
 						
@@ -268,7 +352,8 @@
 								                <th data-column-id="observacion">Obs</th>
 								                <th data-column-id="valorunitario">Valor Unitario</th>
 								                <th data-column-id="valortotal">Valor Total</th>
-								                <th width="120">Eliminar</th>
+								                <th width="90">Eliminar</th>
+								                <th width="90">Duplicar</th>
 								            </tr>
 								        </thead>
 								      	<tbody>
@@ -278,6 +363,18 @@
 						</div>
 						<table class='table table-bordered'>
 								<tbody>
+									<tr>
+										<td>
+										</td>
+										<td>
+										</td>
+										<td>
+										</td>
+										<td>
+											<label><input type="radio" aria-label="..." value="completo" id='completo' name="requiereDevuelta">Paga Completo</label>
+											<label><input type="radio" aria-label="..." value="devuelta" id='devuelta' name="requiereDevuelta">Requiere Devuelta</label>
+										</td>
+									</tr>
 									<tr>
 										<td class="active">Valor Total del Pedido</td>
 										<td class="active"><input type="text" class="form-control" id="totalpedido" placeholder="Valor total del Pedido" disabled></td>
@@ -293,7 +390,7 @@
 								</tbody>
 							</table>
 								<input type="button" class="btn btn-primary btn-lg" value="Confimar Pedido" onclick="ConfirmarPedido()">
-								<input type="button" class="btn btn-primary btn-lg" value="Reiniciar Pedido" onclick="ReiniciarPedido()">
+								<input type="button" class="btn btn-danger btn-lg" value="Reiniciar Pedido" onclick="ReiniciarPedido()">
 										
 		</div>
 	</body>
@@ -301,4 +398,10 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.1.0/jquery-confirm.min.js"></script>
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRtUQ2WV0L2gMnb9DKiFn1PTHJQLH3suA&callback=initMap">
     </script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="js/datepicker.js"></script>
+    <script>
+    	$("#fechapedido").datepicker($.datepicker.regional["es"]);
+		$("#fechapedido").datepicker('setDate', new Date());
+	</script>
 </html>

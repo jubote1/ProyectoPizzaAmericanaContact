@@ -15,6 +15,8 @@ import capaControlador.AutenticacionCtrl;
 import org.apache.log4j.Logger;
 /**
  * Servlet implementation class IngresarAplicacion
+ * Servicio utilizado para el logueo de la aplicación, recibiendo usuario y password, validando el resultado de la operacion
+ * y retornando un resultado para que el sistema interprete y continue la carga de la interface de pedidos.
  */
 @WebServlet("/GetIngresarAplicacion")
 public class GetIngresarAplicacion extends HttpServlet {
@@ -27,6 +29,8 @@ public class GetIngresarAplicacion extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Servicio para el logueo a la aplicación recibiendo los parámetros de usuario y login, e invocando al método autenticarUsuario 
+	 * de la capa Autenticacion controlador, si el proceso es exitoso, se creará un objeto tipo usuario y se dejará dentro de la sesión.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
@@ -58,6 +62,6 @@ public class GetIngresarAplicacion extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
-		System.out.println("hola");
+		
 	}
 }

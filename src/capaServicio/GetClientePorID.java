@@ -14,6 +14,8 @@ import capaControlador.ClienteCtrl;
 
 /**
  * Servlet implementation class GetClientePorID
+ * Servicio que se encarga de recibir un idcliente (el cual corresponde a el autoincrementable que posee la tabla de clientes)
+ * con base en esto retorna un único cliente asociado a este id, el retorno es formato JSON.
  */
 @WebServlet("/GetClientePorID")
 public class GetClientePorID extends HttpServlet {
@@ -29,6 +31,9 @@ public class GetClientePorID extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * EL servicio toma como parámetro el idcliente y con base en esto retorna en formato JSON el cliente asociado al id
+	 * pasado como parámetro, lo anterior invocando el método obtenerClienteporID(idCliente) en la capa controlador 
+	 * Cliente.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try{

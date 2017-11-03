@@ -14,6 +14,7 @@ import capaControlador.PedidoCtrl;
 
 /**
  * Servlet implementation class GetSaboresLiquidoProducto
+ * Servicio que recibe un idproducto y con base en este retorna los liquidos asociados al producto en formato JSON.
  */
 @WebServlet("/GetSaboresLiquidoProducto")
 public class GetSaboresLiquidoProducto extends HttpServlet {
@@ -29,6 +30,9 @@ public class GetSaboresLiquidoProducto extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * El Servicio recibe como parámetro el idproducto y con base en este invocando al método ObtenerSaboresLiquidoProducto 
+	 * de la capa Pedido controlador, retorna los sabores tipo liquido en formato JSON, con el objetivo de que la capa
+	 * de presentación se encargue de pintarlos, según la elección del pedido.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try{

@@ -1,5 +1,10 @@
 package capaModelo;
 
+/**
+ * Clase que implementa la entidad Especialidad
+ * @author JuanDavid
+ *
+ */
 public class Especialidad {
 
 	private int idespecialidad;

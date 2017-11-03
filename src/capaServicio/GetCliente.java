@@ -14,6 +14,8 @@ import capaControlador.ClienteCtrl;;
 
 /**
  * Servlet implementation class GetCliente
+ * Servicio que se encarga de consultar todos los registros que tiene asociado un cliente en la tabla de clientes, dando 
+ * como parámetro un teléfono determinado.
  */
 @WebServlet("/GetCliente")
 public class GetCliente extends HttpServlet {
@@ -29,6 +31,9 @@ public class GetCliente extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * El servicio recibe como parámetro del teléfono el cual es manejado como un String, con base en esto se retorna
+	 * en formato JSON todos los registros que tiene asociado el cliente en la tabla de clientes con el teléfono indicado.
+	 * Lo anterior invocando el método obtenerCliente(tel) de la capa controlador cliente.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub

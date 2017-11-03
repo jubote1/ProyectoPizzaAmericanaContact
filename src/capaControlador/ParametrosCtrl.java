@@ -22,11 +22,20 @@ import capaModelo.SaborLiquido;
 import capaModelo.Tienda;
 import capaModelo.Municipio;
 import capaModelo.FormaPago;
-
+/**
+ * 
+ * @author Juan David Botero Duque
+ * Esta clase está en la capa controlador y se encarga de todos los parámetros de la solución
+ *
+ */
 public class ParametrosCtrl {
 	
 	//FORMAPAGO
 	
+	/**
+	 * Método en la capa controlador que se encarga de retornar la información de las formas de pago en formato JSON
+	 * @return
+	 */
 	public String retornarFormasPago(){
 		JSONArray listJSON = new JSONArray();
 		ArrayList<FormaPago> formasPago = FormaPagoDAO.obtenerFormasPago();
@@ -43,6 +52,12 @@ public class ParametrosCtrl {
 	
 	//ESPECIALIDAD
 	
+	/**
+	 * Método en la capa controlador que recibe parámetros desde la capa de Presentación para la creación de especialidades
+	 * @param nombre Nombre de la especialidad
+	 * @param abreviatura Abreviatura de la especialidad
+	 * @return Retorna el id de la especialidad creado y devuelvo por la base de datos
+	 */
 	public String insertarEspecialidad(String nombre, String abreviatura)
 	{
 		JSONArray listJSON = new JSONArray();
@@ -54,6 +69,11 @@ public class ParametrosCtrl {
 		return listJSON.toJSONString();
 	}
 	
+	/**
+	 * 
+	 * @param idespecialidad Recibe como parámetro el idespecialidad que se va  a consultar
+	 * @return Retorna en formato JSON la información de la especialidad de acuerdo al parámetro de idespecialidad.
+	 */
 	public String retornarEspecialidad(int idespecialidad)
 	{
 		JSONArray listJSON = new JSONArray();
@@ -66,6 +86,11 @@ public class ParametrosCtrl {
 		return listJSON.toJSONString();
 	}
 	
+	/**
+	 * 
+	 * @param idespecialidad Se pasa como parámetro el idespecialidad que desea se eliminado
+	 * @return Se retorna el valor de exitoso en caso de que se elimine de manera exitosa la especialidad.
+	 */
 	public String eliminarEspecialidad(int idespecialidad)
 	{
 		JSONArray listJSON = new JSONArray();
@@ -76,6 +101,13 @@ public class ParametrosCtrl {
 		return listJSON.toJSONString();
 	}
 	
+	/**
+	 * 
+	 * @param idespecialidad Parámetro con base en el cual se edita la especialidad.
+	 * @param nombre Valor de nombre de la especialidad que va a ser editado.
+	 * @param abreviatura  Valor abreviatura de la especialidad que va a  ser editado.
+	 * @return Se retorna el valor resultado.
+	 */
 	public String editarEspecialidad(int idespecialidad , String nombre, String abreviatura)
 	{
 		JSONArray listJSON = new JSONArray();
@@ -90,6 +122,11 @@ public class ParametrosCtrl {
 	
 	//ESTADO PEDIDO
 	
+	/**
+	 * Método para la inserción de estado pedido en la capa de controlador
+	 * @param descripcion Se recibe como parámetro el valor de la descripción del estado.
+	 * @return Se devuelve el idestado insertado desde base de datos.
+	 */
 	public String insertarEstadoPedido(String descripcion)
 	{
 		JSONArray listJSON = new JSONArray();
@@ -101,6 +138,11 @@ public class ParametrosCtrl {
 		return listJSON.toJSONString();
 	}
 	
+	/**
+	 * Método que se encarga de retornar la información de un estado pedido determinado de acuerdo al parámetro idestadopedido
+	 * @param idestadopedido Se recibe como parámetro el idestadopedido a consultar.
+	 * @return Se retona en formato JSON la información del estado pedido a consutar.
+	 */
 	public String retornarEstadoPedido(int idestadopedido)
 	{
 		JSONArray listJSON = new JSONArray();
@@ -113,7 +155,10 @@ public class ParametrosCtrl {
 	}
 	
 	
-	
+	/**
+	 * Método que retorna en formato JSON los estados pedidos creados en la base de datos en capa controlador
+	 * @return Método que retorna en formato JSON los estados pedidos creados en la base de datos en capa controlador
+	 */
 	public String retornarEstadosPedido(){
 		JSONArray listJSON = new JSONArray();
 		ArrayList<EstadoPedido> estados = EstadoPedidoDAO.obtenerEstadosPedido();
@@ -127,6 +172,12 @@ public class ParametrosCtrl {
 		return listJSON.toJSONString();
 	}
 	
+	
+	/**
+	 * Método en capa controlador que recide el idestadopedido a eliminar y se encarga de llamar al método en la capa DAO, retona el valor exitoso en caso de finalizar bien.
+	 * @param idestadopedido Recibe el idestadopedido que va a ser eliminado.
+	 * @return Se retorna el resultado del proceso (exitoso)
+	 */
 	public String eliminarEstadoPedido(int idestadopedido)
 	{
 		JSONArray listJSON = new JSONArray();
@@ -137,6 +188,12 @@ public class ParametrosCtrl {
 		return listJSON.toJSONString();
 	}
 	
+	/**
+	 * Metódo en capa controlador que recibe los valores de estado a pedido a editar y se encarga de llamar al método correspondiente en la capa DAO.
+	 * @param idestadopedido Se recibe el idestadopedido a editar.
+	 * @param descripcion Se recibe el valor de la descripción del estado pedido que se va a editar.
+	 * @return Se retorna el valor del resultado de la edición.
+	 */
 	public String editarEstadoPedido(int idestadopedido , String descripcion)
 	{
 		JSONArray listJSON = new JSONArray();
@@ -149,7 +206,15 @@ public class ParametrosCtrl {
 	}
 	
 	//EXCEPCION PRECIO
-	
+	/**
+	 * Para la entidad Excepción Precio se reciben los parámetros para inserción y se invoca al método correspondiente en la capa DAO.
+	 * @param idproducto Se recibe como parámetro idproducto asociado a la excepción de precio 
+	 * @param precio Se recibe el valor del precio de la excepción
+	 * @param descripcion Se recibe la descripcion de la excepción.
+	 * @param incluye_liquido Se recibe si la excepción de precio incluye o no líquido.
+	 * @param idtipoliquido En caso de incluir líquido se recibe parámetro del tipo liquido que incluye.
+	 * @return Se retorna el id excepción creado según los parámetros enviados.
+	 */
 		public String insertarExcepcionPrecio(int idproducto, double precio, String descripcion, String incluye_liquido, int  idtipoliquido)
 		{
 			JSONArray listJSON = new JSONArray();
@@ -161,6 +226,13 @@ public class ParametrosCtrl {
 			return listJSON.toJSONString();
 		}
 		
+		
+		
+		/**
+		 * Método en la capa controlador que se encarga de recibir el id excepción a consultar y de invocar el método en clase DAO que ejecuta la acción.
+		 * @param idexcepcion Se recibe el valor del idexcepción con base en el cual se retonará en formato JSON la entidad Excepción Precio.
+		 * @return Se retorna en formato JSON la información de la entidad Excepcion Precio a consultar según el parámetro entregado.
+		 */
 		public String retornarExcepcionPrecio(int idexcepcion)
 		{
 			JSONArray listJSON = new JSONArray();
@@ -177,7 +249,10 @@ public class ParametrosCtrl {
 		}
 		
 		
-		
+		/**
+		 * Método en capa controlador que se encarga de retonar en formato JSON la información de las entidades Excepción Precio, luego del llamado a la capa DAO.
+		 * @return retorna en formato JSON las excepciones de precio que se tienen en base de datos.
+		 */
 		public String retornarExcecionesPrecio(){
 			JSONArray listJSON = new JSONArray();
 			ArrayList<ExcepcionPrecio> excepciones = ExcepcionPrecioDAO.obtenerExcepcionesPrecio();
@@ -195,6 +270,10 @@ public class ParametrosCtrl {
 			return listJSON.toJSONString();
 		}
 		
+		/**
+		 * Método en capa controlador  que se encarga de retonar en formato JSON los tipos liquidos de la base de datos, con base en la invocación al método en la capa DAO.
+		 * @return Método en capa controlador  que se encarga de retonar en formato JSON los tipos liquidos de la base de datos, con base en la invocación al método en la capa DAO.
+		 */
 		public String ObtenerTiposLiquido(){
 			JSONArray listJSON = new JSONArray();
 			ArrayList<TipoLiquido> tipliquidos = PedidoDAO.ObtenerTiposLiquido();
@@ -209,6 +288,10 @@ public class ParametrosCtrl {
 			return listJSON.toJSONString();
 		}
 		
+		/**
+		 * Método en capa controlador  que se encarga de retonar en formato JSON los tipos liquidos de la base de datos, con base en la invocación al método en la capa DAO.
+		 * @return Método en capa controlador  que se encarga de retonar en formato JSON los tipos liquidos de la base de datos, con base en la invocación al método en la capa DAO.
+		 */
 		public String retornarExcecionesPrecioGrid(){
 			JSONArray listJSON = new JSONArray();
 			ArrayList<ExcepcionPrecio> excepciones = ExcepcionPrecioDAO.obtenerExcepcionesPrecioGrid();
@@ -228,6 +311,11 @@ public class ParametrosCtrl {
 			return listJSON.toJSONString();
 		}
 		
+		/**
+		 * Método que se encarga de recibir el idexcepcion Precio a eliminar, invocar la capa DAO y retonar el resultado del proceso.
+		 * @param idexcepcion Se recibe el idexcepcion que será eliminado.
+		 * @return Se retorna el resultado de la eliminación.
+		 */
 		public String eliminarExcepcionPrecio(int idexcepcion)
 		{
 			JSONArray listJSON = new JSONArray();
@@ -238,6 +326,17 @@ public class ParametrosCtrl {
 			return listJSON.toJSONString();
 		}
 		
+		
+		/**
+		 * Método en la capa controlador que se encarga de editar la excepción, se reciben los parámetros y se invoca la capa DAO.
+		 * @param idexcepcion Valor de idexcepcion a editar.
+		 * @param idproducto idproducto valor a editar.
+		 * @param precio precio valor a editar
+		 * @param descripcion descripcion valor a editar.
+		 * @param incluye_liquido valor incluye_liquido valor a editar
+		 * @param idtipoliquido idtipoliquido valor a  editar
+		 * @return se retorna el resultado del proceso de la edición.
+		 */
 		public String editarExcepcionPrecio(int idexcepcion, int idproducto, double precio, String descripcion, String incluye_liquido, int idtipoliquido)
 		{
 			JSONArray listJSON = new JSONArray();
@@ -252,11 +351,23 @@ public class ParametrosCtrl {
 		
 		//PRODUCTO
 		
-				
+			
+		/**
+		 * Se reciben los parámetros para la inserción del producto, se invoca a la capa DAO y se retorna el idproducto insertado
+		 * @param idreceta Parámetro la inserción del producto, id receta asociado al producto.
+		 * @param nombre Nombre del producto a insertar.
+		 * @param descripcion Descripción del producto a insertar.
+		 * @param impuesto Impuesto que manejará el producto a insertar.
+		 * @param tipo Clasificación asociado al producto a insertar, podrá ser PIZZAS, OTROS, MODIFICADORES CON etc
+		 * @param preciogeneral Precio General que manejará al producto
+		 * @param incluye_liquido Se recibe el parámetro si el producto manejará  o no liquido
+		 * @param idtipo_liquido Dependiendo de si el producto incluye liquido o no, se parametriza el tipo liquido que manera el producto.
+		 * @return Se retorna el idproducto creado.
+		 */
 			public String insertaProducto(int idreceta,String nombre, String descripcion, float impuesto, String tipo, double preciogeneral, String incluye_liquido, int idtipo_liquido)
 			{
 				JSONArray listJSON = new JSONArray();
-				Producto Pro = new Producto(0,idreceta,nombre, descripcion, impuesto, tipo, 0, preciogeneral,  incluye_liquido, idtipo_liquido);
+				Producto Pro = new Producto(0,idreceta,nombre, descripcion, impuesto, tipo, 0, preciogeneral,  incluye_liquido, idtipo_liquido,"");
 				int idProIns = ProductoDAO.insertarProducto(Pro);
 				JSONObject ResultadoJSON = new JSONObject();
 				ResultadoJSON.put("idproducto", idProIns);
@@ -264,6 +375,11 @@ public class ParametrosCtrl {
 				return listJSON.toJSONString();
 			}
 			
+			/**
+			 * Método de la capa controladora que recibe un id producto y retorna en formato JSON la información del producto, luego de invocar la capa DAO.
+			 * @param idproducto Se recibe información del idproducto que desea consultar.
+			 * @return Se retorna en formato JSON la información de la entidad producto consultada.
+			 */
 			public String retornarProducto(int idproducto)
 			{
 				JSONArray listJSON = new JSONArray();
@@ -283,7 +399,10 @@ public class ParametrosCtrl {
 			}
 			
 			
-			
+			/**
+			 * Método de la capa controladora que retorna en formato JSON todos los productos creados en la base de datos.
+			 * @return Retorna en formato JSON todos los productos creados en la base de datos.
+			 */
 			public String retornarProductos(){
 				JSONArray listJSON = new JSONArray();
 				ArrayList<Producto> productos = ProductoDAO.obtenerProductos();
@@ -304,7 +423,10 @@ public class ParametrosCtrl {
 				return listJSON.toJSONString();
 			}
 			
-						
+			/**
+			 * Método de la capa Controladora que retorna en formato JSON todos los productos creados en la base de datos, con el objetivo de alimentar el GRID que soporta el CRUD de productos.		
+			 * @return Retorna en formato JSON todos los productos creados en la base de datos.
+			 */
 			public String retornarProductosGrid(){
 				JSONArray listJSON = new JSONArray();
 				ArrayList<Producto> productos = ProductoDAO.obtenerProductosGrid();
@@ -327,6 +449,11 @@ public class ParametrosCtrl {
 				return listJSON.toJSONString();
 			}
 			
+			/**
+			 * Método de la capa controladora que se encarga de recibir un idproducto y con el llamado a la capa DAO elimina un producto
+			 * @param idproducto Se recibe como parámetro el idproducto que se desea eliminar.
+			 * @return Retorna el resultado de la eliminación del producto.
+			 */
 			public String eliminarProducto(int idproducto)
 			{
 				JSONArray listJSON = new JSONArray();
@@ -337,10 +464,23 @@ public class ParametrosCtrl {
 				return listJSON.toJSONString();
 			}
 			
+			/**
+			 * Método que se encarga de modificar la información de un producto con base en el idproducto recibido como parámetro.
+			 * @param idproducto Valor con base en el cual se realiza la modificación.
+			 * @param idreceta Valor de idreceta a modificar.
+			 * @param nombre Valor de Nombre del producto a modificar.
+			 * @param descripcion Valor de descripción  del producto a modificar.
+			 * @param impuesto Valor de impuesto del producto a modificar.
+			 * @param tipo Valro del tipo de producto a modificar.
+			 * @param preciogeneral Valor del precio general del producto a modificar
+			 * @param incluye_liquido 
+			 * @param idtipo_liquido
+			 * @return Se retorna el valor del resultado del producto.
+			 */
 			public String editarProducto(int idproducto,int idreceta,String nombre, String descripcion, float impuesto, String tipo, double preciogeneral, String incluye_liquido, int idtipo_liquido)
 			{
 				JSONArray listJSON = new JSONArray();
-				Producto Pro = new Producto(idproducto,idreceta,nombre,descripcion, impuesto, tipo,0, preciogeneral, incluye_liquido, idtipo_liquido);
+				Producto Pro = new Producto(idproducto,idreceta,nombre,descripcion, impuesto, tipo,0, preciogeneral, incluye_liquido, idtipo_liquido,"");
 				String resultado =ProductoDAO.editarProducto(Pro);
 				JSONObject ResultadoJSON = new JSONObject();
 				ResultadoJSON.put("resultado", resultado);
@@ -351,7 +491,12 @@ public class ParametrosCtrl {
 			
 			//SABOR LIQUIDO
 			
-			
+			/**
+			 * Metodo de la capa Controladora que se encarga de Insertar un sabor Liquido con base en los parámetros recibidos.
+			 * @param descripcion Valor de descripción del sabor liquido a insertar.
+			 * @param idtipo_liquido Valor de tipo liquido asociado al sabor liquido a insertar.
+			 * @return Retorna el idsabortipoliquido creado.
+			 */
 			public String insertarSaborLiquido(String descripcion, int idtipo_liquido)
 			{
 				JSONArray listJSON = new JSONArray();
@@ -363,6 +508,11 @@ public class ParametrosCtrl {
 				return listJSON.toJSONString();
 			}
 			
+			/**
+			 * Método de la capa controladora que se encarga de retornar en formato JSON la entidad sator tipo liquido consultado con base en el valor del id sabor tipo liquido enviado.
+			 * @param idsabortipoliquido Valor idsabortipoliquido con base en el cual se consulta.
+			 * @return Retorna en formato JSON la entidad sator tipo liquido consultado con base en el valor del id sabor tipo liquido enviado.
+			 */
 			public String retornarSaborLiquido(int idsabortipoliquido)
 			{
 				JSONArray listJSON = new JSONArray();
@@ -376,7 +526,10 @@ public class ParametrosCtrl {
 			}
 			
 			
-			
+			/**
+			 * Método de la capa controlador qeu se encarga de retonar en formato JSON los sabores liquidos creados en el sistema.
+			 * @return Retonar en formato JSON los sabores liquidos creados en el sistema.
+			 */
 			public String retornarSaborLiquidos(){
 				JSONArray listJSON = new JSONArray();
 				ArrayList<SaborLiquido> sabores = SaborTipoLiquidoDAO.obtenerSaborLiquidos();
@@ -391,7 +544,10 @@ public class ParametrosCtrl {
 				return listJSON.toJSONString();
 			}
 			
-						
+			/**
+			 * Este método de la capa controlador retorna la información en formato de JSON de los Sabores Tipo Liquido con el fin de ser desplegado en el CRUD de este parámetro.			
+			 * @return Retorna la información en formato de JSON de los Sabores Tipo Liquido con el fin de ser desplegado en el CRUD de este parámetro.			
+			 */
 			public String retornarSaborLiquidosGrid(){
 				JSONArray listJSON = new JSONArray();
 				ArrayList<SaborLiquido> sabores = SaborTipoLiquidoDAO.obtenerSaborLiquidosGrid();
@@ -407,6 +563,11 @@ public class ParametrosCtrl {
 				return listJSON.toJSONString();
 			}
 			
+			/**
+			 * Método de la capa controlador que se encarga de la eliminación de un sabor tipo liquido con base en la identificación
+			 * @param idsaborxtipoliquido Recibe como parámetro el id sabor tipo liquido con base en el cual se realiza la eliminación.
+			 * @return Se retorna el resultado del proceso de eliminación de sabor tipo liquido
+			 */
 			public String eliminarSaborLiquido(int idsaborxtipoliquido)
 			{
 				JSONArray listJSON = new JSONArray();
@@ -417,6 +578,13 @@ public class ParametrosCtrl {
 				return listJSON.toJSONString();
 			}
 			
+			/**
+			 * Método en la capa controlador que se encarga de recibir los parámetros para la edición de sabores tipo liquido, invocar la capa DAO y retornar el resultado del proceso.
+			 * @param idsaborxtipoliquido Valor del id del sabor tipo liquido que se va a editar
+			 * @param descripcion Valor de la descripción que se va  editar.
+			 * @param idtipo_liquido id tipo liquido asociado al sabor tipo liquido que va a ser editado.
+			 * @return Se retorna el resultado del proceso.
+			 */
 			public String editarSaborLiquido(int idsaborxtipoliquido, String descripcion, int idtipo_liquido)
 			{
 				JSONArray listJSON = new JSONArray();
@@ -431,7 +599,12 @@ public class ParametrosCtrl {
 			
 //TIENDA
 			
-			
+			/**
+			 * Método de la capa controlador que recibe los parámetros para la inserción de una nueva tienda, invoca la capa DAO y retorna el ID de la nueva tienda creada.
+			 * @param nombre Parámetro con el valor de la tienda a insertar.
+			 * @param dsn Parámetro con el valor del Data Source Name de la tienda a crear
+			 * @return Retorna el valor id de la tienda creada en formato JSON.
+			 */
 			public String insertarTienda(String nombre, String dsn)
 			{
 				JSONArray listJSON = new JSONArray();
@@ -442,7 +615,11 @@ public class ParametrosCtrl {
 				listJSON.add(ResultadoJSON);
 				return listJSON.toJSONString();
 			}
-			
+			/**
+			 * Método de la capa controladora que dado un id tienda, lo retorna en formato JSON luego de invocada la capa DAO.
+			 * @param idtienda Parámetro con el valor de idtienda que se desea consultar.
+			 * @return Se retorna la entidad tienda consultada en formato JSON.
+			 */
 			public String retornarTienda(int idtienda)
 			{
 				JSONArray listJSON = new JSONArray();
@@ -456,7 +633,10 @@ public class ParametrosCtrl {
 			}
 			
 			
-			
+			/**
+			 * Método de la capa controlador que retorna en formato JSON las tiendas que existen en la base de datos
+			 * @return Retorna en formato JSON las tiendas que existen en la base de datos, invocando la capa DAO.
+			 */
 			public String retornarTiendas(){
 				JSONArray listJSON = new JSONArray();
 				ArrayList<Tienda> tiendas = TiendaDAO.obtenerTiendas();
@@ -471,7 +651,11 @@ public class ParametrosCtrl {
 				return listJSON.toJSONString();
 			}
 			
-						
+			/**
+			 * Método de la capa controlador que se encarga de Eliminar una tienda, con base en la id tienda recibida como parámetro.			
+			 * @param idtienda Parámetro con base en el cual realiza la eliminación de la tienda.
+			 * @return Retorna el resultado del proceso.
+			 */
 			public String eliminarTienda(int idtienda)
 			{
 				JSONArray listJSON = new JSONArray();
@@ -482,6 +666,13 @@ public class ParametrosCtrl {
 				return listJSON.toJSONString();
 			}
 			
+			/**
+			 * Método en la capa controlador que se encarga de la edición de la entidad tienda
+			 * @param idtienda Parámetro de la tienda a modificar.
+			 * @param nombre NOmbre de la tienda a ser modificado
+			 * @param dsn Data source name de la tienda a ser modificado
+			 * @return Se retorna el resultado del proceso.
+			 */
 			public String editarTienda(int idtienda, String nombre, String dsn)
 			{
 				JSONArray listJSON = new JSONArray();
@@ -496,7 +687,12 @@ public class ParametrosCtrl {
 	
 //TIPO LIQUIDO
 			
-			
+			/**
+			 * Método de la capa controlador que se encarga de recibir los parámetro para la inserción de la entidad tipo liquido, se encarga de invocar la capa DAO.
+			 * @param nombre Parámetro con el valor del nombre tipo liquido
+			 * @param capacidad Parámetro de la capacidad del tipo liquido.
+			 * @return Se retorna en formato JSON el valor de id tipo liquido insertado.
+			 */
 			public String insertarTipoLiquido(String nombre, String capacidad)
 			{
 				JSONArray listJSON = new JSONArray();
@@ -508,6 +704,11 @@ public class ParametrosCtrl {
 				return listJSON.toJSONString();
 			}
 			
+			/**
+			 * Método de la capa controlador que se encarga 
+			 * @param idtipo_liquido  parámetro con base en el cual se retorna el tipo liquido.
+			 * @return Se retorna en formato JSON el tipo liquido con base en el id tipo liquido pasado como parámetro.
+			 */
 			public String retornarTipoLiquido(int idtipo_liquido)
 			{
 				JSONArray listJSON = new JSONArray();
@@ -521,7 +722,10 @@ public class ParametrosCtrl {
 			}
 			
 			
-			
+			/**
+			 * Método de la capa controladora que se encarga de retornar en formato JSON los tipos liquidos de la base de datos.
+			 * @return Se retorna en formato JSON los tipos liquidos definidos en le sistema.
+			 */
 			public String retornarTiposLiquidos(){
 				JSONArray listJSON = new JSONArray();
 				ArrayList<TipoLiquido> tipos = TipoLiquidoDAO.obtenerTiposLiquido();
@@ -536,7 +740,11 @@ public class ParametrosCtrl {
 				return listJSON.toJSONString();
 			}
 			
-						
+			/**
+			 * Método de la capa controlador qeu se encarga de eliminar un tipo liquido invocando la capa DAO.			
+			 * @param idtipo_liquido Se recibe como parámetro del id tipo liquido con base en el cual se realiza la eliminación
+			 * @return Retorna en formato JSON el resultado del proceso de eliminación.
+			 */
 			public String eliminarTipodLiquido(int idtipo_liquido)
 			{
 				JSONArray listJSON = new JSONArray();
@@ -547,6 +755,13 @@ public class ParametrosCtrl {
 				return listJSON.toJSONString();
 			}
 			
+			/**
+			 * Método de la clase controladora que se encarga de editar un tipo liquido invocando la capa DAO con los parámetros.
+			 * @param idtipo_liquido Parámetro con base en el cual se realiza la edición del tipo liquido
+			 * @param nombre Parámetro del nombre del tipo liquido a modificar.
+			 * @param capacidad Parámetro de la capacidad del tipo liquido a modificar.
+			 * @returnS Se retorna en formato JSON el resultado del proceso.
+			 */
 			public String editarTipoLiquido(int idtipo_liquido, String nombre, String capacidad)
 			{
 				JSONArray listJSON = new JSONArray();
@@ -561,6 +776,10 @@ public class ParametrosCtrl {
 			
 			//MUNICIPIOS
 			
+			/**
+			 * Método de la capa controladora que se encarga mediante la invocación de la capa DAO de retornar las entidades municipio creadas en el sistema.
+			 * @return Retorna en formato DAO los municipios creados en el sistema.
+			 */
 			public String retornarMunicipios(){
 				JSONArray listJSON = new JSONArray();
 				ArrayList<Municipio> municipios = MunicipioDAO.obtenerMunicipios();

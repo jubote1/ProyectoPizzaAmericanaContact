@@ -16,6 +16,8 @@ import capaControlador.PedidoCtrl;
 
 /**
  * Servlet implementation class EliminarDetallePedido
+ * Servicio que se encarga de eliminar un detalle pedido, seleccionado desde la capa de presentacion, el servicio recibirá
+ * el iddetallepedido que se desea eliminar, finalmente retornará el formato JSON el resultado de la operación.
  */
 @WebServlet("/EliminarDetallePedido")
 public class EliminarDetallePedido extends HttpServlet {
@@ -31,6 +33,7 @@ public class EliminarDetallePedido extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * El servicio el recibirá iddetallepedido que se desea eliminar, finalmente retornará el formato JSON el resultado de la operación
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub

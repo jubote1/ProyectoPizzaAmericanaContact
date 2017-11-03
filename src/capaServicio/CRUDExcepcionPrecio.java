@@ -14,6 +14,7 @@ import capaControlador.ParametrosCtrl;
 
 /**
  * Servlet implementation class CRUDExcepcionPrecio
+ * Servicio que implementa los servicios que responden al CRUD de la entidad Excepcion Precio.
  */
 @WebServlet("/CRUDExcepcionPrecio")
 public class CRUDExcepcionPrecio extends HttpServlet {
@@ -29,6 +30,8 @@ public class CRUDExcepcionPrecio extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Se implementa el CRUD para la entidad Excepción Precio, se recibe como parámetro principal el idoperacion
+	 * 1 insertar 2 editar 3 Eliminar  4 Consultar, con base en el idoperacion se pediran el resto de parámetros.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//Operación idoperacion 1 insertar 2 editar 3 Eliminar  4 Consultar

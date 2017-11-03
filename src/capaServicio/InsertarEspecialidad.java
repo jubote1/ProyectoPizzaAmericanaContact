@@ -13,6 +13,7 @@ import capaControlador.ParametrosCtrl;;
 
 /**
  * Servlet implementation class InsertarEspecialidad
+ * Método que se encarga recibir los parámetros para la inserción de una especialidad.
  */
 @WebServlet("/InsertarEspecialidad")
 public class InsertarEspecialidad extends HttpServlet {
@@ -28,6 +29,8 @@ public class InsertarEspecialidad extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Servicio que recibe los parámetros para llamar al método insertarEspecialidad de la capa Parametros controlador,
+	 * e insertar la especialidad.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub

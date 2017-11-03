@@ -16,11 +16,40 @@
 	<body>
 
 		<link id="Menu-file" href="Menu.html" rel="import" />
+		<link id="MenuAdm-file" href="MenuAdm.html" rel="import" />
 		<script type="text/javascript">
-			var getImport = document.querySelector('#Menu-file'); 
-			var getContent = getImport.import.querySelector('#menuprincipal');
-			document.body.appendChild(document.importNode(getContent, true));
-			console.log(getContent);
+			
+			var getImport; 
+			var getContent;
+			//Obtenemos el valor de la variable server, con base en la URL digitada
+			var loc = window.location;
+			var pathName = loc.pathname.substring(0, loc.pathname.lastIndexOf('/') + 1);
+			server = loc.href.substring(0, loc.href.length - ((loc.pathname + loc.search + loc.hash).length - pathName.length));
+			var respuesta ='';
+			$.ajax({ 
+		    	url: server + 'ValidarUsuarioAplicacion', 
+		    	dataType: 'text',
+		    	type: 'post', 
+		    	async: false, 
+		    	success: function(data){
+						    respuesta =  data;		
+				} 
+			});
+			switch(respuesta)
+		    		{
+		    			case 'OK':
+		    				getImport = document.querySelector('#Menu-file');
+		    				break;
+		    			case 'OKA':
+		    				getImport = document.querySelector('#MenuAdm-file');
+		    				break;	
+		    			default:
+		    				location.href = server +"Index.html";
+		    				break;
+		    		}
+		    		getContent = getImport.import.querySelector('#menuprincipal');
+			    	document.body.appendChild(document.importNode(getContent, true));
+
 		</script>
 
 	<div class="container">

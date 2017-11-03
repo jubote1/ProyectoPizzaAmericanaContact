@@ -15,8 +15,18 @@ import capaModelo.TipoLiquido;
 import java.sql.ResultSet;
 import org.apache.log4j.Logger;
 
+/**
+ * Clase que se encarga de implementar toda la interacción con la base de datos para le entidad Producto.
+ * @author JuanDavid
+ *
+ */
 public class ProductoDAO {
 	
+	/**
+	 * Método que se encarga de retonar la información de todas la entidades Producto definidas en el sistema.
+	 * @return Se retorna un ArrayList con todos los productos definidos en el sistema.
+	 *
+	 */
 	public static ArrayList<Producto> obtenerProductos()
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -40,16 +50,32 @@ public class ProductoDAO {
 				double preciogeneral = rs.getDouble("preciogeneral");
 				String incluye_liquido = rs.getString("incluye_liquido");
 				int idtipoliquido = rs.getInt("idtipo_liquido");
-				Producto producto = new Producto(idproducto, idreceta, nombre, descripcion, impuesto,tipo,productoasociaadicion, preciogeneral, incluye_liquido, idtipoliquido);
+				String manejacantidad = rs.getString("manejacantidad");
+				Producto producto = new Producto(idproducto, idreceta, nombre, descripcion, impuesto,tipo,productoasociaadicion, preciogeneral, incluye_liquido, idtipoliquido, manejacantidad);
 				productos.add(producto);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(productos);
 		
 	}
 	
+	/**
+	 * Método que se encarga de retornar la información de todos los productos definidos en el sistema, en forma GRID
+	 * para la implementación del CRUD de la entidad Producto.
+	 * @return Se retorna un ArrayList con todos los productos definidos en el sistema con la información base para
+	 * la implementación del GRID.
+	 */
 	public static ArrayList<Producto> obtenerProductosGrid()
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -77,13 +103,28 @@ public class ProductoDAO {
 				Producto producto = new Producto(idproducto,idreceta, nombrereceta, nombre, descripcion, impuesto, tipo, preciogeneral, incluye_liquido, idtipoliquido, nombreliquido);
 				productos.add(producto);
 			}
+			rs.close();
+			stm.close();
+			con1.close();
 		}catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(productos);
 		
 	}
 	
+	/**
+	 * Método que se encarga de insertar un nuevo producto con base en la información recibida como parámetro
+	 * @param pro Se recibe como parámetro un objeto Modelo Producto con toda la informació del nuevo producto
+	 * a insertar
+	 * @return Se retorna un valor entero con el idproducto del producto creado.
+	 */
 	public static int insertarProducto(Producto pro)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -106,11 +147,21 @@ public class ProductoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			return(0);
 		}
 		return(idProductoIns);
 	}
 
+	/**
+	 * Método que se encarga de la eliminación de un Producto con base el parámetro recibido.
+	 * @param idproducto Se recibe como parámetro el idproducto con base en el cual se realiza la eliminación del producto
+	 */
 	public static void eliminarProducto(int idproducto)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -127,11 +178,22 @@ public class ProductoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			
 		}
 		
 	}
 
+	/**
+	 * Método con base en el cual se retorna la información de un producto con base en el parámetro recibido
+	 * @param idproducto Se recibe como parámetro el idproducto del producto que desea ser consultado.
+	 * @return Se retorna un objeto Modelo Producto con la información del producto que se desea consultar.
+	 */
 	public static Producto retornarProducto(int idproducto)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -141,7 +203,7 @@ public class ProductoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select idproducto,idreceta,nombre, descripcion,impuesto,tipo,producto_asocia_adicion,preciogeneral,incluye_liquido,idtipo_liquido from  producto  where idproducto = " + idproducto; 
+			String consulta = "select idproducto,idreceta,nombre, descripcion,impuesto,tipo,producto_asocia_adicion,preciogeneral,incluye_liquido,idtipo_liquido, manejacantidad from  producto  where idproducto = " + idproducto; 
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idproduc = 0;
@@ -154,6 +216,7 @@ public class ProductoDAO {
 			double preciogeneral = 0;
 			String incluye_liquido = "";
 			int idtipo_liquido = 0;
+			String manejacantidad = "";
 			while(rs.next()){
 				idproduc = rs.getInt("idproducto");
 				idreceta  = rs.getInt("idreceta");
@@ -165,19 +228,31 @@ public class ProductoDAO {
 				preciogeneral = rs.getDouble("preciogeneral");
 				incluye_liquido = rs.getString("incluye_liquido");
 				idtipo_liquido = rs.getInt("idtipo_liquido");
+				manejacantidad = rs.getString("manejacantidad");
 				break;
 			}
-			Pro = new Producto(idproduc,idreceta,nombre,descripcion,impuesto,tipo,productoasociaadicion,preciogeneral,incluye_liquido,idtipo_liquido);
+			Pro = new Producto(idproduc,idreceta,nombre,descripcion,impuesto,tipo,productoasociaadicion,preciogeneral,incluye_liquido,idtipo_liquido, manejacantidad);
 			stm.close();
 			con1.close();
 		}
 		catch (Exception e){
 			logger.error(e.toString());
-			
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 		}
 		return(Pro);
 	}
 
+	/**
+	 * Método que se encarga de editar un producto con base en los parámetros recibidos
+	 * @param Pro Se recibe como parámetro un objeto Modelo Producto el cual contiene la información base para
+	 * la edición del producto.
+	 * @return Se retorna un valor tipo String con el resultado del proceso.
+	 */
 	public static String editarProducto(Producto Pro)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -197,6 +272,12 @@ public class ProductoDAO {
 		}
 		catch (Exception e){
 			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
 			resultado = "error";
 		}
 		return(resultado);

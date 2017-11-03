@@ -1,5 +1,10 @@
 package capaModelo;
 
+/**
+ * Clase que implementa la entidad Municipio
+ * @author JuanDavid
+ *
+ */
 public class Municipio {
 	
 	private int idmunicipio;

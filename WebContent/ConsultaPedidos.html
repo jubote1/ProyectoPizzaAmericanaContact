@@ -14,10 +14,40 @@
 	<body>
 
 		<link id="Menu-file" href="Menu.html" rel="import" />
+		<link id="MenuAdm-file" href="MenuAdm.html" rel="import" />
 		<script type="text/javascript">
-			var getImport = document.querySelector('#Menu-file'); 
-			var getContent = getImport.import.querySelector('#menuprincipal');
-			document.body.appendChild(document.importNode(getContent, true));
+			
+			var getImport; 
+			var getContent;
+			//Obtenemos el valor de la variable server, con base en la URL digitada
+			var loc = window.location;
+			var pathName = loc.pathname.substring(0, loc.pathname.lastIndexOf('/') + 1);
+			server = loc.href.substring(0, loc.href.length - ((loc.pathname + loc.search + loc.hash).length - pathName.length));
+			var respuesta ='';
+			$.ajax({ 
+		    	url: server + 'ValidarUsuarioAplicacion', 
+		    	dataType: 'text',
+		    	type: 'post', 
+		    	async: false, 
+		    	success: function(data){
+						    respuesta =  data;		
+				} 
+			});
+			switch(respuesta)
+		    		{
+		    			case 'OK':
+		    				getImport = document.querySelector('#Menu-file');
+		    				break;
+		    			case 'OKA':
+		    				getImport = document.querySelector('#MenuAdm-file');
+		    				break;	
+		    			default:
+		    				location.href = server +"Index.html";
+		    				break;
+		    		}
+		    		getContent = getImport.import.querySelector('#menuprincipal');
+			    	document.body.appendChild(document.importNode(getContent, true));
+
 		</script>
 
 		<div class="container">
@@ -38,14 +68,14 @@
 										<td>
 											<select id="selectTiendas" class="form-control"></select>
 										</td>
-										<td class="active">Número de Pedido</td>
+										<td class="active">Número de Pedido Tienda</td>
 										<td><input type="text" id="numeropedido" name="zona" class="form-control" placeholder="Número de Pedido"></td>
 								</tr>
 								
 							
 						</tbody>
 					</table>
-						<input type="button" class="btn btn-primary btn-lg" value="Consultar" onclick="consultarPedido()">
+						<input type="button" class="btn btn-primary btn-lg" value="Consultar Pedidos" onclick="consultarPedido()">
 
 				
 			</form>
@@ -57,13 +87,21 @@
 								            <tr>
 								                <th data-column-id="idpedido">Id Pedido</th>
 								                <th data-column-id="tienda">Tienda</th>
-								                <th data-column-id="totalbruto">Total Bruto</th>
-								                <th data-column-id="impuesto">Impuesto</th>
-								                <th data-column-id="totalneto">Total Neto</th>
-								                <th data-column-id="idcliente">ID Cliente</th>
+								                <th data-column-id="fechainsercion">Fecha/hora Tomado</th>
 								                <th data-column-id="cliente">Cliente</th>
+								                <th data-column-id="direccion">Direccion</th>
+								                <th data-column-id="telefono">Teléfono</th>
+								                <th data-column-id="totalneto">Total Neto</th>
 								                <th data-column-id="estadopedido">Estado Pedido</th>
-								                <th data-column-id="fechapedido">Fecha Pedido</th>
+								                <th data-column-id="usuariopedido">Usuario</th>
+								                <th data-column-id="numposheader">#Pedido Tienda</th>
+								                <th data-column-id="enviadopixel">Estado Tienda</th>
+								                <th data-column-id="estadoenviotienda">Estado Pedido Tienda</th>
+								                <th data-column-id="formapago">Forma Pago</th>
+								                <th data-column-id="idformapago">ID Forma Pago</th>
+								                <th data-column-id="idtienda">ID Tienda</th>
+								                <th data-column-id="urltienda">URL Tienda</th>
+								                <th data-column-id="stringpixel">String Pixel</th>
 								            </tr>
 								        </thead>
 								      	<tbody>
@@ -130,12 +168,32 @@
 									<tr>
 										<td class="active">Número de Pedido</td>
 										<td class="active"><input type="text" class="form-control" id="NumPedido" placeholder="Número de pedido" disabled></td>
-										<td class="active">Número Id Cliente</td>
+										<td class="active">Nombre Cliente</td>
 										<td class="active"><input type="text" class="form-control" id="Cliente" placeholder="Cliente" disabled></td>
 									</tr>
 									<tr>
 										<td class="active">Estado del Pedido</td>
 										<td class="active"><input type="text" class="form-control" id="estadopedido" placeholder="Estado del Pedido" disabled></td>
+										<td class="active">Enviado a Sistema Tienda</td>
+										<td class="active"><input type="text" class="form-control" id="estadotienda" placeholder="Estado Envío Tienda" disabled></td>
+									</tr>
+									<tr>
+										<td class="active">Número Pedido Tienda</td>
+										<td class="active"><input type="text" class="form-control" id="numpedidotienda" placeholder="Número Pedido Tienda" disabled></td>
+										<td class="active">Valor Total del Pedido</td>
+										<td class="active"><input type="text" class="form-control" id="totalpedido" placeholder="Valor total del Pedido" disabled></td>
+									</tr>
+									<tr>
+										<td class="active">Valor de Pago</td>
+										<td class="active"><input type="text" class="form-control" id="valorpago" placeholder="Valor de pago del cliente" disabled></td>
+										<td class="active">Valor a Devolver</td>
+										<td class="active"><input type="text" class="form-control" id="valordevolver" placeholder="Valor Devuelta" disabled></td>
+									</tr>
+									<tr>
+										<td class="active">Forma de Pago</td>
+										<td class="active"><input type="text" class="form-control" id="formapago" placeholder="Forma de Pago" disabled></td>
+										<td class="active">Valor Forma de Pago</td>
+										<td class="active"><input type="text" class="form-control" id="valorformapago" placeholder="Valor Forma de Pago" disabled></td>
 									</tr>
 								</tbody>
 							</table>
@@ -160,6 +218,7 @@
 								      			
 								      	</tbody>
 								</table>
+								<input type="button" class="btn btn-danger btn-lg" id="reenviarPedido" name="reenviarPedido" value="Reenviar Pedido a Tienda" onclick="enviarPedidoTienda()">
 						</div>
 
 								
@@ -173,6 +232,8 @@
 	<script type="text/javascript" src="js/datepicker.js"></script>
 	<script>
 		$("#fechainicial").datepicker($.datepicker.regional["es"]);
+		$("#fechainicial").datepicker('setDate', new Date());
 		$("#fechafinal").datepicker($.datepicker.regional["es"]);
+		$("#fechafinal").datepicker('setDate', new Date());
 	</script>
 </html>

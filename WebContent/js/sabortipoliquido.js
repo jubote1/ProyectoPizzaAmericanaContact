@@ -10,22 +10,7 @@ $(document).ready(function() {
 	server = loc.href.substring(0, loc.href.length - ((loc.pathname + loc.search + loc.hash).length - pathName.length));
 	
 		//Lo primero que realizaremos es validar si está logueado
-	$.ajax({ 
-	    	url: server + 'ValidarUsuarioAplicacion', 
-	    	dataType: 'text',
-	    	type: 'post', 
-	    	async: false, 
-	    	success: function(data){ 
-		    	if(data == 'OK')
-		    	{
-		    	}
-		    	else
-		    	{
-		    		location.href ="http://localhost:8080/ProyectoPizzaAmericana/Index.html";
-		    	}
-		    	console.log("OJO" + data);
-			} 
-		});
+	
 		
 	    table = $('#grid-saborTipoLiquido').DataTable( {
     		"aoColumns": [

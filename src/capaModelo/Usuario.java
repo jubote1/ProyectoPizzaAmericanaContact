@@ -1,5 +1,10 @@
 package capaModelo;
 
+/**
+ * Clase que implementa la entidad Usuario.
+ * @author JuanDavid
+ *
+ */
 public class Usuario {
 	
 	private String nombreUsuario;

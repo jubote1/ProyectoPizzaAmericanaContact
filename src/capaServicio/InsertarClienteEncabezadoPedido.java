@@ -10,11 +10,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
+
+import capaControlador.AutenticacionCtrl;
 import capaControlador.ClienteCtrl;
 import capaControlador.PedidoCtrl;
+import capaModelo.Usuario;
 
 /**
  * Servlet implementation class InsertarClienteEncabezadoPedido
+ * Este servicio se encarga de pasar como parámetro todo los valores del cliente y con base en estos el sistema
+ * o actualiza o crea un nuevo cliente, esta labor se realiza en la inserción del encabezado de un pedido
  */
 @WebServlet("/InsertarClienteEncabezadoPedido")
 public class InsertarClienteEncabezadoPedido extends HttpServlet {
@@ -30,11 +36,31 @@ public class InsertarClienteEncabezadoPedido extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Este servicio recibe como parámetro todos los valores de un cliente, telefono, nombres, apellidos etc, con estos 
+	 * valores y mediante la invocación al método InsertarClientePedidoEncabezado de la capa Cliente Controlador, se
+	 * realiza la actualización o inserción del cliente. 
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.addHeader("Access-Control-Allow-Origin", "*");
+		Logger logger = Logger.getLogger("log_file");
 		HttpSession sesion = request.getSession();
+		//Capturamos la información de la sesion del usuario que está ejecutando la inserción
+		Usuario usuario = (Usuario) sesion.getAttribute("usuario");
+		String resultado ="" ;
+		String user = "" ;
+		//Al no existir el usuario logueado es posible que produza una excepcion
+		try
+		{
+			user = usuario.getNombreUsuario();
+			
+			
+		}catch(Exception e)
+		{
+			
+			
+		}
+		//Final de captura del usuario
 		String telefono = request.getParameter("telefono");
         String nombres = request.getParameter("nombres");
         String apellidos = request.getParameter("apellidos");
@@ -44,7 +70,8 @@ public class InsertarClienteEncabezadoPedido extends HttpServlet {
         String observacion = request.getParameter("observacion");
         String tienda = request.getParameter("tienda");
         String municipio = request.getParameter("municipio");
-        System.out.println(tienda+municipio);
+        String fechaPedido = request.getParameter("fechapedido");
+        System.out.println("tienda" +tienda+ "municipio" + municipio);
         float latitud;
         float longitud;
         int idCliente;
@@ -77,7 +104,7 @@ public class InsertarClienteEncabezadoPedido extends HttpServlet {
         int idcliente = ClienCtrl.InsertarClientePedidoEncabezado(idCliente,telefono, nombres, apellidos, nombreCompania,  direccion, municipio, latitud, longitud, zona, observacion, tienda, memcode);
         String respuesta = "";
         PedidoCtrl PedidoCtrl = new PedidoCtrl();
-	    respuesta = PedidoCtrl.InsertarEncabezadoPedido(tienda,idcliente);
+	    respuesta = PedidoCtrl.InsertarEncabezadoPedido(tienda,idcliente,fechaPedido, user);
         
         PrintWriter out = response.getWriter();
 		out.write(respuesta);

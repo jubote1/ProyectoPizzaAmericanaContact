@@ -12,7 +12,11 @@ var idCliente = 0;
 var idEstadoPedido = 0;
 var longitud = 0;
 var latitud = 0;
-
+var urlTienda ="";
+var idformapago;
+var totalpedido;
+var valorformapago;
+var stringPixel;
 
 
 $(document).ready(function() {
@@ -24,22 +28,6 @@ $(document).ready(function() {
 	
 
 	//Lo primero que realizaremos es validar si está logueado
-	$.ajax({ 
-	    	url: server + 'ValidarUsuarioAplicacion', 
-	    	dataType: 'text',
-	    	type: 'post', 
-	    	async: false, 
-	    	success: function(data){ 
-		    	if(data == 'OK')
-		    	{
-		    	}
-		    	else
-		    	{
-		    		location.href ="http://localhost:8080/ProyectoPizzaAmericana/Index.html";
-		    	}
-		    	console.log("OJO" + data);
-			} 
-		});
 
 	//Llenamos arreglo con los productos
 	
@@ -63,6 +51,7 @@ $(document).ready(function() {
             { "mData": "liquido" },
             { "mData": "excepcion" }
             
+            
         ]
     	} );
 
@@ -70,13 +59,21 @@ $(document).ready(function() {
     		"aoColumns": [
     		{ "mData": "idpedido" },
             { "mData": "tienda" },
-            { "mData": "totalbruto" },
-            { "mData": "impuesto" },
-            { "mData": "totalneto" },
-            { "mData": "idcliente" },
+            { "mData": "fechainsercion" },
             { "mData": "cliente" },
+            { "mData": "direccion" },
+            { "mData": "telefono" },
+            { "mData": "totalneto" },
             { "mData": "estadopedido" },
-            { "mData": "fechapedido" }
+            { "mData": "usuariopedido" },
+            { "mData": "enviadopixel"  , "visible": false },
+            { "mData": "estadoenviotienda" },
+            { "mData": "numposheader"  },
+            { "mData": "formapago"  },
+            { "mData": "idformapago"  },
+            { "mData": "idtienda", "visible": false },
+            { "mData": "urltienda", "visible": false },
+            { "mData": "stringpixel", "visible": false }
         ]
     	} );
 
@@ -85,11 +82,29 @@ $(document).ready(function() {
         datospedido = table.row( this ).data();
         //alert( 'Diste clic en  '+datos.nombre+'\'s row' );
         //$('#nombres').val(datos.nombre);
-        var idpedido = datospedido.idpedido;
-        $('#NumPedido').val(idpedido);
+        idPedido = datospedido.idpedido;
+        idCliente = datospedido.idcliente;
+        urlTienda = datospedido.urltienda;
+        stringPixel = datospedido.stringpixel;
+        $('#NumPedido').val(idPedido);
         $('#Cliente').val(datospedido.cliente);
         $('#estadopedido').val(datospedido.estadopedido);
+        var tempEstadoPedidoPixel = datospedido.enviadopixel;
+        if (tempEstadoPedidoPixel == 0)
+        {
+        	$('#estadotienda').val("PENDIENTE TIENDA");
+        	$("#estadotienda").attr("disabled", true).css("background-color","#FF0000");
+        	$('#reenviarPedido').attr('disabled', false);
+        }
+        else
+        {
+        	$('#estadotienda').val("ENVIADO A TIENDA");
+        	$("#estadotienda").attr("disabled", true).css("background-color","#00FF00");
+        	$('#reenviarPedido').attr('disabled', true);
+        }
+        $('#numpedidotienda').val(datospedido.numposheader);
         // La idea es tomar el id pedido seleccionado y con esto ir a buscar la información.
+        
         $.getJSON(server + 'GetClientePorID?idcliente=' + datospedido.idcliente, function(data1){
 	                		
 	                		$('#telefono').val(data1[0].telefono);
@@ -99,18 +114,33 @@ $(document).ready(function() {
 	                		$('#zona').val(data1[0].zona);
 	                		$('#observacionDir').val(data1[0].observacion);
 	                		$('#tienda').val(data1[0].nombretienda);
+
 							
 					});
         if ( $.fn.dataTable.isDataTable( '#grid-detallepedido' ) ) {
     		tabledetalle = $('#grid-detallepedido').DataTable();
     	}
-        $.getJSON(server + 'ConsultarDetallePedido?numeropedido=' + idpedido, function(data1){
+        $.getJSON(server + 'ConsultarDetallePedido?numeropedido=' + idPedido, function(data1){
 	                		tabledetalle.clear().draw();
 	                		console.log(data1);
 							for(var i = 0; i < data1.length;i++){
 								tabledetalle.row.add(data1[i]).draw();
 							}
 	                		
+							
+					});
+
+        //Obtenemos la forma de pago
+        $.getJSON(server + 'ObtenerFormaPagoPedido?idpedido=' + idPedido, function(data2){
+	                		var respuesta = data2[0];
+							$('#totalpedido').val(data2[0].valortotal);
+	                		$('#valorpago').val(data2[0].valorformapago);
+	                		var valorDevolver =  data2[0].valorformapago - data2[0].valortotal;
+	                		$('#valordevolver').val(valorDevolver);
+	                		$('#formapago').val(data2[0].nombre);
+	                		idformapago = data2[0].idformapago;
+							totalpedido = data2[0].valortotal;
+							valorformapago = data2[0].valorformapago;
 							
 					});
      
@@ -159,6 +189,7 @@ function getListaTiendas(){
 			var cadaTienda  = data[i];
 			str +='<option value="'+ cadaTienda.nombre +'" id ="'+ cadaTienda.id +'">' + cadaTienda.nombre +'</option>';
 		}
+		str +='<option value="'+ 'TODAS' +'" id ="'+ 'TODAS' +'">' + 'TODAS' +'</option>';
 		$('#selectTiendas').html(str);
 	});
 }
@@ -400,6 +431,7 @@ function consultarPedido()
     }
 	$.getJSON(server + 'ConsultaIntegradaPedidos?fechainicial=' + fechaini +"&fechafinal=" + fechafin + "&tienda=" + tienda +  "&numeropedido=" + numpedido, function(data1){
 	                		
+	                		
 	                		table.clear().draw();
 							for(var i = 0; i < data1.length;i++){
 								var cadaPedido  = data1[i];
@@ -438,3 +470,95 @@ function validarFechaMenorActual(date1, date2){
         return true;
 }
 
+function enviarPedidoTienda(){
+
+									//Rediseños para mejorar las cosas
+									$.confirm({
+										'title'		: 'Confirmacion de Reenvío de Pedido',
+										'content'	: 'Desea confirmar el reenvío del Pedido Número ' + idPedido + '<br> El Pedido pasará a estado  Finalizado'+
+										'Con la siguiente información: <br>' +
+										'CLIENTE: ' + $('#nombres').val() + ' ' + $('#apellidos').val() + '<br>' +
+										'DIRECCION ' +  $('#direccion').val() + '<br>' +
+										'TOTAL PEDIDO ' + $("#totalpedido").val() + '<br>' +
+										'CAMBIO ' + $("#valorpago").val() + '<br>' +
+										'TIENDA DEL PEDIDO ' +  '<h1>' + $("#tienda").val().toUpperCase() + '</h1> <br>',
+										'type': 'dark',
+						   				'typeAnimated': true,
+										'buttons'	: {
+											'Si'	: {
+												'class'	: 'blue',
+												'action': function(){
+													//OJO var idformapago =  $("#selectformapago").val();
+													var formapago =  $("#formapago").val();
+													var valorformapago =  $("#valorpago").val();
+													var insertado = 0;
+													$.ajax({ 
+								    				url: server + 'FinalizarPedido?idpedido=' + idPedido + "&idformapago=" + idformapago + "&valortotal=" + totalpedido + "&valorformapago=" + valorformapago + "&idcliente=" + idCliente + "&insertado=" + insertado , 
+								    				dataType: 'json', 
+								    				async: false, 
+								    				success: function(data){ 
+
+															resultado = data[0];
+															var resJSON = JSON.stringify(resultado);
+															var urlTienda = resultado.url;
+															//Mandamos todos los párametros para la inserción de la tienda
+															//Ejecutamos el servicio para insertar en Pixel
+
+															//OJO CAMBIOS PARA EL SERVICIO CON LOS PARÁMETROS Y NO SERÁ AJAX SINO JSON ES DECIR ASINCRONO
+															$.ajax({ 
+													    				url: urlTienda + 'FinalizarPedidoPixel' , 
+													    				dataType: 'json', 
+													    				type: 'post', 
+							    										data: {'datos' : resJSON }, 
+													    				async: false, 
+													    				success: function(data1){ 
+																		var resPedPixel = data1[0];
+																		if(resPedPixel.numerofactura > 0)
+												    					{
+												    						$.ajax({ 
+														    				url: server + 'ActualizarNumeroPedidoPixel?idpedido=' + resPedPixel.idpedido + '&numpedidopixel=' + resPedPixel.numerofactura +  '&creacliente=' + resPedPixel.creacliente +  '&membercode=' + resPedPixel.membercode + '&idcliente=' + resPedPixel.idcliente, 
+															    				dataType: 'json', 
+															    				async: false, 
+															    				success: function(data){
+															    					var resul =  data[0];
+															    					if (resul.resultado)
+															    					{
+															    						$('#estadotienda').val("ENVIADO A TIENDA");
+								        												$("#estadotienda").attr("disabled", true).css("background-color","#00FF00");
+								        												$('#reenviarPedido').attr('disabled', true);
+								        												$('#numpedidotienda').val(numeroPedidoPixel);
+								        												alert("El pedido se ha enviado satisfactoriamente a la tienda");
+															    					}
+															    				},
+																				error: function(){
+																				    alert('Se produjo en la actualización del número del pedido de la tienda en el sistema central');
+																				    //Posiblemente aca sería necesario actualizar el estado
+																				 } 
+
+																			});
+												    					}
+																		console.log("numero pedido pixel " +resPedPixel.numerofactura);
+																	} 
+															});
+														},
+														error: function(){
+														    alert('Se produjo un error en la inserción del Pedido, favor revisar logs y reintentar');
+														 } 
+
+													});
+													
+
+
+												}
+											},
+											'No'	: {
+												'class'	: 'gray',
+												'action': function(){}	// Nothing to do in this case. You can as well omit the action property.
+											}
+										}
+									});
+
+									//Revisamos como quitamos la parte del string 
+									//console.log(stringPixel);
+									
+}

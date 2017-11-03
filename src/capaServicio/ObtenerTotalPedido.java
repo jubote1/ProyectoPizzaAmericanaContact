@@ -13,6 +13,8 @@ import capaControlador.PedidoCtrl;
 
 /**
  * Servlet implementation class ObtenerTotalPedido
+ * Servicio que permite dado un id de pedido, retornar el total de un pedido, sumando los detalles de pedido asociados
+ * al pedido.
  */
 @WebServlet("/ObtenerTotalPedido")
 public class ObtenerTotalPedido extends HttpServlet {
@@ -28,6 +30,9 @@ public class ObtenerTotalPedido extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Este servicio recibe como parámetro el idpedido correspondiente y se encarga de retornar el total del pedido,
+	 * sumando los detalles de pedidos asociados al pedido, esto invocando al método obtenerTotalPedido de la capa
+	 * Pedido Controlador.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub

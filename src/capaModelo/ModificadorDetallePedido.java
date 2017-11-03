@@ -1,5 +1,10 @@
 package capaModelo;
 
+/**
+ * Clase que implementa la entidad Modificador Detalle Pedido
+ * @author JuanDavid
+ *
+ */
 public class ModificadorDetallePedido {
 	
 	private int idmodificador;
@@ -7,6 +12,15 @@ public class ModificadorDetallePedido {
 	private int idproductoespecialidad1;
 	private int idproductoespecialidad2;
 	private double cantidad;
+	private int iddetallepedidoasociado;
+	
+	
+	public int getIddetallepedidoasociado() {
+		return iddetallepedidoasociado;
+	}
+	public void setIddetallepedidoasociado(int iddetallepedidoasociado) {
+		this.iddetallepedidoasociado = iddetallepedidoasociado;
+	}
 	public int getIdmodificador() {
 		return idmodificador;
 	}
@@ -37,6 +51,17 @@ public class ModificadorDetallePedido {
 	public void setCantidad(double cantidad) {
 		this.cantidad = cantidad;
 	}
+	public ModificadorDetallePedido(int idmodificador, int iddetallepedidopadre, int idproductoespecialidad1,
+			int idproductoespecialidad2, double cantidad, int iddetallepedidoasociado) {
+		super();
+		this.idmodificador = idmodificador;
+		this.iddetallepedidopadre = iddetallepedidopadre;
+		this.idproductoespecialidad1 = idproductoespecialidad1;
+		this.idproductoespecialidad2 = idproductoespecialidad2;
+		this.cantidad = cantidad;
+		this.iddetallepedidoasociado = iddetallepedidoasociado;
+	}
+	
 	public ModificadorDetallePedido(int idmodificador, int iddetallepedidopadre, int idproductoespecialidad1,
 			int idproductoespecialidad2, double cantidad) {
 		super();

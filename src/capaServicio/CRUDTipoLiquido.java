@@ -14,6 +14,7 @@ import capaControlador.ParametrosCtrl;
 
 /**
  * Servlet implementation class CRUDTipoLiquido
+ * Servicio implementado para soportar las operaciones CRUD de la entidad tipo liquido.
  */
 @WebServlet("/CRUDTipoLiquido")
 public class CRUDTipoLiquido extends HttpServlet {
@@ -29,6 +30,9 @@ public class CRUDTipoLiquido extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Este método se encarga de solicitar principalmente el idoperacion de acuerdo a lo siguiente:
+	 * 1 insertar 2 editar 3 Eliminar  4 Consultar, con base en lo anterior se solicitarán los parametros y 
+	 * posteriormente se invocará el método correspondiente en la capa controlador.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//Operación idoperacion 1 insertar 2 editar 3 Eliminar  4 Consultar

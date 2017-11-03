@@ -29,6 +29,8 @@ public class ConsultarDetallePedido extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Este servicio recibe como parámetro un numeropedido y con base en este retorna la información, de un pedido.
+	 * Se invoca en la capa controlador el método  ConsultarDetallePedido, el cual retorna en formato JSON la información.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub

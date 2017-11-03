@@ -1,5 +1,10 @@
 package capaModelo;
 
+/**
+ * Clase qeu implementa la entidad SaborLiquido.
+ * @author JuanDavid
+ *
+ */
 public class SaborLiquido {
 	
 	private int idSaborTipoLiquido;

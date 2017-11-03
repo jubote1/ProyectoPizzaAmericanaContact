@@ -1,5 +1,10 @@
 package capaModelo;
 
+/**
+ * Clase que implementa la entidad Excepción Precio.
+ * @author JuanDavid
+ *
+ */
 public class ExcepcionPrecio {
 	private int idExcepcion;
 	private int idProducto;
@@ -9,8 +14,27 @@ public class ExcepcionPrecio {
 	private String incluyeliquido;
 	private int idtipoliquido;
 	private String nombreLiquido;
+	private String controlaCantidadIngredientes;
+	private int cantidadIngrediantes;
+	private String partiradiciones;
 	
 	
+	
+	
+	public String getPartiradiciones() {
+		return partiradiciones;
+	}
+
+
+
+
+	public void setPartiradiciones(String partiradiciones) {
+		this.partiradiciones = partiradiciones;
+	}
+
+
+
+
 	public ExcepcionPrecio(int idProducto, double precio, String descripcion, String incluyeliquido,
 			int idtipoliquido) {
 		super();
@@ -49,6 +73,34 @@ public class ExcepcionPrecio {
 		this.incluyeliquido = incluyeliquido;
 		this.idtipoliquido = idtipoliquido;
 		this.nombreLiquido = nombreLiquido;
+	}
+
+
+
+
+	public String getControlaCantidadIngredientes() {
+		return controlaCantidadIngredientes;
+	}
+
+
+
+
+	public void setControlaCantidadIngredientes(String controlaCantidadIngredientes) {
+		this.controlaCantidadIngredientes = controlaCantidadIngredientes;
+	}
+
+
+
+
+	public int getCantidadIngrediantes() {
+		return cantidadIngrediantes;
+	}
+
+
+
+
+	public void setCantidadIngrediantes(int cantidadIngrediantes) {
+		this.cantidadIngrediantes = cantidadIngrediantes;
 	}
 
 
@@ -118,12 +170,16 @@ public class ExcepcionPrecio {
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
-	public ExcepcionPrecio(int idExcepcion, int idProducto, double precio, String descripcion) {
+	public ExcepcionPrecio(int idExcepcion, int idProducto, double precio, String descripcion, String controlaCantidadIngredientes, int cantidadIngredientes,String incluyeliquido,
+			int idtipoliquido, String partiradiciones ) {
 		super();
 		this.idExcepcion = idExcepcion;
 		this.idProducto = idProducto;
 		this.precio = precio;
 		this.descripcion = descripcion;
+		this.controlaCantidadIngredientes = controlaCantidadIngredientes;
+		this.cantidadIngrediantes = cantidadIngredientes;
+		this.partiradiciones = partiradiciones;
 	}
 	
 	

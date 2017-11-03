@@ -13,7 +13,9 @@ import javax.servlet.http.HttpSession;
 import capaControlador.PedidoCtrl;
 
 /**
- * Servlet implementation class getExcepcionesPrecio
+ * Servlet implementation class getExcepcionesPrecio 
+ * Servicio que se encarga de retornar en formato JSON todas las excepciones de precio, parametrizadas en el sistema, 
+ * no se toma ningún filtro para la información.
  */
 @WebServlet("/getExcepcionesPrecio")
 public class getExcepcionesPrecio extends HttpServlet {
@@ -29,6 +31,8 @@ public class getExcepcionesPrecio extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * El servicio no toma ningún filtro, se retornan todas las excepciones de precio de producto en formato JSON
+	 * invocando al método obtenerTodosExcepciones() de la capa Pedido Controlador.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try{

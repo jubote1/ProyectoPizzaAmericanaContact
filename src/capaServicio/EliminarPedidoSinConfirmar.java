@@ -14,6 +14,7 @@ import capaControlador.PedidoCtrl;
 
 /**
  * Servlet implementation class EliminarPedidoSinConfirmar
+ * Servicio que permitirá elminar un pedido del cual ya se inició el pedido, sin embargo no se ha confirmado y se desea eliminar.
  */
 @WebServlet("/EliminarPedidoSinConfirmar")
 public class EliminarPedidoSinConfirmar extends HttpServlet {
@@ -29,6 +30,7 @@ public class EliminarPedidoSinConfirmar extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * El servicio solicitará el idpedido, con esta informción se encargará de eliminar la información del pedido que no se ha confirmado.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.addHeader("Access-Control-Allow-Origin", "*");

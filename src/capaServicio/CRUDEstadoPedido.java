@@ -14,6 +14,7 @@ import capaControlador.ParametrosCtrl;
 
 /**
  * Servlet implementation class CRUDEstadoPedido
+ * Servicio que implementa los diferentes métodos para soportar el CRUD de la entidad Estado Pedido
  */
 @WebServlet("/CRUDEstadoPedido")
 public class CRUDEstadoPedido extends HttpServlet {
@@ -29,6 +30,8 @@ public class CRUDEstadoPedido extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * El servicio recibe como parámetro principal un idoperación que significa lo siguiente: 1 insertar 2 editar 3 Eliminar  4 Consultar
+	 * con base en el idoperación se pedirán los parámetros necesario para cada operación del CRUD en la entidad estado pedido.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//Operación idoperacion 1 insertar 2 editar 3 Eliminar  4 Consultar

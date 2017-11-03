@@ -10,8 +10,20 @@ import java.util.ArrayList;
 import org.json.simple.*;
 import org.json.simple.parser.*;
 
+/**
+ * 
+ * @author Juan David Botero Duque
+ * Clase qeu tiene como objetivo en la capa de Controlador para todo el esquema de clientes
+ */
 public class ClienteCtrl {
 	
+	/**
+	 * 
+	 * @param tel recibe el valor del teléfono para buscar al cliente en la base de datos y devolver en una estructura json
+	 * las incripciones del cliente que corresponden al número telefónico entregado como parámetro.
+	 * @return un valor String en formato json con el arreglo de inscripciones en la tabla cliente que responden al teléfono
+	 * enviado como parámetro
+	 */
 	public String obtenerCliente(String tel){
 		JSONArray listJSON = new JSONArray();
 		ArrayList<Cliente> clientes = ClienteDAO.obtenerCliente(tel);
@@ -39,6 +51,11 @@ public class ClienteCtrl {
 		return listJSON.toJSONString();
 	}
 	
+/**
+ * 	
+ * @param id Dado el id de un cliente se retorna la información del cliente
+ * @return Se retorna en formato json la información del cliente que corresponde al id cliente, ingresado como parámetro.
+ */
 public String obtenerClienteporID(int id)
 {
 	Cliente clienteConsultado = ClienteDAO.obtenerClienteporID(id);
@@ -58,8 +75,18 @@ public String obtenerClienteporID(int id)
 	listJSON.add(Respuesta);
 	return(listJSON.toJSONString());
 }
-	
-	
+
+
+/**
+ * 	Este método tiene como objetivo tomar los parámetros de un cliente para realizar la inserción
+ * @param telefono parámetro de ingreso para la creación de cliente
+ * @param nombres parámetro de ingreso para la creación de cliente
+ * @param direccion parámetro de ingreso para la creación de cliente
+ * @param zona parámetro de ingreso para la creación de cliente 
+ * @param observacion parámetro de ingreso para la creación de cliente
+ * @param tienda parámetro de ingreso para la creación de cliente
+ * @return Se retorna en formato Json el id del cliente sea ingresado o actualizado.
+ */
 public String InsertarClientePedido(String telefono, String nombres, String direccion,  String zona,  String observacion, String tienda)
 {
 	//Validar si el cliente ya existe en la base de datos
@@ -77,7 +104,7 @@ public String InsertarClientePedido(String telefono, String nombres, String dire
 	{
 		for (Cliente cliente : clientes) 
 		{
-			System.out.println(cliente.getTienda() + clienteInsertar.getTienda());
+			
 			if (cliente.getTienda().equals(clienteInsertar.getTienda()))
 			{
 				clienteTiendaExiste = true;
@@ -117,6 +144,23 @@ public String InsertarClientePedido(String telefono, String nombres, String dire
 	return(listJSON.toJSONString());
 }
 
+/**
+ * Este método recibe la informacion de un cliente y de acuerdo a los diferentes condiciones, actualiza o crea el cliente en la base de datos
+ * @param idCliente 
+ * @param telefono
+ * @param nombres
+ * @param apellidos
+ * @param nombreCompania
+ * @param direccion
+ * @param municipio
+ * @param latitud
+ * @param longitud
+ * @param zona
+ * @param observacion
+ * @param tienda
+ * @param memcode
+ * @return Retorna el idcliente ingresado o actualizado según los datos recibidos como parámetro.
+ */
 public int InsertarClientePedidoEncabezado(int idCliente,String telefono, String nombres, String apellidos, String nombreCompania, String direccion, String municipio, float latitud, float longitud, String zona,  String observacion, String tienda, int memcode)
 {
 	//Validar si el cliente ya existe en la base de datos
@@ -135,6 +179,9 @@ public int InsertarClientePedidoEncabezado(int idCliente,String telefono, String
 	}else if((idCliente == 0 ) && (memcode == 0))
 	{
 		idRespuestaCreacion = ClienteDAO.insertarCliente(clienteRevisar);
+	}else if((idCliente > 0 ) && (memcode == 0))
+	{
+		idRespuestaActualizacion = ClienteDAO.actualizarCliente(clienteRevisar);
 	}
 		
 	if (idRespuestaActualizacion > 0)
