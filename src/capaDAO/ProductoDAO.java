@@ -119,6 +119,59 @@ public class ProductoDAO {
 		
 	}
 	
+	public static ArrayList<Producto> GetProductosTienda(int idtienda) {
+		Logger logger = Logger.getLogger("log_file");
+		ArrayList<Producto> todosProducto = new ArrayList();
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		try
+		{
+			Statement stm = con1.createStatement();
+			String consulta = "select p.idproducto, p.idreceta, p.nombre, p.descripcion, p.impuesto, p.tipo, p.producto_asocia_adicion, p.preciogeneral, p.incluye_liquido, p.idtipo_liquido, p.manejacantidad from producto p where p.idproducto not in (select b.idproducto from producto_no_existente b where idtienda ="+ idtienda +" ) order by nombre asc";
+			logger.info(consulta);
+			ResultSet rs = stm.executeQuery(consulta);
+			int idProducto;
+			int idReceta;
+			String nombre;
+			String descripcion;
+			float impuesto;
+			String tipo;
+			int productoasociaadicion;
+			double precio;
+			String incluye_liquido;
+			int idtipo_liquido;
+			String manejacantidad;
+			while(rs.next()){
+				idProducto = rs.getInt("idproducto");
+				idReceta = rs.getInt("idreceta");
+				nombre = rs.getString("nombre");
+				descripcion = rs.getString("descripcion");
+				impuesto = rs.getFloat("impuesto");
+				tipo = rs.getString("tipo");
+				productoasociaadicion = rs.getInt("producto_asocia_adicion");
+				precio = rs.getDouble("preciogeneral");
+				incluye_liquido = rs.getString("incluye_liquido");
+				idtipo_liquido = rs.getInt("idtipo_liquido");
+				manejacantidad = rs.getString("manejacantidad");
+				Producto prod = new Producto(idProducto, idReceta, nombre, descripcion,impuesto, tipo,productoasociaadicion, precio, incluye_liquido, idtipo_liquido, manejacantidad);
+				todosProducto.add(prod);
+			}
+			rs.close();
+			stm.close();
+			con1.close();
+		}catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+		}
+		return(todosProducto);
+		
+	}
+	
 	/**
 	 * Método que se encarga de insertar un nuevo producto con base en la información recibida como parámetro
 	 * @param pro Se recibe como parámetro un objeto Modelo Producto con toda la informació del nuevo producto

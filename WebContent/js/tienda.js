@@ -65,7 +65,35 @@ $(document).ready(function() {
         
     	//
 		pintarTiendas();
+		setInterval('validarVigenciaLogueo()',600000);
 });
+
+function validarVigenciaLogueo()
+{
+	var d = new Date();
+	
+	var respuesta ='';
+	$.ajax({ 
+	   	url: server + 'ValidarUsuarioAplicacion', 
+	   	dataType: 'json',
+	   	type: 'post', 
+	   	async: false, 
+	   	success: function(data){
+			    respuesta =  data[0].respuesta;		
+		} 
+	});
+	switch(respuesta)
+	{
+		case 'OK':
+				break;
+		case 'OKA':
+				break;	
+		default:
+				location.href = server +"Index.html";
+		    	break;
+	}
+		    		
+}
 
 function guardarTienda()
 {

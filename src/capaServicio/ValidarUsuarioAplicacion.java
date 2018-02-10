@@ -58,17 +58,8 @@ public class ValidarUsuarioAplicacion extends HttpServlet {
 					
 				}
 		        PrintWriter out = response.getWriter();
-		        if (resultado.equals(new  String ("N")) ){
-		        		out.write("OK");
-		        		//response.sendRedirect("http://localhost:8080/ProyectoPizzaAmericana/Pedidos.html");
-		        } 
-		        else if(resultado.equals(new  String ("S"))){
-		        	   	out.write("OKA");
-		        	
-		        }else
-		        {
-		        	out.write("NOK");
-		        }
+		        out.write(resultado);
+		        
 		        	
 	}
 

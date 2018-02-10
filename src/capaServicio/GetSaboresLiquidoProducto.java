@@ -41,8 +41,16 @@ public class GetSaboresLiquidoProducto extends HttpServlet {
 			response.setContentType("application/json");
 			String idProducto = request.getParameter("idProducto");
 			int idProdu = Integer.parseInt(idProducto);
+			int idtienda;
+			try
+			{
+				idtienda = Integer.parseInt(request.getParameter("idtienda"));
+			}catch(Exception e)
+			{
+				idtienda = 0;
+			}
 			PedidoCtrl PedidoCtrl = new PedidoCtrl();
-			String respuesta = PedidoCtrl.ObtenerSaboresLiquidoProducto(idProdu);
+			String respuesta = PedidoCtrl.ObtenerSaboresLiquidoProducto(idProdu, idtienda);
 			PrintWriter out = response.getWriter();
 			out.write(respuesta);
 			

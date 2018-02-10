@@ -42,8 +42,16 @@ public class GetSaboresLiquidoExcepcion extends HttpServlet {
 			response.setContentType("application/json");
 			String idExcepcion = request.getParameter("idExcepcion");
 			int idExcep = Integer.parseInt(idExcepcion);
+			int idtienda;
+			try
+			{
+				idtienda = Integer.parseInt(request.getParameter("idtienda"));
+			}catch(Exception e)
+			{
+				idtienda = 0;
+			}
 			PedidoCtrl PedidoCtrl = new PedidoCtrl();
-			String respuesta = PedidoCtrl.ObtenerSaboresLiquidoExcepcion(idExcep);
+			String respuesta = PedidoCtrl.ObtenerSaboresLiquidoExcepcion(idExcep, idtienda);
 			PrintWriter out = response.getWriter();
 			out.write(respuesta);
 			

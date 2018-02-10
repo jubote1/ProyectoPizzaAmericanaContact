@@ -43,9 +43,52 @@ public class ConexionBaseDatos {
 			/**
 			 * Se realiza la creación de la conexión a la base de datos
 			 */
+			//con = DriverManager.getConnection(
+		    //        "jdbc:mysql://192.168.0.25/pizzaamericana?"
+		    //        + "user=root&password=4m32017");
+			
 			con = DriverManager.getConnection(
 		            "jdbc:mysql://localhost/pizzaamericana?"
 		            + "user=root&password=4m32017");
+
+		    // Otros y operaciones sobre la base de datos...
+
+		} catch (SQLException ex) {
+
+		    // Mantener el control sobre el tipo de error
+		    System.out.println("SQLException: " + ex.getMessage());
+
+		}
+		return(con);
+	}
+	
+	/**
+	 * Método que se encarga de tener conexión al sistema principal de temas generales
+	 * @return
+	 */
+	public Connection obtenerConexionBDGeneral(){
+		try {
+		    Class.forName("com.mysql.jdbc.Driver").newInstance();
+		    
+
+		} catch (Exception e) {
+
+		    System.out.println(e.toString());
+
+		}
+		
+		Connection con = null;
+		//...
+
+		try {
+
+			con = DriverManager.getConnection(
+		            "jdbc:mysql://localhost/general?"
+		            + "user=root&password=4m32017");
+			
+			//con = DriverManager.getConnection(
+		    //        "jdbc:mysql://192.168.0.25/general?"
+		    //        + "user=root&password=4m32017");
 
 		    // Otros y operaciones sobre la base de datos...
 

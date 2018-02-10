@@ -71,6 +71,10 @@ public class InsertarClienteEncabezadoPedido extends HttpServlet {
         String tienda = request.getParameter("tienda");
         String municipio = request.getParameter("municipio");
         String fechaPedido = request.getParameter("fechapedido");
+        int idnomenclatura = 0;
+        String numNomenclatura = request.getParameter("numnomenclatura1");
+        String numNomenclatura2 = request.getParameter("numnomenclatura2");
+        String num3 = request.getParameter("num3");
         System.out.println("tienda" +tienda+ "municipio" + municipio);
         float latitud;
         float longitud;
@@ -100,8 +104,14 @@ public class InsertarClienteEncabezadoPedido extends HttpServlet {
         {
         	idCliente = 0;
         }
+        try{
+        	idnomenclatura = Integer.parseInt(request.getParameter("idnomenclatura"));
+        }catch(Exception e)
+        {
+        	idnomenclatura = 0;
+        }
         ClienteCtrl ClienCtrl = new ClienteCtrl();
-        int idcliente = ClienCtrl.InsertarClientePedidoEncabezado(idCliente,telefono, nombres, apellidos, nombreCompania,  direccion, municipio, latitud, longitud, zona, observacion, tienda, memcode);
+        int idcliente = ClienCtrl.InsertarClientePedidoEncabezado(idCliente,telefono, nombres, apellidos, nombreCompania,  direccion, municipio, latitud, longitud, zona, observacion, tienda, memcode, idnomenclatura, numNomenclatura, numNomenclatura2, num3);
         String respuesta = "";
         PedidoCtrl PedidoCtrl = new PedidoCtrl();
 	    respuesta = PedidoCtrl.InsertarEncabezadoPedido(tienda,idcliente,fechaPedido, user);

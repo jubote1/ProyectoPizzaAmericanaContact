@@ -70,7 +70,7 @@ $(document).ready(function() {
             { "mData": "estadoenviotienda" },
             { "mData": "numposheader"  },
             { "mData": "formapago"  },
-            { "mData": "idformapago"  },
+            { "mData": "tiempopedido"  },
             { "mData": "idtienda", "visible": false },
             { "mData": "urltienda", "visible": false },
             { "mData": "stringpixel", "visible": false }
@@ -122,8 +122,7 @@ $(document).ready(function() {
     	}
         $.getJSON(server + 'ConsultarDetallePedido?numeropedido=' + idPedido, function(data1){
 	                		tabledetalle.clear().draw();
-	                		console.log(data1);
-							for(var i = 0; i < data1.length;i++){
+	                		for(var i = 0; i < data1.length;i++){
 								tabledetalle.row.add(data1[i]).draw();
 							}
 	                		
@@ -159,10 +158,38 @@ $(function(){
 	
 	getListaTiendas();
 	getExcepcionesPrecios();
+	setInterval('validarVigenciaLogueo()',600000);
 	
 });
 
 
+
+function validarVigenciaLogueo()
+{
+	var d = new Date();
+	
+	var respuesta ='';
+	$.ajax({ 
+	   	url: server + 'ValidarUsuarioAplicacion', 
+	   	dataType: 'json',
+	   	type: 'post', 
+	   	async: false, 
+	   	success: function(data){
+			    respuesta =  data[0].respuesta;		
+		} 
+	});
+	switch(respuesta)
+	{
+		case 'OK':
+				break;
+		case 'OKA':
+				break;	
+		default:
+				location.href = server +"Index.html";
+		    	break;
+	}
+		    		
+}
 
 function validarTelefono(){
 
@@ -227,7 +254,6 @@ function getExcepcionesPrecios(){
 			else
 			{
 				$.getJSON(server + 'GetSaboresLiquidoExcepcion?idExcepcion=' + selExcepcion, function(data1){
-                		console.log(data1);
                 		var strGas='';
                 		var strGas = '<h2>Gaseosa</h2>';
                 		strGas += '<table class="table table-bordered">';
@@ -265,7 +291,6 @@ function getExcepcionesPrecios(){
 				else
 				{
 					$.getJSON(server + 'GetSaboresLiquidoExcepcion?idExcepcion=' + selExcepcion, function(data1){
-	                		console.log(data1);
 	                		var strGas='';
 	                		strGas = '<h2>Gaseosa</h2>';
 	                		strGas += '<table class="table table-bordered">';
@@ -283,7 +308,7 @@ function getExcepcionesPrecios(){
 				}
 			}
 		}
-		//console.log(selExcepcion + " " + idSelExcepcion);
+		
 	});
 }
 
@@ -305,9 +330,7 @@ function buscarMapa() {
 	    				dataType: 'json', 
 	    				async: false, 
 	    				success: function(data){ 
-								console.log(data);
 								resultado = data;
-								console.log(resultado);
 							} 
 						});
     // Creamos el Objeto Geocoder
@@ -431,7 +454,6 @@ function consultarPedido()
     }
 	$.getJSON(server + 'ConsultaIntegradaPedidos?fechainicial=' + fechaini +"&fechafinal=" + fechafin + "&tienda=" + tienda +  "&numeropedido=" + numpedido, function(data1){
 	                		
-	                		
 	                		table.clear().draw();
 							for(var i = 0; i < data1.length;i++){
 								var cadaPedido  = data1[i];
@@ -477,7 +499,7 @@ function enviarPedidoTienda(){
 										'title'		: 'Confirmacion de Reenvío de Pedido',
 										'content'	: 'Desea confirmar el reenvío del Pedido Número ' + idPedido + '<br> El Pedido pasará a estado  Finalizado'+
 										'Con la siguiente información: <br>' +
-										'CLIENTE: ' + $('#nombres').val() + ' ' + $('#apellidos').val() + '<br>' +
+										'CLIENTE: ' + $('#nombres').val() + ' ' + '<br>' +
 										'DIRECCION ' +  $('#direccion').val() + '<br>' +
 										'TOTAL PEDIDO ' + $("#totalpedido").val() + '<br>' +
 										'CAMBIO ' + $("#valorpago").val() + '<br>' +
@@ -493,7 +515,7 @@ function enviarPedidoTienda(){
 													var valorformapago =  $("#valorpago").val();
 													var insertado = 0;
 													$.ajax({ 
-								    				url: server + 'FinalizarPedido?idpedido=' + idPedido + "&idformapago=" + idformapago + "&valortotal=" + totalpedido + "&valorformapago=" + valorformapago + "&idcliente=" + idCliente + "&insertado=" + insertado , 
+								    				url: server + 'FinalizarPedidoReenvio?idpedido=' + idPedido + "&idformapago=" + idformapago + "&valortotal=" + totalpedido + "&valorformapago=" + valorformapago + "&idcliente=" + idCliente + "&insertado=" + insertado , 
 								    				dataType: 'json', 
 								    				async: false, 
 								    				success: function(data){ 
@@ -526,7 +548,7 @@ function enviarPedidoTienda(){
 															    						$('#estadotienda').val("ENVIADO A TIENDA");
 								        												$("#estadotienda").attr("disabled", true).css("background-color","#00FF00");
 								        												$('#reenviarPedido').attr('disabled', true);
-								        												$('#numpedidotienda').val(numeroPedidoPixel);
+								        												$('#numpedidotienda').val(resPedPixel.numerofactura);
 								        												alert("El pedido se ha enviado satisfactoriamente a la tienda");
 															    					}
 															    				},
@@ -557,8 +579,7 @@ function enviarPedidoTienda(){
 											}
 										}
 									});
-
-									//Revisamos como quitamos la parte del string 
-									//console.log(stringPixel);
+									consultarPedido();
+									
 									
 }

@@ -71,13 +71,13 @@ public class UsuarioDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select administrador from usuario where nombre = '" + usuario.getNombreUsuario() + "'";
+			String consulta = "select administrador, nombre_largo from usuario where nombre = '" + usuario.getNombreUsuario() + "'";
 			ResultSet rs = stm.executeQuery(consulta);
 			while(rs.next()){
 				
 				try{
-					resultado = rs.getString(1);
-					
+					resultado = rs.getString("administrador");
+					usuario.setNombreLargo(rs.getString("nombre_largo"));
 				}catch(Exception e){
 					
 					

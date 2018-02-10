@@ -42,6 +42,7 @@ $("#fecha").change(function(){
 	// En resumen se invocan todos servicios que se encargan de llenar la data del formulario.
 	getListaTiendas();
 	getListaMunicipios();
+	setInterval('validarVigenciaLogueo()',600000);
 	// Llevamos a cero los campos cálculos de los totales
 	// Se define evento para campo valor a devolver.
 	
@@ -73,7 +74,6 @@ $("#fecha").change(function(){
         $('#observacionDir').val(datos.observacion);
         $("#selectTiendas").val(datos.tienda);
         // Para evitar que modifiquen la tienda
-        $('#selectTiendas').attr('disabled', true);
         $("#selectMunicipio").val(datos.municipio);
         memcode = datos.memcode;
         idCliente = datos.idCliente;
@@ -88,6 +88,32 @@ $("#fecha").change(function(){
 	} );
 
 
+function validarVigenciaLogueo()
+{
+	var d = new Date();
+	
+	var respuesta ='';
+	$.ajax({ 
+	   	url: server + 'ValidarUsuarioAplicacion', 
+	   	dataType: 'json',
+	   	type: 'post', 
+	   	async: false, 
+	   	success: function(data){
+			    respuesta =  data[0].respuesta;		
+		} 
+	});
+	switch(respuesta)
+	{
+		case 'OK':
+				break;
+		case 'OKA':
+				break;	
+		default:
+				location.href = server +"Index.html";
+		    	break;
+	}
+		    		
+}
 
 // Método que se encarga luego de introducido un teléfono en el campo de teléfono del cliente llamar al servicio
 function validarTelefono(){
@@ -160,15 +186,12 @@ function limpiarSeleccionCliente()
 		$('#telefono').val("");
 		$('#nombres').val("");
         $('#apellidos').val("");
-        $('#nombreCompania').val("");
         $('#direccion').val("");
         $('#zona').val("");
-        $('#observacionDir').val("");
+        $("#comentarios").val('');
         $("#selectTiendas").val("");
-        //Volvemos  a habiliar el select de tiendas si es qúe está deshabilitado
-        $('#selectTiendas').attr('disabled', false);
         $("#selectMunicipio").val("");
-        memcode = 0;
+        idCliente = 0;
         if ( $.fn.dataTable.isDataTable( '#grid-clientes' ) ) 
         {
 			table = $('#grid-clientes').DataTable();
@@ -225,17 +248,74 @@ function ConfirmarPQRS()
 	{
 		return;
 	}
-	var tempTienda =  $("#selectTiendas option:selected").val();
-	var tempMunicipio = $("#selectMunicipio option:selected").val();
 	var fechaSolicitud = $("#fecha").val();
-	var nombresEncode = encodeURIComponent(nombres.value);;
-	var apellidosEncode = encodeURIComponent(apellidos.value);;
-	var nombreCompaniaEncode = encodeURIComponent(nombreCompania.value);;
-	var direccionEncode = encodeURIComponent(direccion.value);
-	var zonaEncode = encodeURIComponent(zona.value); 
-	var observacionDirEncode = encodeURIComponent(observacionDir.value);
-	var comentario = encodeURIComponent(comentario.value);
 	var tipoSolicitud = $("#selectSolicitud option:selected").val();
+	//idCliente
+	var tempTienda =  $("#selectTiendas option:selected").attr('id');
+	var nombresEncode = $("#nombres").val();;
+	var apellidosEncode = $("#apellidos").val();
+	var tel = $("#telefono").val();
+	var direccionEncode = $("#direccion").val();
+	var zonaEncode = $("#zona").val(); 
+	var tempMunicipio = $("#selectMunicipio option:selected").attr('id');
+	var comentarioEncode = $("#comentarios").val();
+	$.confirm({
+			'title'		: 'Confirmacion SolicitudPQRS',
+			'content'	: 'Desea confirmar la inserción de la Solicitud PQRS.' ,
+			'buttons'	: {
+				'Si'	: {
+					'class'	: 'blue',
+					'action': function(){
+					$.ajax({ 
+							    				url: server + 'InsertarSolicitudPQRS' , 
+							    				dataType: 'json', 
+							    				type: 'post', 
+	    										data: {'fechasolicitud' : fechaSolicitud,
+	    										 'tiposolicitud' : tipoSolicitud,
+	    										 'idcliente' : idCliente,
+	    										 'idtienda' : tempTienda,
+	    										 'nombres' : nombresEncode,
+	    										 'apellidos' : apellidosEncode,
+	    										 'telefono' : tel,
+	    										 'direccion' : direccionEncode,
+	    										 'zona' : zonaEncode,
+	    										 'idmunicipio' : tempMunicipio,
+	    										 'comentario' : comentarioEncode
+	    										}, 
+							    				async: false, 
+							    				success: function(data1){ 
+												var respuesta = data1[0];
+												if(respuesta.idSolicitudPQRS > 0)
+						    					{
+						    						alert("Se ha insertado correctamente la solicitud PQRS número  " + respuesta.idSolicitudPQRS);
+						    					}
+												
+											} 
+							});
+					$('#telefono').val('');
+					$('#nombres').val('');
+					$('#apellidos').val('');
+					$('#direccion').val('');
+					$('#zona').val('');
+					$("#selectTiendas").val('');
+					$("#selectMunicipio").val(1);
+					$("#comentarios").val('');
+					idCliente = 0;
+					if ( $.fn.dataTable.isDataTable( '#grid-clientes' ) ) {
+						table = $('#grid-clientes').DataTable();
+						table.clear().draw();
+					}	
+						
+
+
+					}
+				},
+				'No'	: {
+					'class'	: 'gray',
+					'action': function(){}	// Nothing to do in this case. You can as well omit the action property.
+				}
+			}
+		});
 }
 
 function ValidacionesDatos()

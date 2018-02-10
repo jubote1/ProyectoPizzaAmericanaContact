@@ -90,5 +90,36 @@ public class MunicipioDAO {
 		}
 		return(idmunicipio);
 	}
+	
+	public static String obtenerMunicipio(int idmunicipio)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		String municipio= "";
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		try
+		{
+			Statement stm = con1.createStatement();
+			String consulta = "select nombre from municipio where idmunicipio = '"+ idmunicipio + "'";
+			logger.info(consulta);
+			ResultSet rs = stm.executeQuery(consulta);
+			while(rs.next()){
+				municipio = rs.getString("nombre");
+				break;
+			}
+			rs.close();
+			stm.close();
+			con1.close();
+		}catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+		}
+		return(municipio);
+	}
 
 }

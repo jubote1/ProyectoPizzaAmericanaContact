@@ -23,6 +23,7 @@ import capaModelo.TipoLiquido;
 import capaModelo.Pedido;
 import capaModelo.DetallePedidoPixel;
 import capaModelo.DetallePedidoAdicion;
+import capaModelo.NomenclaturaDireccion;
 import org.apache.log4j.Logger;
 //import pixelpos.Main;
 import capaModelo.DetallePedidoPixel;
@@ -242,7 +243,7 @@ public class PedidoDAO {
 	 * disponibles por parametrización.
 	 * @return Se retorna un ArrayList con objetos Modelo SaborLiquido con la información según los parámetros recibidos.
 	 */
-	public static ArrayList<SaborLiquido> ObtenerSaboresLiquidoProducto(int idProdu)
+	public static ArrayList<SaborLiquido> ObtenerSaboresLiquidoProducto(int idProdu, int idtienda)
 	{
 		Logger logger = Logger.getLogger("log_file");
 		ArrayList<SaborLiquido> saboresLiquido = new ArrayList();
@@ -251,7 +252,7 @@ public class PedidoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select a.idsabor_x_tipo_liquido, a.descripcion, b.idtipo_liquido, b.nombre, c.idproducto, c.descripcion from sabor_x_tipo_liquido a , tipo_liquido b, producto c where a.idtipo_liquido = b.idtipo_liquido and c.idtipo_liquido = b.idtipo_liquido and c.idproducto = " + idProdu;
+			String consulta = "select a.idsabor_x_tipo_liquido, a.descripcion, b.idtipo_liquido, b.nombre, c.idproducto, c.descripcion from sabor_x_tipo_liquido a , tipo_liquido b, producto c where a.idtipo_liquido = b.idtipo_liquido and c.idtipo_liquido = b.idtipo_liquido and c.idproducto = " + idProdu + " and a.idproducto not in (select idproducto from producto_no_existente where idtienda = " + idtienda +  ")";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idSaborTipoLiquido;
@@ -295,7 +296,7 @@ public class PedidoDAO {
 	 * @return Se retorna un ArrayList con objetos MOdelo SaborLiquido de acuerdo a la excepcion pasada como 
 	 * parámetro.
 	 */
-	public static ArrayList<SaborLiquido> ObtenerSaboresLiquidoExcepcion(int idExce)
+	public static ArrayList<SaborLiquido> ObtenerSaboresLiquidoExcepcion(int idExce, int idtienda)
 	{
 		Logger logger = Logger.getLogger("log_file");
 		ArrayList<SaborLiquido> saboresLiquido = new ArrayList();
@@ -304,7 +305,7 @@ public class PedidoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select a.idsabor_x_tipo_liquido, a.descripcion, b.idtipo_liquido, b.nombre, c.idexcepcion, c.descripcion from sabor_x_tipo_liquido a , tipo_liquido b, excepcion_precio c where a.idtipo_liquido = b.idtipo_liquido and c.idtipoliquido = b.idtipo_liquido and c.idexcepcion = " + idExce;
+			String consulta = "select a.idsabor_x_tipo_liquido, a.descripcion, b.idtipo_liquido, b.nombre, c.idexcepcion, c.descripcion from sabor_x_tipo_liquido a , tipo_liquido b, excepcion_precio c where a.idtipo_liquido = b.idtipo_liquido and c.idtipoliquido = b.idtipo_liquido and c.idexcepcion = " + idExce + " and a.idproducto not in (select idproducto from producto_no_existente where idtienda = " + idtienda +  ")";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idSaborTipoLiquido;
@@ -604,6 +605,42 @@ public class PedidoDAO {
 		return(valorTotal);
 	}
 	
+	public static int obtenerIdClientePedido(int idpedido)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		int idcliente = 0;
+		try
+		{
+			
+			Statement stm = con1.createStatement();
+			String consulta = "select idcliente from pedido where idpedido = " + idpedido + " " ; 
+			logger.info(consulta);
+			ResultSet rs = stm.executeQuery(consulta);
+			while(rs.next()){
+				idcliente = Integer.parseInt(rs.getString("idcliente"));
+				break;
+			}
+			
+			rs.close();
+			stm.close();
+			con1.close();
+		}
+		catch (Exception e){
+			logger.error(e.toString());
+			idcliente = 0;
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+		}
+		
+		return(idcliente);
+	}
+	
 	/**
 	 * Método que se encarga de actualizar un pedido con el número de pedido el cual le fue asignado en la tienda correspondiente.
 	 * @param idpedido Se recibe como parámetro el idpedido en el sistema de Contact Center.
@@ -643,7 +680,7 @@ public class PedidoDAO {
 	 * @param idpedido Se recibe como parámetro el idpedido que se desea eliminar.
 	 * @return Se retorna valor booleano indicando si el proceso fue exitoso (true) o si no fue exitoso (false).
 	 */
-	public static boolean eliminarPedidoSinConfirmar(int idpedido)
+	public static boolean eliminarPedidoSinConfirmar(int idpedido, int idcliente, String usuario)
 	{
 		Logger logger = Logger.getLogger("log_file");
 		ConexionBaseDatos con = new ConexionBaseDatos();
@@ -663,6 +700,9 @@ public class PedidoDAO {
 			delete = "delete from pedido  where idpedido = "+ idpedido ;
 			logger.info(delete);
 			stm.executeUpdate(delete);
+			String logDelete = "insert into log_reiniciar_pedido (idpedido, idcliente, usuario) values ("+ idpedido + " , " + idcliente + " , '" + usuario + "')";
+			logger.info(logDelete);
+			stm.executeUpdate(logDelete);
 			stm.close();
 			con1.close();
 		}
@@ -715,9 +755,10 @@ public class PedidoDAO {
 	 * @param valortotal
 	 * @param idcliente idcliente asociado al pedido.
 	 * @param insertado Marcación que indica si el cliente fue actualizado o insertado.
+	 * @param tiempoPedido se recibe como parámetro el tiempo pedido que se le dio al cliente al momento de confirmar dicho pedido.
 	 * @return Se retorna un valor booleano con el resultado del proceso exitoso (true) o no exitoso (false).
 	 */
-	public static InsertarPedidoPixel finalizarPedido(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado)
+	public static InsertarPedidoPixel finalizarPedido(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado, double tiempopedido)
 	{
 		Logger logger = Logger.getLogger("log_file");
 		ConexionBaseDatos con = new ConexionBaseDatos();
@@ -733,7 +774,7 @@ public class PedidoDAO {
 				valorTotal = rs.getDouble(1);
 				break;
 			}
-			String update = "update pedido set total_bruto =" + valorTotal* 0.92 + " , impuesto = " + valorTotal * 0.08 + " , total_neto =" + valorTotal + " , idestadopedido = 2 where idpedido = " + idpedido;
+			String update = "update pedido set total_bruto =" + valorTotal* 0.92 + " , impuesto = " + valorTotal * 0.08 + " , total_neto =" + valorTotal + " , idestadopedido = 2, tiempopedido = " + tiempopedido +  " where idpedido = " + idpedido;
 			logger.info(update);
 			stm.executeUpdate(update);
 			String insertformapago = "insert pedido_forma_pago (idpedido, idforma_pago, valortotal, valorformapago) values (" + idpedido + " , " + idformapago + " , " + valortotal + " , " + valorformapago + ")";
@@ -858,6 +899,44 @@ public class PedidoDAO {
 		return(url);
 	}
 	
+	public static ArrayList<NomenclaturaDireccion> obtenerNomenclaturaDireccion()
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		ArrayList<NomenclaturaDireccion> nomenclaturas = new ArrayList();
+		try
+		{
+			Statement stm = con1.createStatement();
+			String consulta = "select * from nomenclatura_direccion" ; 
+			logger.info(consulta);
+			ResultSet rs = stm.executeQuery(consulta);
+			int idnomenclatura;
+			String nomenclatura;
+			while(rs.next()){
+				idnomenclatura = rs.getInt("idnomenclatura");
+				nomenclatura = rs.getString("nomenclatura");
+				NomenclaturaDireccion nomen = new NomenclaturaDireccion(idnomenclatura, nomenclatura);
+				nomenclaturas.add(nomen);
+			}
+			rs.close();
+			stm.close();
+			con1.close();
+		}
+		catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+			
+		}
+		return(nomenclaturas);
+	}
+	
+	
 	public static int obtenerFormaPagoHomologadaTienda(int idtienda, int idformapago)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -890,7 +969,6 @@ public class PedidoDAO {
 		}
 		return(idformapagohomo);
 	}
-	
 	
 	/**
 	 * Método que se encarga de retornar los tipos Liquidos existentes en el sistema.
@@ -939,7 +1017,8 @@ public class PedidoDAO {
 	}
 	
 	/**
-	 * Método que permite la consulta de pedidos de acuerdo a los parámetros enviados para la consulta
+	 * Método que permite la consulta de pedidos de acuerdo a los parámetros enviados para la consulta, esta consulta es exclusiva para los 
+	 * productos que son registrados dentro del sistema contact center.
 	 * @param fechainicial Fecha inicial de los pedidos a consultar.
 	 * @param fechafinal Fecha final de los pedidos a consultar.
 	 * @param tienda nombre de la tienda que se desea filtrar para la consulta de los pedidos.
@@ -958,21 +1037,21 @@ public class PedidoDAO {
 		{
 			if (tienda.equals("TODAS"))
 			{
-				consulta = "select a.idpedido, b.nombre, a.total_bruto, a.impuesto, a.total_neto, concat (c.nombre , '-' , c.apellido) nombrecliente, c.direccion, c.telefono, d.descripcion, a.fechapedido, c.idcliente, a.enviadopixel, a.numposheader, b.idtienda, b.url, a.stringpixel, a.fechainsercion, a.usuariopedido, e.nombre formapago, e.idforma_pago from pedido a, tienda b, cliente c, estado_pedido d, forma_pago e, pedido_forma_pago f where a.idtienda = b.idtienda and a.idcliente = c.idcliente and a.idestadopedido = d.idestadopedido and e.idforma_pago = f.idforma_pago and f.idpedido = a.idpedido and a.fechapedido >=  '" + fechaini +"' and a.fechapedido <= '"+ fechafin +"'"  + " and a.numposheader = " + numeropedido;
+				consulta = "select a.idpedido, b.nombre, a.total_bruto, a.impuesto, a.total_neto, concat (c.nombre , '-' , c.apellido) nombrecliente, c.direccion, c.telefono, d.descripcion, a.fechapedido, c.idcliente, a.enviadopixel, a.numposheader, b.idtienda, b.url, a.stringpixel, a.fechainsercion, a.usuariopedido, e.nombre formapago, e.idforma_pago, a.tiempopedido from pedido a, tienda b, cliente c, estado_pedido d, forma_pago e, pedido_forma_pago f where a.idtienda = b.idtienda and a.idcliente = c.idcliente and a.idestadopedido = d.idestadopedido and e.idforma_pago = f.idforma_pago and f.idpedido = a.idpedido and a.fechapedido >=  '" + fechaini +"' and a.fechapedido <= '"+ fechafin +"'"  + " and a.numposheader = " + numeropedido;
 			}else
 			{
 				idtienda = TiendaDAO.obteneridTienda(tienda);
-				consulta = "select a.idpedido, b.nombre, a.total_bruto, a.impuesto, a.total_neto, concat (c.nombre , '-' , c.apellido) nombrecliente, c.direccion, c.telefono, d.descripcion, a.fechapedido, c.idcliente, a.enviadopixel, a.numposheader, b.idtienda, b.url, a.stringpixel, a.fechainsercion, a.usuariopedido, e.nombre formapago, e.idforma_pago from pedido a, tienda b, cliente c, estado_pedido d, forma_pago e, pedido_forma_pago f where a.idtienda = b.idtienda and a.idcliente = c.idcliente and a.idestadopedido = d.idestadopedido and e.idforma_pago = f.idforma_pago and f.idpedido = a.idpedido and a.fechapedido >=  '" + fechaini +"' and a.fechapedido <= '"+ fechafin +"' and a.idtienda =" + idtienda + " and a.numposheader = " + numeropedido;
+				consulta = "select a.idpedido, b.nombre, a.total_bruto, a.impuesto, a.total_neto, concat (c.nombre , '-' , c.apellido) nombrecliente, c.direccion, c.telefono, d.descripcion, a.fechapedido, c.idcliente, a.enviadopixel, a.numposheader, b.idtienda, b.url, a.stringpixel, a.fechainsercion, a.usuariopedido, e.nombre formapago, e.idforma_pago, a.tiempopedido from pedido a, tienda b, cliente c, estado_pedido d, forma_pago e, pedido_forma_pago f where a.idtienda = b.idtienda and a.idcliente = c.idcliente and a.idestadopedido = d.idestadopedido and e.idforma_pago = f.idforma_pago and f.idpedido = a.idpedido and a.fechapedido >=  '" + fechaini +"' and a.fechapedido <= '"+ fechafin +"' and a.idtienda =" + idtienda + " and a.numposheader = " + numeropedido;
 			}
 		}else if((fechainicial.length()>0) && (fechafinal.length()>0) && (tienda.length()>0))
 		{
 			if (tienda.equals("TODAS"))
 			{
-				consulta = "select a.idpedido, b.nombre, a.total_bruto, a.impuesto, a.total_neto, concat (c.nombre , '-' , c.apellido) nombrecliente, c.direccion, c.telefono, d.descripcion, a.fechapedido, c.idcliente, a.enviadopixel, a.numposheader, b.idtienda, b.url, a.stringpixel, a.fechainsercion, a.usuariopedido, e.nombre formapago, e.idforma_pago from pedido a, tienda b, cliente c, estado_pedido d, forma_pago e, pedido_forma_pago f where a.idtienda = b.idtienda and a.idcliente = c.idcliente and a.idestadopedido = d.idestadopedido and e.idforma_pago = f.idforma_pago and f.idpedido = a.idpedido and a.fechapedido >=  '" + fechaini +"' and a.fechapedido <= '"+ fechafin + "'";
+				consulta = "select a.idpedido, b.nombre, a.total_bruto, a.impuesto, a.total_neto, concat (c.nombre , '-' , c.apellido) nombrecliente, c.direccion, c.telefono, d.descripcion, a.fechapedido, c.idcliente, a.enviadopixel, a.numposheader, b.idtienda, b.url, a.stringpixel, a.fechainsercion, a.usuariopedido, e.nombre formapago, e.idforma_pago, a.tiempopedido from pedido a, tienda b, cliente c, estado_pedido d, forma_pago e, pedido_forma_pago f where a.idtienda = b.idtienda and a.idcliente = c.idcliente and a.idestadopedido = d.idestadopedido and e.idforma_pago = f.idforma_pago and f.idpedido = a.idpedido and a.fechapedido >=  '" + fechaini +"' and a.fechapedido <= '"+ fechafin + "'";
 			}else
 			{
 				idtienda = TiendaDAO.obteneridTienda(tienda);
-				consulta = "select a.idpedido, b.nombre, a.total_bruto, a.impuesto, a.total_neto, concat (c.nombre , '-' , c.apellido) nombrecliente, c.direccion, c.telefono, d.descripcion, a.fechapedido, c.idcliente, a.enviadopixel, a.numposheader, b.idtienda, b.url, a.stringpixel, a.fechainsercion, a.usuariopedido, e.nombre formapago, e.idforma_pago from pedido a, tienda b, cliente c, estado_pedido d, forma_pago e, pedido_forma_pago f where a.idtienda = b.idtienda and a.idcliente = c.idcliente and a.idestadopedido = d.idestadopedido and e.idforma_pago = f.idforma_pago and f.idpedido = a.idpedido and a.fechapedido >=  '" + fechaini +"' and a.fechapedido <= '"+ fechafin +"' and a.idtienda =" + idtienda ;
+				consulta = "select a.idpedido, b.nombre, a.total_bruto, a.impuesto, a.total_neto, concat (c.nombre , '-' , c.apellido) nombrecliente, c.direccion, c.telefono, d.descripcion, a.fechapedido, c.idcliente, a.enviadopixel, a.numposheader, b.idtienda, b.url, a.stringpixel, a.fechainsercion, a.usuariopedido, e.nombre formapago, e.idforma_pago, a.tiempopedido from pedido a, tienda b, cliente c, estado_pedido d, forma_pago e, pedido_forma_pago f where a.idtienda = b.idtienda and a.idcliente = c.idcliente and a.idestadopedido = d.idestadopedido and e.idforma_pago = f.idforma_pago and f.idpedido = a.idpedido and a.fechapedido >=  '" + fechaini +"' and a.fechapedido <= '"+ fechafin +"' and a.idtienda =" + idtienda ;
 			}
 		}
 		logger.info(consulta);
@@ -1001,6 +1080,7 @@ public class PedidoDAO {
 			String direccion;
 			String formapago;
 			int idformapago;
+			double tiempopedido;
 			while(rs.next())
 			{
 				idpedido = rs.getInt("idpedido");
@@ -1022,9 +1102,10 @@ public class PedidoDAO {
 				url = rs.getString("url");
 				formapago = rs.getString("formapago");
 				idformapago = rs.getInt("idforma_pago");
+				tiempopedido = rs.getDouble("tiempopedido");
 				Tienda tiendapedido = new Tienda(idtienda, nombreTienda, "", url);
 				Pedido cadaPedido = new Pedido(idpedido,  nombreTienda,totalBruto, impuesto, totalNeto,
-						estadoPedido, fechaPedido, nombreCliente, idcliente, enviadopixel,numposheader, tiendapedido, stringpixel, fechainsercion, usuariopedido, direccion, telefono, formapago, idformapago);
+						estadoPedido, fechaPedido, nombreCliente, idcliente, enviadopixel,numposheader, tiendapedido, stringpixel, fechainsercion, usuariopedido, direccion, telefono, formapago, idformapago, tiempopedido);
 				consultaPedidos.add(cadaPedido);
 			}
 			rs.close();

@@ -3,6 +3,7 @@
 // Se definen las variables globales.
 var server;
 var tiendas;
+var tiendasBloqueadas;
 var productosIncluidos;
 var table;
 var dtpedido;
@@ -66,13 +67,19 @@ $("#fechapedido").change(function(){
 
 	//Se invoca servicio para traerse la información de los productos disponibles en el sistema
 	// En resumen se invocan todos servicios que se encargan de llenar la data del formulario.
-	getTodosProductos();
+	//getTodosProductos();
+	
 	getListaTiendas();
 	getHomologacionGaseosaTienda();
 	getListaMunicipios();
 	getExcepcionesPrecios();
 	getFormasPago();
 	obtenerProductosIncluidos();
+	getListaNomenclaturas();
+	setInterval('validarVigenciaLogueo()',600000);
+	obtenerTiendasBloqueadas();
+	setInterval('obtenerTiendasBloqueadas',300000);
+	$('#descDireccion').attr('disabled', true);
 	// Llevamos a cero los campos cálculos de los totales
 	$("#totalpedido").val('0');
 	$("#valorpago").val('0');
@@ -173,23 +180,75 @@ $("#fechapedido").change(function(){
     //dirección. 
     $('#grid-clientes tbody').on('click', 'tr', function () {
         datos = table.row( this ).data();
+        $("#selectTiendas").val(datos.tienda);
+        var idtien = $("#selectTiendas option:selected").attr('id');
+        for(var i = 0; i < tiendasBloqueadas.length;i++){
+    		var idtienBloq = tiendasBloqueadas[i].idtienda;
+    		if(idtien == idtienBloq)
+    		{
+    			$.alert('La tienda elegida esta deshabilitada en este momento ' + tiendasBloqueadas[i].comentario );
+    			$("#selectTiendas").val('');
+    			return;
+    		}
+
+    	}
         //alert( 'Diste clic en  '+datos.nombre+'\'s row' );
+        $('#selectTiendas').attr('disabled', true);
         $('#nombres').val(datos.nombre);
         $('#apellidos').val(datos.apellido);
         $('#nombreCompania').val(datos.nombrecompania);
         $('#direccion').val(datos.direccion);
         $('#zona').val(datos.zona);
         $('#observacionDir').val(datos.observacion);
-        $("#selectTiendas").val(datos.tienda);
         // Para evitar que modifiquen la tienda
-        $('#selectTiendas').attr('disabled', true);
+        $("#selectNomenclaturas").val(datos.nomenclatura);
         $("#selectMunicipio").val(datos.municipio);
+        $('#numNomen').val(datos.numnomenclatura1);
+        $('#numNomen2').val(datos.numnomenclatura2);
+        $('#num3').val(datos.num3);
+        var selMunicipio = $("#selectMunicipio").val();
+        if (selMunicipio == '' || selMunicipio == null || selMunicipio == 'null')
+        {
+        	selMunicipio = '';
+        }
+        $('#descDireccion').val($("#selectNomenclaturas").val() +  " "  + $("#numNomen").val() + " # " + $("#numNomen2").val() + " - " + $("#num3").val() + " " + selMunicipio);
+        getProductosTienda(idtien);
         memcode = datos.memcode;
         idCliente = datos.idCliente;
         var municipio = datos.municipio;
-        var dirbuscar = datos.direccion + " " + municipio.toLowerCase();
-        buscarMapa(dirbuscar);
+        //Cambiamos la manera de buscar el mapa
+        //var dirbuscar = datos.direccion + " " + municipio.toLowerCase();
+        //buscarMapa(dirbuscar);
+        if(datos.nomenclatura == '' || datos.nomenclatura == null || datos.numnomenclatura1 == '' || datos.numnomenclatura1 == null || datos.numnomenclatura2 == '' || datos.numnomenclatura2 == null )
+        {
+        	if(($('#direccion').val() != null) && ($('#direccion').val() != '') && ($("#selectMunicipio").val() != null) && ($("#selectMunicipio").val() != ''))
+        	{
+        		buscarMapaDigitado();
+        	}
+
+        }
+        else
+        {
+        	buscarMapaDigitado1();
+        }
+        
      } );
+
+    $("#selectTiendas").change(function(){
+    	//Este podría ser el punto transversal donde intervenidos para validar si la tienda está bbloqueada
+    	var idtien = $("#selectTiendas option:selected").attr('id');
+    	for(var i = 0; i < tiendasBloqueadas.length;i++){
+    		var idtienBloq = tiendasBloqueadas[i].idtienda;
+    		if(idtien == idtienBloq)
+    		{
+    			$.alert('La tienda elegida esta deshabilitada en este momento ' + tiendasBloqueadas[i].comentario );
+    			$("#selectTiendas").val('');
+    			return;
+    		}
+
+    	}
+        getProductosTienda(idtien);
+    });
  	
 
     // Se definen los eventos para para cuando demos clic sobre los botones de forma pizza de pizza entera o pizza mitad
@@ -284,11 +343,50 @@ $("#fechapedido").change(function(){
 
 	} );
 
+function validarVigenciaLogueo()
+{
+	var d = new Date();
+	
+	var respuesta ='';
+	$.ajax({ 
+	   	url: server + 'ValidarUsuarioAplicacion', 
+	   	dataType: 'json',
+	   	type: 'post', 
+	   	async: false, 
+	   	success: function(data){
+			    respuesta =  data[0].respuesta;		
+		} 
+	});
+	switch(respuesta)
+	{
+		case 'OK':
+				break;
+		case 'OKA':
+				break;	
+		default:
+				location.href = server +"Index.html";
+		    	break;
+	}
+		    		
+}
 
+
+
+function descripcionDireccion()
+{
+	var selMunicipio = $("#selectMunicipio").val();
+    if (selMunicipio == '' || selMunicipio == null || selMunicipio == 'null')
+    {
+        selMunicipio = '';
+    }
+	$('#descDireccion').val($("#selectNomenclaturas").val() +  " "  + $("#numNomen").val() + " # " + $("#numNomen2").val() + " - " + $("#num3").val() + " " + selMunicipio);	
+}
 
 // Método que se encarga luego de introducido un teléfono en el campo de teléfono del cliente llamar al servicio
 function validarTelefono(){
 
+	//Incluimos validación del logueo dado que es un punto crítico para retomar los pedidos
+	validarVigenciaLogueo();
 	// Validamos el tema de la longitud del pedido
 	var lngTel = $("#telefono").val().length;
 	if (lngTel < 10)
@@ -518,6 +616,26 @@ function getListaTiendas(){
 	});
 }
 
+function obtenerTiendasBloqueadas(){
+	$.getJSON(server + 'CRUDTiendaBloqueada?idoperacion=5', function(data){
+		tiendasBloqueadas = data;
+	});
+}
+
+function getListaNomenclaturas(){
+	$.getJSON(server + 'GetNomenclaturasDireccion', function(data){
+		var nomenclaturas = data;
+		var str = '';
+		for(var i = 0; i < data.length;i++){
+			var cadaNomen = data[i];
+			str +='<option value="'+ cadaNomen.nomenclatura +'" id ="'+ cadaNomen.idnomenclatura +'">' + cadaNomen.nomenclatura +'</option>';
+		}
+		$('#selectNomenclaturas').html(str);
+		// Realizamos cambio para que la tienda no esté seleccionada por defecto
+		$("#selectNomenclaturas").val('');
+	});
+}
+
 
 // Método que invoca servicio en el que obtiene para las tiendas que gaseosas están homologadas como tipo de gaseosa incluido
 function getHomologacionGaseosaTienda(){
@@ -560,6 +678,7 @@ function getListaMunicipios(){
 			str +='<option value="'+ cadaMunicipio.nombre +'" id ="'+ cadaMunicipio.idmunicipio +'">' + cadaMunicipio.nombre +'</option>';
 		}
 		$('#selectMunicipio').html(str);
+		$("#selectMunicipio").val('');
 	});
 
 }
@@ -611,6 +730,16 @@ function getExcepcionesPrecios(){
 			cantidadIngredientes = 0;
 			return;
 		}
+		var idtien = $("#selectTiendas option:selected").attr('id');
+		if (idtien > 0)
+		{
+
+		}
+		else
+		{
+			alert("Debe seleccionar una Tienda.");
+			return;
+		}
 		if (selCodigoProducto != 'otros')
 		{
 
@@ -635,7 +764,7 @@ function getExcepcionesPrecios(){
 			}
 			else
 			{
-				$.getJSON(server + 'GetSaboresLiquidoExcepcion?idExcepcion=' + selExcepcion, function(data1){
+				$.getJSON(server + 'GetSaboresLiquidoExcepcion?idExcepcion=' + selExcepcion +"&idtienda=" + idtien, function(data1){
                 		
                 		var strGas='';
                 		var indfila = 1;
@@ -700,7 +829,7 @@ function getExcepcionesPrecios(){
 				}
 				else
 				{
-					$.getJSON(server + 'GetSaboresLiquidoExcepcion?idExcepcion=' + selExcepcion, function(data1){
+					$.getJSON(server + 'GetSaboresLiquidoExcepcion?idExcepcion=' + selExcepcion + "&idtienda=" + idtien, function(data1){
 	                		
 	                		var strGas='';
 	                		var indfila = 1;
@@ -825,6 +954,14 @@ function getTodosProductos()
 	});
 }
 
+function getProductosTienda(idtienda)
+{
+	$.getJSON(server + 'GetProductosTienda?idtienda='+ idtienda, function(data){
+		productos = data;
+		getPizzas();
+	});
+}
+
 //Método que se encarga de pintar los productos tipo pizza.
 function getPizzas()
 {
@@ -874,6 +1011,7 @@ function getPizzas()
 	strPizza +='<tr>';		
 	strPizza += '</table>';
 	$('#FormTamanoPizza').html(strPizza);
+	var idtien = $("#selectTiendas option:selected").attr('id');
 	$("input[name=tamanoPizza]:radio").click(function() { 
 
 			//Validamos que la tienda este seleccionada, esto con el objetivo de controlar el desppliegue de productos como gaseosas, otros y adicionales.
@@ -915,7 +1053,7 @@ function getPizzas()
                     	break;
                     default:
                     	$('#otrosproductos').html('');
-	                	$.getJSON(server + 'GetSaboresLiquidoProducto?idProducto=' + tamanoPizza, function(data1){
+	                	$.getJSON(server + 'GetSaboresLiquidoProducto?idProducto=' + tamanoPizza + "&idtienda=" + idtien, function(data1){
 	                		
 	                		var strGas='';
 	                		var indfila = 1;
@@ -969,6 +1107,7 @@ function getOtrosProductos()
 	var indfila = 1;
 	str += '<table class="table table-bordered">';
     str += '<tbody>';
+    var idtien = $("#selectTiendas option:selected").attr('id');
 	for(var i = 0; i < productos.length;i++){
 			var cadaProdu  = productos[i];
 			if (cadaProdu.tipo == "OTROS" )
@@ -1001,7 +1140,7 @@ function getOtrosProductos()
 		$('#otrosproductos').html(str);
 		$("input[name=otros]:radio").click(function() { 
 			var idProductoOtros = $("input:radio[name=otros]:checked").attr('id');
-			$.getJSON(server + 'GetSaboresLiquidoProducto?idProducto=' + idProductoOtros, function(data1){
+			$.getJSON(server + 'GetSaboresLiquidoProducto?idProducto=' + idProductoOtros + "&idtienda=" + idtien, function(data1){
                 		console.log("gaseosa para otros productos " + data1);
                 		var strGas='';
                 		indfila = 1;
@@ -1772,94 +1911,166 @@ function ocultarModalAdiciones()
 
 function ReiniciarPedido()
 {
+	var resultado;
 	$.confirm({
 				'title'		: 'Confirmacion para Cancelar Pedido',
-				'content'	: 'Desea confirmar la Cancelación del pedido?',
+				'content'	: '<h4> <p style="color:#FF0000";> Desea confirmar la Cancelación del pedido? </p> </h4>',
+				'autoClose': 'No|8000',
 				'buttons'	: {
 					'Si'	: {
 						'class'	: 'blue',
 						'action': function(){
-							if (idPedido != 0)
-							{
-								//Es porque ya hemos realizado la inserción de algún item por lo tanto consumimos servicio para eliminar lo agregado del pedido
-								$.ajax({ 
-				    				url: server + 'EliminarPedidoSinConfirmar?idpedido=' + idPedido , 
-				    				dataType: 'json', 
-				    				async: false, 
-				    				success: function(data){
-				    					var resul =  data[0];
-				    					if (resul.respuesta == "true")
-				    					{
-
-				    					}
-				    				},
-									error: function(){
-									    alert('Se produjo un error en la Eliminación del pedido');
-									 } 
-
-								});
-							}
-									//Limpieza de las variables y campos del formulario												
-									var strClr = "";
-									idPedido = 0;
-									memcode = 0;
-									idCliente = 0;
-									contadorItem = 1;
-								    $('#otrosproductos').html(strClr);
-								    $('#especialidades').html(strClr);
-								    $('#pintarAdiciones').html(strClr);
-								    //$('input:text[name=cantidad]').val('');
-								    //Se reinician valores por defecto
-								    $('input:radio[name=adicion]:nth(1)').attr('checked',true);
-								    $('input:radio[name=tamanoPizza]').attr('checked',false);
-								    $('input:radio[name=formapizza]').attr('checked',false);
-								    $('input:radio[name=liquido]').attr('checked',false);
-								    $('input:radio[name=requiereDevuelta]')[1].checked = true;
-								    $('#valorpago').attr('disabled', false);
-								    $("#selectExcepcion").val('vacio');
-								    $('#observacionDir').val('');
-								    $('#observacion').val('');
-								    //Adicional al clareo de todo el pedido
-								    $("#NumPedido").val('');
-									$("#IdCliente").val('');
-									$("#estadopedido").val('');
-									$('#telefono').val('');
-									$('#nombres').val('');
-									$('#apellidos').val('');
-									$('#nombreCompania').val('');
-							        $('#direccion').val('');
-							        $('#zona').val('');
-							        $('#observacionDir').val('');
-							        $("#selectTiendas").val('');
-							        $("#selectformapago").val(1);
-							        if ( $.fn.dataTable.isDataTable( '#grid-clientes' ) ) {
-							    		table = $('#grid-clientes').DataTable();
-							    		table.clear().draw();
-							    	}
-
-							    	if ( $.fn.dataTable.isDataTable( '#grid-pedido' ) ) {
-							    		table = $('#grid-pedido').DataTable();
-							    		table.clear().draw();
-							    	}
-							    	$('input:radio[name=adicion]')[1].checked = true;
-							    	totalpedido = 0;
-							    	$("#totalpedido").val('0');
-									$("#valorpago").val('0');
-									$("#valordevolver").val('0');
-									marcadorAdiciones = 0;
-									marcardorProductoCon = 0;
-									marcardorProductoSin = 0;
-									//Volvemos a habilitar el select de tienda
-									$('#selectTiendas').attr('disabled', false);
-									$('#limpiar').attr('disabled', false);
 							
+							//Agregamos el ingreso de la clave del usuario para confirmar el logueo
+							$.confirm({
+							    title: 'Confirmar reinicio de Pedido',
+							    content: '' +
+							    '<form action="" class="formuConfirmarReinicio" id="formuConfirmarReinicio">' +
+							    '<div class="form-group">' +
+							    '<label>Ingrese Usuario</label>' +
+							    '<input type="text" placeholder="Usuario" name="usuario" class="usuario form-control" required />' +
+							    '<label>Ingrese Clave</label>' +
+							    '<input type="password" placeholder="Clave" name="clave" class="clave form-control" required />' +
+							    '</div>' +
+							    '</form>',
+							    buttons: {
+							        formSubmit: {
+							            text: 'Confirmar',
+							            btnClass: 'btn-blue',
+							            action: function () {
+							                var usuario = this.$content.find('.usuario').val();
+											var password = this.$content.find('.clave').val();
+											$.ajax({ 
+							    				url: server + 'GetIngresarAplicacion', 
+							    				dataType: 'text',
+							    				type: 'post', 
+							    				data: {'txtUsuario' : usuario , 'txtPassword' : password }, 
+							    				async: false, 
+							    				success: function(data){ 
+							    						resultado = data;
+							    						if (resultado == 'OK')
+														{
+															if (idPedido != 0)
+															{
+																//Es porque ya hemos realizado la inserción de algún item por lo tanto consumimos servicio para eliminar lo agregado del pedido
+																$.ajax({ 
+												    				url: server + 'EliminarPedidoSinConfirmar?idpedido=' + idPedido , 
+												    				dataType: 'json', 
+												    				async: false, 
+												    				success: function(data){
+												    					var resul =  data[0];
+												    					if (resul.respuesta == "true")
+												    					{
 
+												    					}
+												    				},
+																	error: function(){
+																	    alert('Se produjo un error en la Eliminación del pedido');
+																	 } 
 
+																});
+															}
+																	//Limpieza de las variables y campos del formulario												
+																	var strClr = "";
+																	idPedido = 0;
+																	memcode = 0;
+																	idCliente = 0;
+																	contadorItem = 1;
+																    $('#otrosproductos').html(strClr);
+																    $('#especialidades').html(strClr);
+																    $('#pintarAdiciones').html(strClr);
+																    //$('input:text[name=cantidad]').val('');
+																    //Se reinician valores por defecto
+																    $('input:radio[name=adicion]:nth(1)').attr('checked',true);
+																    $('input:radio[name=tamanoPizza]').attr('checked',false);
+																    $('input:radio[name=formapizza]').attr('checked',false);
+																    $('input:radio[name=liquido]').attr('checked',false);
+																    $('input:radio[name=requiereDevuelta]')[1].checked = true;
+																    $('#valorpago').attr('disabled', false);
+																    $("#selectExcepcion").val('vacio');
+																    $('#observacionDir').val('');
+																    $('#observacion').val('');
+																    //Adicional al clareo de todo el pedido
+																    $("#NumPedido").val('');
+																	$("#IdCliente").val('');
+																	$("#estadopedido").val('');
+																	$('#telefono').val('');
+																	$('#nombres').val('');
+																	$('#apellidos').val('');
+																	$('#nombreCompania').val('');
+															        $('#direccion').val('');
+															        $('#zona').val('');
+															        $('#observacionDir').val('');
+															        $("#selectTiendas").val('');
+															        $("#selectNomenclaturas").val('');
+															        $('#numNomen').val("");
+															        $('#numNomen2').val("");
+															        $('#num3').val("");
+															        $('#descDireccion').val("");
+															        $("#selectMunicipio").val("");
+															        //reiniciamos el arreglo de productos
+															        productos = "";
+															        $('#FormTamanoPizza').html('');
+															        $('#otrosproductos').html('');
+																    $('#especialidades').html('');
+																    $('#pintarAdiciones').html('');
+
+															        $("#selectformapago").val(1);
+															        if ( $.fn.dataTable.isDataTable( '#grid-clientes' ) ) {
+															    		table = $('#grid-clientes').DataTable();
+															    		table.clear().draw();
+															    	}
+
+															    	if ( $.fn.dataTable.isDataTable( '#grid-pedido' ) ) {
+															    		table = $('#grid-pedido').DataTable();
+															    		table.clear().draw();
+															    	}
+															    	$('input:radio[name=adicion]')[1].checked = true;
+															    	totalpedido = 0;
+															    	$("#totalpedido").val('0');
+																	$("#valorpago").val('0');
+																	$("#valordevolver").val('0');
+																	marcadorAdiciones = 0;
+																	marcardorProductoCon = 0;
+																	marcardorProductoSin = 0;
+																	//Volvemos a habilitar el select de tienda
+																	$('#selectTiendas').attr('disabled', false);
+																	$('#limpiar').attr('disabled', false);
+																	$('#validaDir').prop('checked', true);
+														}
+														else
+														{
+															$.alert('No se elimino el pedido debido a que el usuario y clave es incorrecta');
+														}
+													} 
+												});
+							            }
+							        },
+							        cancel: function () {
+							            //close
+							        },
+							    },
+							    onContentReady: function () {
+							        // bind to events
+							        var jc = this;
+							        this.$content.find('formuConfirmarReinicio').on('submit', function (e) {
+							            // if the user submits the form by pressing enter in the field.
+							            e.preventDefault();
+							            jc.$$formSubmit.trigger('click'); // reference the button and click it
+							        });
+							    }
+							});
+
+							//Validamos que el logueo sea exitoso para eliminar el pedido
+							
 						}
 					},
 					'No'	: {
 						'class'	: 'gray',
-						'action': function(){}	// Nothing to do in this case. You can as well omit the action property.
+						'action': function(){
+
+							$.alert('La acción de Reinicio de pedido fue cancelada');
+						}	// Nothing to do in this case. You can as well omit the action property.
 					}
 				}
 			});
@@ -1874,18 +2085,42 @@ function ConfirmarPedido()
 		alert("Para confirmar el pedido debe tener por lo menos un item agregado");
 		return;
 	}
+	if(dtpedido.data().count() == 0)
+	{
+		alert('Debe agregar por lo menos un item al pedido para poderlo finalizar');
+		return;
+	}
 	var valordevolver =  $("#valordevolver").val();
 	if(valordevolver >= 0)
 	{
+		// Se realiza llamado de servicio en sistema contact con el fin de obtener el tiempo actual de la tienda
+		var tiempopedido;
+		var idtien = $("#selectTiendas option:selected").attr('id');
+		$.ajax({ 
+			url: server + 'CRUDTiempoPedido?idoperacion=3&idtienda=' + idtien , 
+			dataType: 'json',
+			type: 'get', 
+			async: false, 
+			success: function(data2){
+				tiempopedido = data2.tiempopedido;			    
+			} 
+		});
+		if (tiempopedido == '' || tiempopedido == null || tiempopedido == undefined || tiempopedido == 0)
+		{
+			tiempopedido = 'No hay tiempo definido para la tienda';
+		}
+		var selMunicipio = $("#selectMunicipio").val();
+		var dir = $("#selectNomenclaturas").val() +  " "  + $("#numNomen").val() + " # " + $("#numNomen2").val() + " - " + $("#num3").val() + " " + selMunicipio;
 		$.confirm({
 				'title'		: 'Confirmacion de Creación de Pedido',
 				'content'	: 'Desea confirmar el Pedido Número ' + idPedido + '<br> El Pedido pasará a estado  Finalizado?'+
 				'Con la siguiente información: <br>' +
 				'CLIENTE: ' + $('#nombres').val() + ' ' + $('#apellidos').val() + '<br>' +
-				'DIRECCION ' +  $('#direccion').val() + '<br>' +
+				'DIRECCION ' +  dir + '<br>' +
 				'TOTAL PEDIDO ' + $("#totalpedido").val() + '<br>' +
 				'CAMBIO ' + $("#valorpago").val() + '<br>' +
-				'TIENDA DEL PEDIDO ' +  '<h1>' + $("#selectTiendas").val().toUpperCase() + '</h1> <br>',
+				'TIENDA DEL PEDIDO ' +  '<h1>' + $("#selectTiendas").val().toUpperCase() + '</h1> <br>' +
+				'<h5> Tiempo Aproximado Pedido :  ' + tiempopedido  + ' Minutos </h5>',
 				'type': 'dark',
    				'typeAnimated': true,
 				'buttons'	: {
@@ -1896,14 +2131,27 @@ function ConfirmarPedido()
 							var tempTienda =  $("#selectTiendas option:selected").val();
 							var tempMunicipio = $("#selectMunicipio option:selected").val();
 							var idClienteTemporal;
-							var nombresEncode = encodeURIComponent(nombres.value);;
-							var apellidosEncode = encodeURIComponent(apellidos.value);;
+							var nombresEncode = encodeURIComponent(nombres.value);
+							var apellidosEncode = encodeURIComponent(apellidos.value);
 							var nombreCompaniaEncode = encodeURIComponent(nombreCompania.value);;
-							var direccionEncode = encodeURIComponent(direccion.value);
+							var direccionEncode;
+							var validaDir = 'S';
+							if($('#validaDir').is(':checked'))
+							{
+								direccionEncode = encodeURIComponent($("#selectNomenclaturas").val() +  " "  + $("#numNomen").val() + " # " + $("#numNomen2").val() + " - " + $("#num3").val());
+							}else
+							{
+								validaDir = 'N';
+								direccionEncode = encodeURIComponent(direccion.value);
+							}
 							var zonaEncode = encodeURIComponent(zona.value); 
 							var observacionDirEncode = encodeURIComponent(observacionDir.value);
+							var nomenclatura = $("#selectNomenclaturas option:selected").attr('id');
+							var numNomenclatura1 = encodeURIComponent($("#numNomen").val());
+							var numNomenclatura2 = encodeURIComponent($("#numNomen2").val());
+							var num3 = encodeURIComponent($("#num3").val());
 							$.ajax({ 
-					    				url: server + 'ActualizarCliente?telefono=' + telefono.value + "&nombres=" + nombresEncode + "&apellidos=" + apellidosEncode + "&nombreCompania=" + nombreCompaniaEncode +  "&direccion="  + direccionEncode  + "&tienda=" + tempTienda +  "&zona=" + zonaEncode + "&observacion=" + observacionDirEncode + "&municipio=" + tempMunicipio + "&longitud=" + longitud + "&latitud=" + latitud + "&memcode=" + memcode + "&idcliente=" + idCliente, 
+					    				url: server + 'ActualizarCliente?telefono=' + telefono.value + "&nombres=" + nombresEncode + "&apellidos=" + apellidosEncode + "&nombreCompania=" + nombreCompaniaEncode +  "&direccion="  + direccionEncode  + "&tienda=" + tempTienda +  "&zona=" + zonaEncode + "&observacion=" + observacionDirEncode + "&municipio=" + tempMunicipio + "&longitud=" + longitud + "&latitud=" + latitud + "&memcode=" + memcode + "&idcliente=" + idCliente + "&idnomenclatura=" + nomenclatura + "&numnomenclatura1=" + numNomenclatura1 + "&numnomenclatura2=" + numNomenclatura2 +  "&num3=" + num3, 
 					    				dataType: 'json', 
 					    				async: false, 
 					    				success: function(data){ 
@@ -1915,7 +2163,7 @@ function ConfirmarPedido()
 							var idformapago =  $("#selectformapago").val();
 							var valorformapago =  $("#valorpago").val();
 							$.ajax({ 
-		    				url: server + 'FinalizarPedido?idpedido=' + idPedido + "&idformapago=" + idformapago + "&valortotal=" + totalpedido + "&valorformapago=" + valorformapago + "&idcliente=" + idCliente + "&insertado=" + insertado , 
+		    				url: server + 'FinalizarPedido?idpedido=' + idPedido + "&idformapago=" + idformapago + "&valortotal=" + totalpedido + "&valorformapago=" + valorformapago + "&idcliente=" + idCliente + "&insertado=" + insertado + "&tiempopedido=" + tiempopedido +"&validadir=" + validaDir, 
 		    				dataType: 'json', 
 		    				async: false, 
 		    				success: function(data){ 
@@ -1976,6 +2224,19 @@ function ConfirmarPedido()
 							        $('#zona').val('');
 							        $('#observacionDir').val('');
 							        $("#selectTiendas").val('');
+							        $("#selectNomenclaturas").val('');
+							        $('#numNomen').val("");
+							        $('#numNomen2').val("");
+							        $('#num3').val("");
+							        $('#descDireccion').val("");
+							        $("#selectMunicipio").val("");
+							        //reiniciamos el arreglo de productos
+							        productos = "";
+							        $('#FormTamanoPizza').html('');
+							        $('#otrosproductos').html('');
+								    $('#especialidades').html('');
+								    $('#pintarAdiciones').html('');
+
 							        $("#selectformapago").val(1);
 							          if ( $.fn.dataTable.isDataTable( '#grid-clientes' ) ) {
 							    		table = $('#grid-clientes').DataTable();
@@ -1994,7 +2255,8 @@ function ConfirmarPedido()
 									//Volvemos a habilitar el select de tienda
 									$('#selectTiendas').attr('disabled', false);
 									$('#limpiar').attr('disabled', false);
-									
+									$('#validaDir').prop('checked', true);
+
 								},
 								error: function(){
 								    alert('Se produjo un error en la inserción del Pedido, favor revisar logs y reintentar');
@@ -2048,10 +2310,30 @@ function ValidacionesDatosNoPizzas()
 	}
 		//validamos campo Direccion
 	var dir = direccion.value;
-	if (dir == '' || dir == null)
+	//if (dir == '' || dir == null)
+	//{
+	//	alert ('Debe ingresar la dirección del cliente');
+	//	return;
+	//}
+	var nomenclatura = $("#selectNomenclaturas option:selected").val();
+	var numNomen1 =  $("#numNomen").val();
+	var numNomen2 =  $("#numNomen2").val();
+	var num3 = $("#num3").val();
+	if($('#validaDir').is(':checked'))
 	{
-		alert ('Debe ingresar la dirección del cliente');
-		return;
+		if (nomenclatura == '' || nomenclatura == null || numNomen1== '' || numNomen1 == null || numNomen1 == 'null' || numNomen2== '' || numNomen2 == null || numNomen2  == 'null' || num3== '' || num3 == null || num3 == 'null')
+		{
+			alert ('Faltan datos de la dirección, por favor completelos');
+			return;
+		}
+	}
+	else
+	{
+		if (dir == '' || dir == null)
+		{
+			alert ('Aunque tiene definido no validar dirección, debe por lo menos ingresar la indicación del sitio');
+			return;
+		}
 	}
 	var tien = $("#selectTiendas option:selected").val();
 	if (tien == '' || tien == null || tien == undefined)
@@ -2094,10 +2376,30 @@ function ValidacionesDatos()
 	}
 		//validamos campo Direccion
 	var dir = direccion.value;
-	if (dir == '' || dir == null)
+	//if (dir == '' || dir == null)
+	//{
+	//	alert ('Debe ingresar la dirección del cliente');
+	//	return;
+	//}
+	var nomenclatura = $("#selectNomenclaturas option:selected").val();
+	var numNomen1 =  $("#numNomen").val();
+	var numNomen2 =  $("#numNomen2").val();
+	var num3 = $("#num3").val();
+	if($('#validaDir').is(':checked'))
 	{
-		alert ('Debe ingresar la dirección del cliente');
-		return;
+		if (nomenclatura == '' || nomenclatura == null || numNomen1== '' || numNomen1 == null || numNomen1 == 'null' || numNomen2== '' || numNomen2 == null || numNomen2  == 'null' || num3== '' || num3 == null || num3 == 'null')
+		{
+			alert ('Faltan datos de la dirección, por favor completarlos');
+			return;
+		}
+	}
+	else
+	{
+		if (dir == '' || dir == null)
+		{
+			alert ('Aunque tiene definido no validar dirección, debe por lo menos ingresar la indicación del sitio');
+			return;
+		}
 	}
 	var tien = $("#selectTiendas option:selected").val();
 	if (tien == '' || tien == null || tien == undefined)
@@ -2284,13 +2586,22 @@ function agregarEncabezadoPedido()
 		var idClienteTemporal;
 		var fechapedido = $("#fechapedido").val();
 		var nombresEncode = encodeURIComponent(nombres.value);;
-		var apellidosEncode = encodeURIComponent(apellidos.value);;
-		var nombreCompaniaEncode = encodeURIComponent(nombreCompania.value);;
-		var direccionEncode = encodeURIComponent(direccion.value);
-		var zonaEncode = encodeURIComponent(zona.value); 
+		var apellidosEncode = encodeURIComponent(apellidos.value);
+		var nombreCompaniaEncode = encodeURIComponent(nombreCompania.value);
+		if($('#validaDir').is(':checked'))
+		{
+			direccionEncode = encodeURIComponent($("#selectNomenclaturas").val() +  " "  + $("#numNomen").val() + " # " + $("#numNomen2").val() + " - " + $("#num3").val());
+		}else
+		{
+			direccionEncode = encodeURIComponent(direccion.value);
+		}var zonaEncode = encodeURIComponent(zona.value); 
 		var observacionDirEncode = encodeURIComponent(observacionDir.value);
+		var nomenclatura =  $("#selectNomenclaturas option:selected").attr('id');
+		var numNomenclatura1 = encodeURIComponent($("#numNomen").val());
+		var numNomenclatura2 = encodeURIComponent($("#numNomen2").val());
+		var num3 = encodeURIComponent($("#num3").val());
 		$.ajax({ 
-    				url: server + 'InsertarClienteEncabezadoPedido?telefono=' + telefono.value + "&nombres=" + nombresEncode + "&apellidos=" + apellidosEncode + "&nombreCompania=" + nombreCompaniaEncode +  "&direccion="  + direccionEncode  + "&tienda=" + tempTienda +  "&zona=" + zonaEncode + "&observacion=" + observacionDirEncode + "&municipio=" + tempMunicipio + "&longitud=" + longitud + "&latitud=" + latitud + "&memcode=" + memcode + "&idcliente=" + idCliente + "&fechapedido=" + fechapedido, 
+    				url: server + 'InsertarClienteEncabezadoPedido?telefono=' + telefono.value + "&nombres=" + nombresEncode + "&apellidos=" + apellidosEncode + "&nombreCompania=" + nombreCompaniaEncode +  "&direccion="  + direccionEncode  + "&tienda=" + tempTienda +  "&zona=" + zonaEncode + "&observacion=" + observacionDirEncode + "&municipio=" + tempMunicipio + "&longitud=" + longitud + "&latitud=" + latitud + "&memcode=" + memcode + "&idcliente=" + idCliente + "&fechapedido=" + fechapedido + "&idnomenclatura=" + nomenclatura + "&numnomenclatura1=" + numNomenclatura1 + "&numnomenclatura2=" + numNomenclatura2 +  "&num3=" + num3, 
     				dataType: 'json', 
     				async: false, 
     				success: function(data){ 
@@ -3209,6 +3520,43 @@ function buscarMapaDigitado() {
     //geocodeResult(resultado.results,resultado.status);
 }
 
+// Método para el nuevo esquema de direcciones
+function buscarMapaDigitado1() {
+
+	if($("#selectNomenclaturas").val() == '' || $("#selectNomenclaturas").val() == null || $("#numNomen").val() == '' || $("#numNomen").val() == null || $("#numNomen2").val() == '' || $("#numNomen2").val() == null )
+        {
+        	if(($('#direccion').val() != null) && ($('#direccion').val() != '') && ($("#selectMunicipio").val() != null) && ($("#selectMunicipio").val() != ''))
+        	{
+        		buscarMapaDigitado();
+        	}
+        	return;
+        }
+
+        
+    // Obtenemos la dirección y la asignamos a una variable
+    var direccion = $("#selectNomenclaturas").val() +  " "  + $("#numNomen").val() + " # " + $("#numNomen2").val() ;
+    var municipio = $("#selectMunicipio").val();
+    municipio = municipio.toLowerCase();
+    direccion = direccion + " " + municipio + " Antioquia Colombia";
+    var resultado;
+    
+    $.ajax({ 
+	    				url:'https://maps.googleapis.com/maps/api/geocode/json?components=administrative_area:Medellin|country:Colombia&address=' + direccion +'&key=AIzaSyBH1VN3540Ux8Y92wDv61horvr8SUqNd_s' , 
+	    				dataType: 'json', 
+	    				async: false, 
+	    				success: function(data){ 
+								resultado = data;
+								
+							} 
+						});
+    // Creamos el Objeto Geocoder
+    var geocoder = new google.maps.Geocoder();
+    // Hacemos la petición indicando la dirección e invocamos la función
+    // geocodeResult enviando todo el resultado obtenido
+    geocoder.geocode({ 'address': direccion}, geocodeResult);
+    //geocodeResult(resultado.results,resultado.status);
+}
+
 //Georeferenciación de la dirección
 
 function buscarMapa(dir) {
@@ -3249,8 +3597,9 @@ function geocodeResult(results, status) {
         // fitBounds acercará el mapa con el zoom adecuado de acuerdo a lo buscado
         map.fitBounds(results[0].geometry.viewport);
         // Dibujamos un marcador con la ubicación del primer resultado obtenido
+        //url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/ZonasDeRepartoTotales.kml',
         var ctaLayer = new google.maps.KmlLayer({
-          url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/ZonasDeRepartoTotales.kml',
+          url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/PizzaAmericana-ZonasDeRepartoTotales-Ver_02.kml',
           map: map,
           scrollwheel: false,
           zoom: 17
@@ -3259,6 +3608,8 @@ function geocodeResult(results, status) {
         var markerOptions = { position: results[0].geometry.location }
         var marker = new google.maps.Marker(markerOptions);
         marker.setMap(map);
+        //Luego de la ubicación en el mapa trataremos de ejecutar una función asincrona para ubicar dentro del mapa y ubicar la tienda
+        ubicarTienda(latitud , longitud , map);
         
     } else {
         // En caso de no haber resultados o que haya ocurrido un error
@@ -3433,10 +3784,25 @@ function limpiarSeleccionCliente()
         $('#zona').val("");
         $('#observacionDir').val("");
         $("#selectTiendas").val("");
+        $("#selectNomenclaturas").val('');
+        $('#numNomen').val("");
+        $('#numNomen2').val("");
+        $('#num3').val("");
+        $('#descDireccion').val("");
+        //reiniciamos el arreglo de productos
+		productos = "";
+		$('#FormTamanoPizza').html('');
+		$('#otrosproductos').html('');
+		$('#especialidades').html('');
+		$('#pintarAdiciones').html('');
+
         //Volvemos  a habiliar el select de tiendas si es qúe está deshabilitado
         $('#selectTiendas').attr('disabled', false);
         $("#selectMunicipio").val("");
+        $('#validaDir').prop('checked', true);
+        //$("#validaDir input[type=checkbox]").prop('checked', true);
         memcode = 0;
+        idCliente = 0;
         if ( $.fn.dataTable.isDataTable( '#grid-clientes' ) ) 
         {
 			table = $('#grid-clientes').DataTable();

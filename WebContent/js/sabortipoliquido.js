@@ -32,7 +32,7 @@ $(document).ready(function() {
 
         // Llenar select de productos y de liquidos
         llenarSelectTipoLiquidos();
-		
+		setInterval('validarVigenciaLogueo()',600000);
   	  	
   	  	$('#userForm')
         .bootstrapValidator({
@@ -61,6 +61,33 @@ $(document).ready(function() {
     	//
 		
 });
+
+function validarVigenciaLogueo()
+{
+	var d = new Date();
+	
+	var respuesta ='';
+	$.ajax({ 
+	   	url: server + 'ValidarUsuarioAplicacion', 
+	   	dataType: 'json',
+	   	type: 'post', 
+	   	async: false, 
+	   	success: function(data){
+			    respuesta =  data[0].respuesta;		
+		} 
+	});
+	switch(respuesta)
+	{
+		case 'OK':
+				break;
+		case 'OKA':
+				break;	
+		default:
+				location.href = server +"Index.html";
+		    	break;
+	}
+		    		
+}
 
 function guardarSaborTipoLiquido()
 {

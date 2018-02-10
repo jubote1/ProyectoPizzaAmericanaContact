@@ -8,6 +8,7 @@ import org.json.simple.JSONObject;
 import capaDAO.ClienteDAO;
 import capaDAO.EspecialidadDAO;
 import capaDAO.PedidoDAO;
+import capaDAO.ProductoDAO;
 import capaDAO.TiendaDAO;
 import capaDAO.ExcepcionPrecioDAO;
 import capaModelo.Especialidad;
@@ -22,6 +23,7 @@ import capaModelo.Pedido;
 import capaModelo.DetallePedidoAdicion;
 import capaModelo.DetallePedidoPixel;
 import capaModelo.ModificadorDetallePedido;
+import capaModelo.NomenclaturaDireccion;
 import capaModelo.ProductoIncluido;
 
 public class PedidoCtrl {
@@ -36,6 +38,20 @@ public class PedidoCtrl {
 			cadaViajeJSON.put("nombre", espe.getNombre());
 			cadaViajeJSON.put("abreviatura", espe.getAbreviatura());
 			listJSON.add(cadaViajeJSON);
+		}
+		
+		return listJSON.toJSONString();
+	}
+	
+	
+	public String obtenerNomenclaturaDireccion(){
+		JSONArray listJSON = new JSONArray();
+		ArrayList<NomenclaturaDireccion> nomenclaturas = PedidoDAO.obtenerNomenclaturaDireccion();
+		for (NomenclaturaDireccion nomen : nomenclaturas) {
+			JSONObject cadaNomenJSON = new JSONObject();
+			cadaNomenJSON.put("idnomenclatura", nomen.getIdnomemclatura());
+			cadaNomenJSON.put("nomenclatura", nomen.getNomenclatura());
+			listJSON.add(cadaNomenJSON);
 		}
 		
 		return listJSON.toJSONString();
@@ -60,6 +76,28 @@ public class PedidoCtrl {
 	public String obtenerTodosProductos(){
 		JSONArray listJSON = new JSONArray();
 		ArrayList<Producto> otrosProductos = PedidoDAO.obtenerTodosProductos();
+		for (Producto produ : otrosProductos) {
+			JSONObject cadaProductoJSON = new JSONObject();
+			cadaProductoJSON.put("idproducto", produ.getIdProducto());
+			cadaProductoJSON.put("idreceta", produ.getIdReceta());
+			cadaProductoJSON.put("nombre", produ.getNombre());
+			cadaProductoJSON.put("descripcion", produ.getDescripcion());
+			cadaProductoJSON.put("impuesto", produ.getImpuesto());
+			cadaProductoJSON.put("tipo", produ.getTipo());
+			cadaProductoJSON.put("productoasociaadicion", produ.getProductoasociaadicion());
+			cadaProductoJSON.put("preciogeneral", produ.getPreciogeneral());
+			cadaProductoJSON.put("incluye_liquido", produ.getIncluye_liquido());
+			cadaProductoJSON.put("idtipo_liquido", produ.getIdtipo_liquido());
+			cadaProductoJSON.put("manejacantidad", produ.getManejacantidad());
+			listJSON.add(cadaProductoJSON);
+		}
+		
+		return listJSON.toJSONString();
+	}
+	
+	public String GetProductosTienda(int idtienda){
+		JSONArray listJSON = new JSONArray();
+		ArrayList<Producto> otrosProductos = ProductoDAO.GetProductosTienda(idtienda);
 		for (Producto produ : otrosProductos) {
 			JSONObject cadaProductoJSON = new JSONObject();
 			cadaProductoJSON.put("idproducto", produ.getIdProducto());
@@ -218,10 +256,10 @@ public class PedidoCtrl {
 	}
 	
 	
-	public String ObtenerSaboresLiquidoProducto(int idProdu)
+	public String ObtenerSaboresLiquidoProducto(int idProdu, int idtienda)
 	{
 		JSONArray listJSON = new JSONArray();
-		ArrayList<SaborLiquido> saboresLiquidos = PedidoDAO.ObtenerSaboresLiquidoProducto(idProdu);
+		ArrayList<SaborLiquido> saboresLiquidos = PedidoDAO.ObtenerSaboresLiquidoProducto(idProdu, idtienda);
 		for (SaborLiquido sabor: saboresLiquidos){
 			JSONObject cadaSaborJSON = new JSONObject();
 			cadaSaborJSON.put("idSaborTipoLiquido", sabor.getIdSaborTipoLiquido());
@@ -235,10 +273,10 @@ public class PedidoCtrl {
 		return listJSON.toJSONString();
 	}
 	
-	public String ObtenerSaboresLiquidoExcepcion(int idExcep)
+	public String ObtenerSaboresLiquidoExcepcion(int idExcep, int idtienda)
 	{
 		JSONArray listJSON = new JSONArray();
-		ArrayList<SaborLiquido> saboresLiquidos = PedidoDAO.ObtenerSaboresLiquidoExcepcion(idExcep);
+		ArrayList<SaborLiquido> saboresLiquidos = PedidoDAO.ObtenerSaboresLiquidoExcepcion(idExcep, idtienda);
 		for (SaborLiquido sabor: saboresLiquidos){
 			JSONObject cadaSaborJSON = new JSONObject();
 			cadaSaborJSON.put("idSaborTipoLiquido", sabor.getIdSaborTipoLiquido());
@@ -252,9 +290,23 @@ public class PedidoCtrl {
 		return listJSON.toJSONString();
 	}
 	
-	public String FinalizarPedido(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado)
+	/**
+	 * Método que se encarga de realizar las acciones para finalizar el pedido en el sistema de Contact Center, secuencialmente
+	 * se finaliza el pedido en la BD de contact center, se totaliza el valor del pedido y se cambia el estado del pedido, adicionalmente
+	 * se forma un json con la informaciónd del pedido, con la cual se invocará el servicio de tienda con los datos necesarios del pedido.
+	 * @param idpedido
+	 * @param idformapago
+	 * @param valorformapago
+	 * @param valortotal
+	 * @param idcliente
+	 * @param insertado
+	 * @param tiempopedido
+	 * @return Se retorna un string en formato JSON con todos los valores que se pasarán al servicio tienda para la creación del pedido en la 
+	 * tienda.
+	 */
+	public String FinalizarPedido(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado, double tiempopedido, String validaDir)
 	{
-		InsertarPedidoPixel pedidoPixel = PedidoDAO.finalizarPedido(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado);
+		InsertarPedidoPixel pedidoPixel = PedidoDAO.finalizarPedido(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado, tiempopedido);
 		String tiendaPixel = PedidoDAO.obtenerUrlTienda(idpedido);
 		JSONArray listJSON = new JSONArray();
 		JSONArray listJSONCliente = new JSONArray();
@@ -287,7 +339,13 @@ public class PedidoCtrl {
 		clienteJSON.put("apellidos", pedidoPixel.getCliente().getApellidos());
 		clienteJSON.put("nombres", pedidoPixel.getCliente().getNombres());
 		clienteJSON.put("nombrecompania", pedidoPixel.getCliente().getNombreCompania());
-		clienteJSON.put("direccion", pedidoPixel.getCliente().getDireccion());
+		if (validaDir.equals(new String("S")))
+		{
+			clienteJSON.put("direccion", pedidoPixel.getCliente().getNomenclatura() + " " + pedidoPixel.getCliente().getNumNomenclatura() + " # " + pedidoPixel.getCliente().getNumNomenclatura2() + " - " + pedidoPixel.getCliente().getNum3() );
+		}else
+		{
+			clienteJSON.put("direccion", pedidoPixel.getCliente().getDireccion() );
+		}
 		clienteJSON.put("telefono", pedidoPixel.getCliente().getTelefono());
 		clienteJSON.put("apellidos", pedidoPixel.getCliente().getApellidos());
 		clienteJSON.put("idcliente", pedidoPixel.getCliente().getIdcliente());
@@ -365,9 +423,10 @@ public class PedidoCtrl {
 		return(respuestaJson);
 	}
 	
-	public String eliminarPedidoSinConfirmar(int idpedido)
+	public String eliminarPedidoSinConfirmar(int idpedido, String usuario)
 	{
-		boolean resultado = PedidoDAO.eliminarPedidoSinConfirmar(idpedido);
+		int idcliente = PedidoDAO.obtenerIdClientePedido(idpedido);
+		boolean resultado = PedidoDAO.eliminarPedidoSinConfirmar(idpedido, idcliente, usuario);
 		JSONArray listJSON = new JSONArray();
 		JSONObject Respuesta = new JSONObject();
 		Respuesta.put("respuesta", resultado);
@@ -430,7 +489,8 @@ public class PedidoCtrl {
 			cadaPedidoJSON.put("direccion", cadaPedido.getDireccion());
 			cadaPedidoJSON.put("telefono", cadaPedido.getTelefono());
 			cadaPedidoJSON.put("formapago", cadaPedido.getFormapago());
-			cadaPedidoJSON.put("idformapago", cadaPedido);
+			cadaPedidoJSON.put("idformapago", cadaPedido.getIdformapago());
+			cadaPedidoJSON.put("tiempopedido", cadaPedido.getTiempopedido());
 			listJSON.add(cadaPedidoJSON);
 		}
 		return listJSON.toJSONString();

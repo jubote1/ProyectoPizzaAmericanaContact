@@ -51,7 +51,8 @@ public class ConsultaIntegradaPedidos extends HttpServlet {
         PedidoCtrl consultapedido = new PedidoCtrl();
         String respuestaConsulta = consultapedido.ConsultaIntegradaPedidos(fechainicial, fechafinal, tienda, numeropedido);
         PrintWriter out = response.getWriter();
-        logger.debug(respuestaConsulta);
+        //Comentamos resultado de la consulta debido a que consultas grandes pueden generar mucha información
+        //logger.debug(respuestaConsulta);
 		out.write(respuestaConsulta);
 	}
 

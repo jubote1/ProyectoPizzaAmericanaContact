@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import capaControlador.PedidoCtrl;
+import capaModelo.Usuario;
 
 /**
  * Servlet implementation class EliminarPedidoSinConfirmar
@@ -35,9 +36,22 @@ public class EliminarPedidoSinConfirmar extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.addHeader("Access-Control-Allow-Origin", "*");
 		HttpSession sesion = request.getSession();
+		Usuario usuario = (Usuario) sesion.getAttribute("usuario");
+		String user = "" ;
+		//Al no existir el usuario logueado es posible que produza una excepcion
+		try
+		{
+			user = usuario.getNombreUsuario();
+			
+			
+		}catch(Exception e)
+		{
+			
+			
+		}
 		int idpedido = Integer.parseInt(request.getParameter("idpedido"));
 		PedidoCtrl PedidoCtrl = new PedidoCtrl();
-        String respuesta = PedidoCtrl.eliminarPedidoSinConfirmar(idpedido);
+        String respuesta = PedidoCtrl.eliminarPedidoSinConfirmar(idpedido, user);
         System.out.println(respuesta);
         PrintWriter out = response.getWriter();
 		out.write(respuesta);

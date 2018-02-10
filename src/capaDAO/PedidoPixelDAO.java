@@ -359,7 +359,7 @@ public class PedidoPixelDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select a.idcliente, b.nombre nombreTienda, a.idtienda, a.nombre, a.apellido, a.nombrecompania, a.direccion, a.zona, a.observacion, a.telefono, c.nombre nombremunicipio, a.latitud, a.longitud, a.memcode from cliente a,tienda b, municipio c where a.idtienda = b.idtienda and a.idmunicipio = c.idmunicipio and a.idcliente = " + id +"";
+			String consulta = "select a.idcliente, b.nombre nombreTienda, a.idtienda, a.nombre, a.apellido, a.nombrecompania, a.direccion, a.zona, a.observacion, a.telefono, c.nombre nombremunicipio, a.latitud, a.longitud, a.memcode, a.idnomenclatura, a.num_nomencla1, a.num_nomencla2, a.num3, d.nomenclatura from cliente a JOIN tienda b ON a.idtienda = b.idtienda JOIN municipio c ON a.idmunicipio = c.idmunicipio left join nomenclatura_direccion d on a.idnomenclatura = d.idnomenclatura  where a.idcliente = " + id +"";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idcliente;
@@ -376,6 +376,11 @@ public class PedidoPixelDAO {
 			float longitud;
 			int idTienda;
 			int memcode;
+			int idnomenclatura;
+			String numNomenclatura1;
+			String numNomenclatura2;
+			String num3;
+			String nomenclatura;
 			while(rs.next()){
 				idcliente = rs.getInt("idcliente");
 				nombreTienda = rs.getString("nombreTienda");
@@ -391,7 +396,12 @@ public class PedidoPixelDAO {
 				longitud = rs.getFloat("longitud");
 				idTienda = rs.getInt("idtienda");
 				memcode = rs.getInt("memcode");
-				clienteConsultado = new Cliente( idcliente, telefono, nombreCliente, apellido, nombreCompania, direccion,municipio,latitud, longitud, zona, observacion, nombreTienda, idTienda,memcode);
+				idnomenclatura = rs.getInt("idnomenclatura");
+				numNomenclatura1 = rs.getString("num_nomencla1");
+				numNomenclatura2 = rs.getString("num_nomencla2");
+				num3 = rs.getString("num3");
+				nomenclatura = rs.getString("nomenclatura");
+				clienteConsultado = new Cliente( idcliente, telefono, nombreCliente, apellido, nombreCompania, direccion,municipio,latitud, longitud, zona, observacion, nombreTienda, idTienda,memcode,idnomenclatura, numNomenclatura1, numNomenclatura2, num3, nomenclatura);
 				
 			}
 		}catch (Exception e){

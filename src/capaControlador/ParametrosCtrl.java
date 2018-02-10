@@ -10,15 +10,22 @@ import capaDAO.FormaPagoDAO;
 import capaDAO.MunicipioDAO;
 import capaDAO.PedidoDAO;
 import capaDAO.ProductoDAO;
+import capaDAO.ProductoNoExistenteDAO;
 import capaDAO.SaborTipoLiquidoDAO;
 import capaDAO.TiendaDAO;
 import capaDAO.TipoLiquidoDAO;
+import capaDAO.GeneralDAO;
+import capaDAO.TiempoPedidoDAO;
+import capaModelo.Correo;
 import capaModelo.Especialidad;
 import capaModelo.EstadoPedido;
 import capaModelo.ExcepcionPrecio;
 import capaModelo.TipoLiquido;
+import utilidades.ControladorEnvioCorreo;
 import capaModelo.Producto;
+import capaModelo.ProductoNoExistente;
 import capaModelo.SaborLiquido;
+import capaModelo.TiempoPedido;
 import capaModelo.Tienda;
 import capaModelo.Municipio;
 import capaModelo.FormaPago;
@@ -792,4 +799,140 @@ public class ParametrosCtrl {
 				}
 				return listJSON.toJSONString();
 			}
+			
+			//PRODUCTOS NO EXISTENTES
+			
+			public String insertaProductoNoExistente(int idtienda, int idproducto)
+			{
+				JSONArray listJSON = new JSONArray();
+				ProductoNoExistente Pro = new ProductoNoExistente(idtienda, "" , idproducto, "");
+				ProductoNoExistenteDAO.insertaProductoNoExistente(Pro);
+				JSONObject ResultadoJSON = new JSONObject();
+				ResultadoJSON.put("insertado", "true");
+				listJSON.add(ResultadoJSON);
+				return listJSON.toJSONString();
+			}
+			
+			
+			public String retornarProductoNoExistente(int idtienda, int idproducto)
+			{
+				JSONArray listJSON = new JSONArray();
+				ProductoNoExistente Pro = ProductoNoExistenteDAO.retornarProductoNoExistente(idtienda, idproducto);
+				JSONObject ResultadoJSON = new JSONObject();
+				ResultadoJSON.put("idtienda", Pro.getIdtienda());
+				ResultadoJSON.put("tienda", Pro.getTienda());
+				ResultadoJSON.put("idproducto", Pro.getIdproducto());
+				ResultadoJSON.put("producto", Pro.getProducto());
+				listJSON.add(ResultadoJSON);
+				return listJSON.toJSONString();
+			}
+			
+			
+			
+			public String retornarProductosNoExistentes(){
+				JSONArray listJSON = new JSONArray();
+				ArrayList<ProductoNoExistente> productos = ProductoNoExistenteDAO.retornarProductosNoExistentes();
+				for (ProductoNoExistente Pro : productos) 
+				{
+					JSONObject ResultadoJSON = new JSONObject();
+					ResultadoJSON.put("idtienda", Pro.getIdtienda());
+					ResultadoJSON.put("tienda", Pro.getTienda());
+					ResultadoJSON.put("idproducto", Pro.getIdproducto());
+					ResultadoJSON.put("producto", Pro.getProducto());
+					listJSON.add(ResultadoJSON);
+				}
+				return listJSON.toJSONString();
+			}
+			
+		
+			public String retornarProductosNoExistentesGrid(){
+				JSONArray listJSON = new JSONArray();
+				ArrayList<ProductoNoExistente> productos = ProductoNoExistenteDAO.obtenerProductosNoExistentesGrid();
+				for (ProductoNoExistente Pro : productos) 
+				{
+					JSONObject ResultadoJSON = new JSONObject();
+					ResultadoJSON.put("idtienda", Pro.getIdtienda());
+					ResultadoJSON.put("tienda", Pro.getTienda());
+					ResultadoJSON.put("idproducto", Pro.getIdproducto());
+					ResultadoJSON.put("producto", Pro.getProducto());
+					listJSON.add(ResultadoJSON);
+				}
+				return listJSON.toJSONString();
+			}
+			
+		
+			public String eliminarProductoNoExistente(int idtienda, int idproducto)
+			{
+				JSONArray listJSON = new JSONArray();
+				ProductoNoExistenteDAO.eliminarProductoNoExistente(idtienda,idproducto);
+				JSONObject ResultadoJSON = new JSONObject();
+				ResultadoJSON.put("resultado", "exitoso");
+				listJSON.add(ResultadoJSON);
+				return listJSON.toJSONString();
+			}
+			
+			
+			public String editarProductoNoExistente(int idtienda, int idproducto)
+			{
+				JSONArray listJSON = new JSONArray();
+				ProductoNoExistente Pro = new ProductoNoExistente(idtienda,"",idproducto, "");
+				String resultado =ProductoNoExistenteDAO.editarProductoNoExistente(Pro);
+				JSONObject ResultadoJSON = new JSONObject();
+				ResultadoJSON.put("resultado", resultado);
+				listJSON.add(ResultadoJSON);
+				return listJSON.toJSONString();
+			}
+			
+			public String retornarTiempoPedido()
+			{
+				JSONArray listJSON = new JSONArray();
+				ArrayList <TiempoPedido> tiempos = TiempoPedidoDAO.retornarTiemposPedidos();
+				for (TiempoPedido tiempo : tiempos) 
+				{
+					JSONObject Respuesta = new JSONObject();
+					Respuesta.put("tiempopedido", tiempo.getMinutosPedido());
+					Respuesta.put("tienda", tiempo.getTienda());
+					Respuesta.put("idtienda", tiempo.getIdtienda());
+					listJSON.add(Respuesta);
+				}
+				return(listJSON.toString());
+			}
+			
+			public String actualizarTiempoPedido(int nuevotiempo, int idtienda, String user)
+			{
+				JSONArray listJSON = new JSONArray();
+				JSONObject Respuesta = new JSONObject();
+				boolean respues = TiempoPedidoDAO.actualizarTiempoPedido(nuevotiempo, idtienda, user);
+				//Realizaremos la validación para envío de correo
+				if(respues)
+				{
+					if (nuevotiempo > 70)
+					{
+						Correo correo = new Correo();
+						correo.setAsunto("ALERTA TIEMPOS PEDIDO");
+						ArrayList correos = GeneralDAO.obtenerCorreosParametro("TIEMPOPEDIDO");
+						correo.setContrasena("Pizzaamericana2017");
+						correo.setUsuarioCorreo("alertaspizzaamericana@gmail.com");
+						Tienda tienda = TiendaDAO.retornarTienda(idtienda);
+						correo.setMensaje("La tienda " + tienda.getNombreTienda() + " está aumentando el tiempo de entrega a " + nuevotiempo + " minutos");
+						ControladorEnvioCorreo contro = new ControladorEnvioCorreo(correo, correos);
+						contro.enviarCorreo();
+					}
+				}
+				Respuesta.put("resultado", respues);
+				listJSON.add(Respuesta);
+				return(Respuesta.toString());
+			}
+			
+			public String retornarTiempoPedidoTienda(int idtienda)
+			{
+				JSONArray listJSON = new JSONArray();
+				JSONObject Respuesta = new JSONObject();
+				int respues = TiempoPedidoDAO.retornarTiempoPedidoTienda( idtienda);
+				Respuesta.put("tiempopedido", respues);
+				listJSON.add(Respuesta);
+				return(Respuesta.toString());
+			}
+			
+			
 }

@@ -46,6 +46,7 @@ public class GetIngresarAplicacion extends HttpServlet {
         if (resultado){
         		Usuario usuario = new Usuario(user);
         		sesion.setAttribute("usuario", usuario);
+        		sesion.setMaxInactiveInterval(60*20);
         		logger.info("El logueo del usuario " + user + " ha sido satisfactorio");
         		out.write("OK");
         		//response.sendRedirect("http://localhost:8080/ProyectoPizzaAmericana/Pedidos.html");

@@ -1,6 +1,10 @@
 package capaControlador;
 
 import capaModelo.Usuario;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import capaDAO.UsuarioDAO;
 
 /**
@@ -43,9 +47,24 @@ public class AutenticacionCtrl {
 	 */
 	public String validarAutenticacion(String usuario)
 	{
+		JSONArray listJSON = new JSONArray();
+		JSONObject Respuesta = new JSONObject();
 		Usuario usu = new Usuario(usuario);
 		String resultado = UsuarioDAO.validarAutenticacion(usu);
-		return(resultado);
+		if (resultado.equals(new  String ("N")) ){
+			Respuesta.put("respuesta", "OK");
+    		
+		} 
+		else if(resultado.equals(new  String ("S"))){
+			Respuesta.put("respuesta", "OKA");
+    	
+		}else
+		{
+			Respuesta.put("respuesta", "NOK");
+		}
+		Respuesta.put("nombreusuario", usu.getNombreLargo());
+		listJSON.add(Respuesta);
+		return(listJSON.toJSONString());
 	}
 
 }

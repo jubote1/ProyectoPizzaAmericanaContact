@@ -17,7 +17,7 @@ import capaControlador.PedidoCtrl;
  * Servicio que se encarga de cerrar un pedido, totalizar el valor del pedido,y cambiar el estado del pedido a finalizado.
  * 
  */
-@WebServlet("/FinalizarPedidoFinalizarPedido.java")
+@WebServlet("/FinalizarPedidoReenvio")
 public class FinalizarPedidoReenvio extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

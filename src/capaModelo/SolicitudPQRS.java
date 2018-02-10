@@ -7,41 +7,23 @@ package capaModelo;
  */
 public class SolicitudPQRS {
 	
+	private int idsolicitud;
 	private String fechaSolicitud;
 	private String tipoSolicitud;
 	private int idcliente;
 	private int idtienda;
-	private String comentario;
-	private String direccion;
-	private String observacion;
 	private String nombres;
 	private String apellidos;
-	
-	
-	
-	public String getDireccion() {
-		return direccion;
+	private String telefono;
+	private String direccion;
+	private String zona;
+	private int idmunicipio;
+	private String comentario;
+	public int getIdsolicitud() {
+		return idsolicitud;
 	}
-	public void setDireccion(String direccion) {
-		this.direccion = direccion;
-	}
-	public String getObservacion() {
-		return observacion;
-	}
-	public void setObservacion(String observacion) {
-		this.observacion = observacion;
-	}
-	public String getNombres() {
-		return nombres;
-	}
-	public void setNombres(String nombres) {
-		this.nombres = nombres;
-	}
-	public String getApellidos() {
-		return apellidos;
-	}
-	public void setApellidos(String apellidos) {
-		this.apellidos = apellidos;
+	public void setIdsolicitud(int idsolicitud) {
+		this.idsolicitud = idsolicitud;
 	}
 	public String getFechaSolicitud() {
 		return fechaSolicitud;
@@ -67,29 +49,69 @@ public class SolicitudPQRS {
 	public void setIdtienda(int idtienda) {
 		this.idtienda = idtienda;
 	}
+	public String getNombres() {
+		return nombres;
+	}
+	public void setNombres(String nombres) {
+		this.nombres = nombres;
+	}
+	public String getApellidos() {
+		return apellidos;
+	}
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
+	}
+	public String getTelefono() {
+		return telefono;
+	}
+	public void setTelefono(String telefono) {
+		this.telefono = telefono;
+	}
+	public String getDireccion() {
+		return direccion;
+	}
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+	public String getZona() {
+		return zona;
+	}
+	public void setZona(String zona) {
+		this.zona = zona;
+	}
+	public int getIdmunicipio() {
+		return idmunicipio;
+	}
+	public void setIdmunicipio(int idmunicipio) {
+		this.idmunicipio = idmunicipio;
+	}
 	public String getComentario() {
 		return comentario;
 	}
 	public void setComentario(String comentario) {
 		this.comentario = comentario;
 	}
-	public SolicitudPQRS(String fechaSolicitud, String tipoSolicitud, int idcliente, int idtienda, String comentario,
-			String direccion, String observacion, String nombres, String apellidos) {
+	public SolicitudPQRS(int idsolicitud, String fechaSolicitud, String tipoSolicitud, int idcliente, int idtienda,
+			String nombres, String apellidos, String telefono, String direccion, String zona, int idmunicipio,
+			String comentario) {
 		super();
+		this.idsolicitud = idsolicitud;
 		this.fechaSolicitud = fechaSolicitud;
 		this.tipoSolicitud = tipoSolicitud;
 		this.idcliente = idcliente;
 		this.idtienda = idtienda;
-		this.comentario = comentario;
-		this.direccion = direccion;
-		this.observacion = observacion;
 		this.nombres = nombres;
 		this.apellidos = apellidos;
+		this.telefono = telefono;
+		this.direccion = direccion;
+		this.zona = zona;
+		this.idmunicipio = idmunicipio;
+		this.comentario = comentario;
 	}
-
 	
 	
-
+	
+	
 	
 
 }

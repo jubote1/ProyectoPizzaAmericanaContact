@@ -55,11 +55,36 @@ $(function(){
 	
 	// Al momento del cargue de la página se consultan las tiendas y con estas se llena el seledt correspondiente.
 	getListaTiendas();
-		
+	setInterval('validarVigenciaLogueo()',600000);
 });
 
 
-
+function validarVigenciaLogueo()
+{
+	var d = new Date();
+	
+	var respuesta ='';
+	$.ajax({ 
+	   	url: server + 'ValidarUsuarioAplicacion', 
+	   	dataType: 'json',
+	   	type: 'post', 
+	   	async: false, 
+	   	success: function(data){
+			    respuesta =  data[0].respuesta;		
+		} 
+	});
+	switch(respuesta)
+	{
+		case 'OK':
+				break;
+		case 'OKA':
+				break;	
+		default:
+				location.href = server +"Index.html";
+		    	break;
+	}
+		    		
+}
 // Función que consume el servicio para obtener las tiendas y adicionalmente se encarga de pintarlas en un select html.
 function getListaTiendas(){
 	$.getJSON(server + 'GetTiendas', function(data){

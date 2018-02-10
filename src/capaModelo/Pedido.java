@@ -28,8 +28,16 @@ public class Pedido {
 	private String telefono;
 	private String formapago;
 	private int idformapago;
+	private double tiempopedido;
 	
 	
+	
+	public double getTiempopedido() {
+		return tiempopedido;
+	}
+	public void setTiempopedido(double tiempopedido) {
+		this.tiempopedido = tiempopedido;
+	}
 	public int getIdformapago() {
 		return idformapago;
 	}
@@ -176,7 +184,7 @@ public class Pedido {
 	}
 	
 	public Pedido(int idpedido, String nombretienda, double totalbruto, double impuesto, double total_neto,
-			String estadopedido, String fechapedido, String nombrecliente, int idcliente, int enviadopixel, int numposheader, Tienda tienda, String stringpixel, String fechainsercion, String usuariopedido, String direccion, String telefono, String formapago, int idformapago) {
+			String estadopedido, String fechapedido, String nombrecliente, int idcliente, int enviadopixel, int numposheader, Tienda tienda, String stringpixel, String fechainsercion, String usuariopedido, String direccion, String telefono, String formapago, int idformapago, double tiempopedido) {
 		super();
 		this.idpedido = idpedido;
 		this.nombretienda = nombretienda;
@@ -197,6 +205,7 @@ public class Pedido {
 		this.telefono = telefono;
 		this.formapago = formapago;
 		this.idformapago = idformapago;
+		this.tiempopedido = tiempopedido;
 	}
 	
 	
