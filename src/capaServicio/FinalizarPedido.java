@@ -87,7 +87,6 @@ public class FinalizarPedido extends HttpServlet {
 		}
 		PedidoCtrl PedidoCtrl = new PedidoCtrl();
         String respuesta = PedidoCtrl.FinalizarPedido(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado, tiempopedido, validaDir);
-        System.out.println(respuesta);
         PrintWriter out = response.getWriter();
 		out.write(respuesta);
 	}

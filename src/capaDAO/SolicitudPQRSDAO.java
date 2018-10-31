@@ -77,7 +77,6 @@ public class SolicitudPQRSDAO {
 	{
 		Logger logger = Logger.getLogger("log_file");
 		ArrayList <SolicitudPQRS> consultaSolicitudes = new ArrayList();
-		int idtienda = 0;
 		String consulta = "";
 		String fechaini = fechainicial.substring(6, 10)+"-"+fechainicial.substring(3, 5)+"-"+fechainicial.substring(0, 2);	
 		String fechafin = fechafinal.substring(6, 10)+"-"+fechafinal.substring(3, 5)+"-"+fechafinal.substring(0, 2);	
@@ -88,8 +87,7 @@ public class SolicitudPQRSDAO {
 				consulta = "select idsolicitudPQRS, fechasolicitud, tiposolicitud,nombres,apellidos, direccion , telefono,comentario from solicitudPQRS where fechasolicitud >=  '" + fechaini +"' and fechasolicitud <= '"+ fechafin +"'" ;
 			}else
 			{
-				idtienda = TiendaDAO.obteneridTienda(tienda);
-				consulta = "select idsolicitudPQRS, fechasolicitud, tiposolicitud,nombres,apellidos, direccion , telefono,comentario from solicitudPQRS where fechasolicitud >=  '" + fechaini +"' and fechasolicitud <= '"+ fechafin +"' and idtienda = " + idtienda;
+				consulta = "select idsolicitudPQRS, fechasolicitud, tiposolicitud,nombres,apellidos, direccion , telefono,comentario from solicitudPQRS where fechasolicitud >=  '" + fechaini +"' and fechasolicitud <= '"+ fechafin +"' and idtienda = " + tienda;
 			}
 		}
 		logger.info(consulta);

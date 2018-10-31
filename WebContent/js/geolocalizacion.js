@@ -1292,5 +1292,20 @@ function ubicarTienda(latitud, longitud , mapa) {
           return;
      }
      $.alert("APARENTEMENTE NO ESTA DENTRO DE LA ZONA DE REPARTO DE NINGÚN PUNTO DE VENTA");
-          
+     //Capturamos los valores para el envio
+     var direccionEncode;
+     if($('#validaDir').is(':checked'))
+     {
+          direccionEncode = encodeURIComponent($("#selectNomenclaturas").val() +  " "  + $("#numNomen").val() + " # " + $("#numNomen2").val() + " - " + $("#num3").val());
+     }else
+     {
+          direccionEncode = encodeURIComponent(direccion.value);
+     }
+     var municipio = $("#selectMunicipio").val();
+     var tel =  telefono.value; 
+     var nombr = encodeURIComponent(nombres.value);
+     var apelli = encodeURIComponent(apellidos.value);
+     $.getJSON(server + 'InsertarDirFueraZona?direccion=' + direccionEncode + "&municipio=" + municipio + "&idcliente=" + idCliente + "&latitud=" + latitud + "&longitud=" + longitud + "&telefono=" + tel + "&nombre=" + nombr + "&apellido=" + apelli , function(data1){
+               
+          });
 }

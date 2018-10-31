@@ -69,7 +69,8 @@ public class PedidoPixelDAO {
 			int idTienda;
 			while(rs.next()){
 				idTienda = rs.getInt("idtienda");
-				tienda = PedidoPixelDAO.retornarTienda(idTienda);
+				tienda = TiendaDAO.retornarTienda(idTienda);
+				break;
 			}
 			rs.close();
 			stm.close();
@@ -445,43 +446,7 @@ public class PedidoPixelDAO {
 	}
 	
 	
-	public static Tienda retornarTienda(int idtienda)
-	{
-		Logger logger = Logger.getLogger("log_file");
-		ConexionBaseDatos con = new ConexionBaseDatos();
-		Connection con1 = con.obtenerConexionBDPrincipal();
-		Tienda Pro = new Tienda(0,"","");
-		try
-		{
-			Statement stm = con1.createStatement();
-			String consulta = "select idtienda,nombre,dsn from  tienda  where idtienda = " + idtienda; 
-			logger.info(consulta);
-			ResultSet rs = stm.executeQuery(consulta);
-			int idtien = 0;
-			String nombre ="";
-			String dsn = "";
-			while(rs.next()){
-				idtien = rs.getInt("idtienda");
-				nombre = rs.getString("nombre");
-				dsn = rs.getString("dsn");
-				break;
-			}
-			Pro = new Tienda(idtien,nombre,dsn);
-			stm.close();
-			con1.close();
-		}
-		catch (Exception e){
-			logger.error(e.toString());
-			try
-			{
-				con1.close();
-			}catch(Exception e1)
-			{
-			}
-		}
-		return(Pro);
-	}
-	
+		
 	public static ArrayList<DetallePedido> ConsultarDetallePedidoSinAdiciones(int numeropedido)
 	{
 		Logger logger = Logger.getLogger("log_file");

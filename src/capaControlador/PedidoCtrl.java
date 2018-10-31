@@ -6,6 +6,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import capaDAO.ClienteDAO;
+import capaDAO.DireccionFueraZonaDAO;
 import capaDAO.EspecialidadDAO;
 import capaDAO.PedidoDAO;
 import capaDAO.ProductoDAO;
@@ -18,10 +19,12 @@ import capaModelo.FormaPago;
 import capaModelo.HomologaGaseosaIncluida;
 import capaModelo.InsertarPedidoPixel;
 import capaModelo.SaborLiquido;
+import capaModelo.Tienda;
 import capaModelo.DetallePedido;
 import capaModelo.Pedido;
 import capaModelo.DetallePedidoAdicion;
 import capaModelo.DetallePedidoPixel;
+import capaModelo.DireccionFueraZona;
 import capaModelo.ModificadorDetallePedido;
 import capaModelo.NomenclaturaDireccion;
 import capaModelo.ProductoIncluido;
@@ -306,8 +309,19 @@ public class PedidoCtrl {
 	 */
 	public String FinalizarPedido(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado, double tiempopedido, String validaDir)
 	{
-		InsertarPedidoPixel pedidoPixel = PedidoDAO.finalizarPedido(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado, tiempopedido);
-		String tiendaPixel = PedidoDAO.obtenerUrlTienda(idpedido);
+		Tienda tienda = PedidoDAO.obtenerTiendaPedido(idpedido);
+		String tiendaPixel = tienda.getUrl();
+		//Capturamos el parámetro de para que POS irá el destino del pedido, con base en esto se formará la información para enviar
+		int pos = tienda.getPos();
+		//Validamos si el Pos es igual a 2 el envío será para PIXEL, en caso contrario será para POS Pizza Americana
+		InsertarPedidoPixel pedidoPixel = new InsertarPedidoPixel();
+		if(pos == 2)
+		{
+			pedidoPixel = PedidoDAO.finalizarPedido(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado, tiempopedido);
+		}else if (pos == 1)
+		{
+			pedidoPixel = PedidoDAO.finalizarPedidoPOSPM(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado, tiempopedido);
+		}
 		JSONArray listJSON = new JSONArray();
 		JSONArray listJSONCliente = new JSONArray();
 		JSONObject respuesta = new JSONObject();
@@ -320,10 +334,12 @@ public class PedidoCtrl {
 		respuesta.put("indicadoract", pedidoPixel.getIndicadorAct());
 		respuesta.put("valorformapago", pedidoPixel.getValorformapago());
 		respuesta.put("idformapagotienda", pedidoPixel.getIdformapagotienda());
-		ArrayList<DetallePedidoPixel> detPedPixel = pedidoPixel.getEnvioPixel();
+		respuesta.put("pos", pos);
+		ArrayList<DetallePedidoPixel> detPedPOS = new ArrayList();
+		detPedPOS = pedidoPixel.getEnvioPixel();
 		//Se realiza un ciclo For para obtener y formatear en json cada uno de los detalles pedidos
 		int contador = 1;
-		for(DetallePedidoPixel detPed: detPedPixel)
+		for(DetallePedidoPixel detPed: detPedPOS)
 		{
 			
 			respuesta.put("idproductoext" + contador, detPed.getIdproductoext() );
@@ -463,6 +479,49 @@ public class PedidoCtrl {
 	{
 		JSONArray listJSON = new JSONArray();
 		ArrayList <Pedido> consultaPedidos = PedidoDAO.ConsultaIntegradaPedidos(fechainicial, fechafinal, tienda, numeropedido);
+		for (Pedido cadaPedido: consultaPedidos){
+			JSONObject cadaPedidoJSON = new JSONObject();
+			cadaPedidoJSON.put("idpedido", cadaPedido.getIdpedido());
+			cadaPedidoJSON.put("tienda", cadaPedido.getNombretienda());
+			cadaPedidoJSON.put("totalneto",cadaPedido.getTotal_neto());
+			cadaPedidoJSON.put("idcliente", cadaPedido.getIdcliente());
+			cadaPedidoJSON.put("cliente", cadaPedido.getNombrecliente());
+			cadaPedidoJSON.put("estadopedido", cadaPedido.getEstadopedido());
+			cadaPedidoJSON.put("enviadopixel", cadaPedido.getEnviadoPixel());
+			if(cadaPedido.getEnviadoPixel() == 1)
+			{
+				cadaPedidoJSON.put("estadoenviotienda", "ENVIADO A TIENDA");
+			}
+			else
+			{
+				cadaPedidoJSON.put("estadoenviotienda", "PENDIENTE TIENDA");
+			}
+			cadaPedidoJSON.put("numposheader", cadaPedido.getNumposheader());
+			cadaPedidoJSON.put("idtienda", cadaPedido.getTienda().getIdTienda());
+			cadaPedidoJSON.put("urltienda", cadaPedido.getTienda().getUrl());
+			cadaPedidoJSON.put("stringpixel", cadaPedido.getStringpixel());
+			cadaPedidoJSON.put("fechainsercion", cadaPedido.getFechainsercion());
+			cadaPedidoJSON.put("usuariopedido", cadaPedido.getUsuariopedido());
+			cadaPedidoJSON.put("direccion", cadaPedido.getDireccion());
+			cadaPedidoJSON.put("telefono", cadaPedido.getTelefono());
+			cadaPedidoJSON.put("formapago", cadaPedido.getFormapago());
+			cadaPedidoJSON.put("idformapago", cadaPedido.getIdformapago());
+			cadaPedidoJSON.put("tiempopedido", cadaPedido.getTiempopedido());
+			listJSON.add(cadaPedidoJSON);
+		}
+		return listJSON.toJSONString();
+	}
+	
+	
+	/**
+	 * Método que responde desde la capa controladora para la consulta del encabezado de los pedidos de un cliente.
+	 * @param idCliente, se recibe como parámetro el identificador del cliente para la consulta
+	 * @return
+	 */
+	public String ConsultaUltimosPedidosCliente(int idCliente)
+	{
+		JSONArray listJSON = new JSONArray();
+		ArrayList <Pedido> consultaPedidos = PedidoDAO.ConsultaUltimosPedidosCliente(idCliente);
 		for (Pedido cadaPedido: consultaPedidos){
 			JSONObject cadaPedidoJSON = new JSONObject();
 			cadaPedidoJSON.put("idpedido", cadaPedido.getIdpedido());
@@ -674,6 +733,30 @@ public class PedidoCtrl {
 		JSONObject precioJSON = new JSONObject();
 		precioJSON.put("precio", precio );
 		listJSON.add(precioJSON);
+		return listJSON.toJSONString();
+		
+	}
+	
+	public String ConsultarDireccionesPedido(String fechainicial, String fechafinal, String idMunicipio)
+	{
+		ArrayList <DireccionFueraZona> dirsPedido = PedidoDAO.ConsultarDireccionesPedido(fechainicial, fechafinal, idMunicipio);
+		JSONArray listJSON = new JSONArray();
+		JSONObject ResultadoJSON = new JSONObject();
+		for (DireccionFueraZona dirTemp : dirsPedido) 
+		{
+			ResultadoJSON = new JSONObject();
+			ResultadoJSON.put("idpedido", dirTemp.getId());
+			ResultadoJSON.put("direccion", dirTemp.getDireccion());
+			ResultadoJSON.put("municipio", dirTemp.getMunicipio());
+			ResultadoJSON.put("idcliente", dirTemp.getIdCliente());
+			ResultadoJSON.put("latitud", dirTemp.getLatitud());
+			ResultadoJSON.put("longitud", dirTemp.getLongitud());
+			ResultadoJSON.put("telefono", dirTemp.getTelefono());
+			ResultadoJSON.put("nombre", dirTemp.getNombre());
+			ResultadoJSON.put("apellido", dirTemp.getApellido());
+			ResultadoJSON.put("fechapedido", dirTemp.getFechaIngreso());
+			listJSON.add(ResultadoJSON);
+		}
 		return listJSON.toJSONString();
 		
 	}

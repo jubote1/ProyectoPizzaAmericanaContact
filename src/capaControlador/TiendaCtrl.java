@@ -19,6 +19,8 @@ public class TiendaCtrl {
 			cadaViajeJSON.put("id", tienda.getIdTienda());
 			cadaViajeJSON.put("nombre", tienda.getNombreTienda());
 			cadaViajeJSON.put("destino", tienda.getDsnTienda());
+			cadaViajeJSON.put("urltienda", tienda.getUrl());
+			cadaViajeJSON.put("pos", tienda.getPos());
 			listJSON.add(cadaViajeJSON);
 		}
 		return listJSON.toJSONString();

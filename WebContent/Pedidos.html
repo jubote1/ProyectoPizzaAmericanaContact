@@ -151,6 +151,7 @@
 					</table>
 
 					<input type="button" class="btn btn-danger btn-sm" id="limpiar" name="limpiar" value="Limpiar Selección Cliente" onclick="limpiarSeleccionCliente()"/>
+					<input type="button" class="btn btn-primary btn-sm" id="ultimospedidos" name="ultimospedidos" value="Últimos Pedidos" onclick="consultarUltimosPedidos()"/>
 
 					<table id="grid-clientes" class="table table-condensed table-hover table-striped" cellspacing="0" width="100%">
 									        <thead>
@@ -165,6 +166,8 @@
 									                <th data-column-id="observacion">Observacion</th>
 									                <th data-column-id="telefono">Telefono</th>
 									                <th data-column-id="memcode">Memcode</th>
+									                <th data-column-id="latitud">latitud</th>
+									                <th data-column-id="longitud">longitud</th>
 									            </tr>
 									        </thead>
 									      	<tbody>
@@ -337,6 +340,165 @@
 										      </div>
 										      <form id='pintarSin'>
 											  </form>
+										    </div>
+										</div>
+									</div>
+
+							<!-- ESTO ES PARA LA VISUALIZACIÓN DE ÚLTIMOS PEDIDOS -->
+							
+								
+									<div class="modal fade" id="ultimosPedidosCliente" tabindex="-1" role="dialog" aria-labelledby="addLabel">
+										 <div class="modal-dialog modal-lg" role="document">
+										    <div class="modal-content">
+										      <div class="modal-header">
+										        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+										        <h4 class="modal-title" id="addLabel">ÚLTIMOS PEDIDIOS</h4>
+										      </div>
+										      		<form id='pintarUltimosPedidosCliente'>
+										      						
+																		<div>
+													        				<table id="grid-encabezadopedido" class="table table-condensed table-hover table-striped">
+																					        <thead>
+																					            <tr>
+																					                <th data-column-id="idpedido">Id Pedido</th>
+																					                <th data-column-id="tienda">Tienda</th>
+																					                <th data-column-id="fechainsercion">Fecha/hora Tomado</th>
+																					                <th data-column-id="cliente">Cliente</th>
+																					                <th data-column-id="direccion">Direccion</th>
+																					                <th data-column-id="telefono">Teléfono</th>
+																					                <th data-column-id="totalneto">Total Neto</th>
+																					                <th data-column-id="estadopedido">Estado Pedido</th>
+																					                <th data-column-id="usuariopedido">Usuario</th>
+																					                <th data-column-id="numposheader">#Pedido Tienda</th>
+																					                <th data-column-id="enviadopixel">Estado Tienda</th>
+																					                <th data-column-id="estadoenviotienda">Estado Pedido Tienda</th>
+																					                <th data-column-id="formapago">Forma Pago</th>
+																					                <th data-column-id="tiempopedido">Tiempo Pedido</th>
+																					                <th data-column-id="idtienda">ID Tienda</th>
+																					                <th data-column-id="urltienda">URL Tienda</th>
+																					                <th data-column-id="stringpixel">String Pixel</th>
+																					            </tr>
+																					        </thead>
+																					      	<tbody>
+																					      			
+																					      	</tbody>
+																					</table>
+																		</div>
+																	
+															
+																<form>
+																	<h1>Cliente del Pedido</h1>
+																	
+																		<table class="table table-bordered">
+																			<tbody>
+																				
+																					<tr>
+																							<td class="active">Teléfono</td>
+																							<td id="encTelefono"><input type="text" id="telefonoClick" name="telefonoClick" class="form-control" placeholder="Telefono" disabled></td>
+																					</tr>
+																					<tr>
+																							<td class="active">Nombres</td>
+																							<td id="encNombres"><input type="text" id="nombresClick" name="nombresClick" class="form-control" placeholder="Nombres" disabled></td>
+																					</tr>
+																					<tr>
+																							<td class="active">Dirección</td>
+																							<td id="encDireccion">
+																							
+																								<div class="col-md-6"> 
+																									<input type="text" id="direccionClick" name="direccionClick" class="form-control" placeholder="Direccion" disabled>
+																								</div>
+																								<div class="col-md-2"> 
+																									<input type="text" id="municipioClick" name="municipioClick" class="form-control" placeholder="Municipio" disabled>
+																								</div>
+																							</td>
+																					</tr>
+																					<tr>
+																							<td class="active">Zona</td>
+																							<td id="encZona"><input type="text" id="zonaClick" name="zonaClick" class="form-control" placeholder="Zona" disabled></td>
+																					</tr>
+																					<tr>
+																							<td class="active">Observacion</td>
+																							<td id="encObservacion"><input type="text" id="observacionDirClick" name="observacionDir" class="form-control" placeholder="Observacion" disabled></td>
+																					</tr>
+																					<tr>
+																							<td class="active">Tienda</td>
+																							<td>
+																							<input type="text" id="tiendaClick" name="tiendaClick" class="form-control" placeholder="Tienda" disabled>
+																							</td>
+																					</tr>
+																				
+																												
+																			</tbody>
+																		</table>
+																	
+																</form>
+															
+																
+																
+															
+																	
+																			<br>
+																				<table class='table table-bordered'>
+																					<tbody>
+																						<tr>
+																							<td class="active">Número de Pedido</td>
+																							<td class="active"><input type="text" class="form-control" id="NumPedidoClick" placeholder="Número de pedido" disabled></td>
+																							<td class="active">Nombre Cliente</td>
+																							<td class="active"><input type="text" class="form-control" id="ClienteClick" placeholder="Cliente" disabled></td>
+																						</tr>
+																						<tr>
+																							<td class="active">Estado del Pedido</td>
+																							<td class="active"><input type="text" class="form-control" id="estadopedidoClick" placeholder="Estado del Pedido" disabled></td>
+																							<td class="active">Enviado a Sistema Tienda</td>
+																							<td class="active"><input type="text" class="form-control" id="estadotiendaClick" placeholder="Estado Envío Tienda" disabled></td>
+																						</tr>
+																						<tr>
+																							<td class="active">Número Pedido Tienda</td>
+																							<td class="active"><input type="text" class="form-control" id="numpedidotiendaClick" placeholder="Número Pedido Tienda" disabled></td>
+																							<td class="active">Valor Total del Pedido</td>
+																							<td class="active"><input type="text" class="form-control" id="totalpedidoClick" placeholder="Valor total del Pedido" disabled></td>
+																						</tr>
+																						<tr>
+																							<td class="active">Valor de Pago</td>
+																							<td class="active"><input type="text" class="form-control" id="valorpagoClick" placeholder="Valor de pago del cliente" disabled></td>
+																							<td class="active">Valor a Devolver</td>
+																							<td class="active"><input type="text" class="form-control" id="valordevolverClick" placeholder="Valor Devuelta" disabled></td>
+																						</tr>
+																						<tr>
+																							<td class="active">Forma de Pago</td>
+																							<td class="active"><input type="text" class="form-control" id="formapagoClick" placeholder="Forma de Pago" disabled></td>
+																							<td class="active">Valor Forma de Pago</td>
+																							<td class="active"><input type="text" class="form-control" id="valorformapagoClick" placeholder="Valor Forma de Pago" disabled></td>
+																						</tr>
+																					</tbody>
+																				</table>
+																			<div>
+													        					<table id="grid-detallepedido" class="table table-condensed table-hover table-striped" cellspacing="0" width="100%">
+																					        <thead>
+																					            <tr>
+																					                <th data-column-id="iddetallepedido">Id Det Ped</th>
+																					                <th data-column-id="nombreproducto">Producto</th>
+																					                <th data-column-id="cantidad">Cant</th>
+																					                <th data-column-id="especialidad1">Especia 1</th>
+																					                <th data-column-id="especialidad2">Especia 2</th>
+																					                <th data-column-id="valorunitario">Valor Unitario</th>
+																					                <th data-column-id="valortotal">Val Tot</th>
+																					                <th data-column-id="adicion">Adición</th>
+																					                <th data-column-id="observacion">Obser</th>
+																					                <th data-column-id="liquido">Liquido</th>
+																					                <th data-column-id="excepcion">Excepción</th>
+																					            </tr>
+																					        </thead>
+																					      	<tbody>
+																					      			
+																					      	</tbody>
+																					</table>
+																					<button type="button" onClick="cerrarModalUltimosPedidos()" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+																					
+																			</div>
+		
+															
+												</form>
 										    </div>
 										</div>
 									</div>

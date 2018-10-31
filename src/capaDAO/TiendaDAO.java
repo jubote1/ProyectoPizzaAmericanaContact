@@ -38,7 +38,9 @@ public class TiendaDAO {
 				int idTienda = rs.getInt("idtienda");
 				String nombre = rs.getString("nombre");
 				String dsn = rs.getString("dsn");
-				Tienda tien = new Tienda(idTienda, nombre, dsn);
+				String url = rs.getString("url");
+				int pos = rs.getInt("pos");
+				Tienda tien = new Tienda(idTienda, nombre, dsn, url, pos);
 				tiendas.add(tien);
 			}
 			rs.close();
@@ -173,23 +175,27 @@ public class TiendaDAO {
 		Logger logger = Logger.getLogger("log_file");
 		ConexionBaseDatos con = new ConexionBaseDatos();
 		Connection con1 = con.obtenerConexionBDPrincipal();
-		Tienda Pro = new Tienda(0,"","");
+		Tienda Pro = new Tienda(0,"","", "",0);
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select idtienda,nombre,dsn from  tienda  where idtienda = " + idtienda; 
+			String consulta = "select idtienda,nombre,dsn,url,pos from  tienda  where idtienda = " + idtienda; 
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idtien = 0;
 			String nombre ="";
 			String dsn = "";
+			String url = "";
+			int pos = 0;
 			while(rs.next()){
 				idtien = rs.getInt("idtienda");
 				nombre = rs.getString("nombre");
 				dsn = rs.getString("dsn");
+				url = rs.getString("url");
+				pos = rs.getInt("pos");
 				break;
 			}
-			Pro = new Tienda(idtien,nombre,dsn);
+			Pro = new Tienda(idtien,nombre,dsn,url,pos);
 			stm.close();
 			con1.close();
 		}

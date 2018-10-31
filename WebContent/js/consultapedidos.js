@@ -326,7 +326,7 @@ function buscarMapa() {
     var resultado;
     
     $.ajax({ 
-	    				url:'https://maps.googleapis.com/maps/api/geocode/json?components=administrative_area:Medellin|country:Colombia&address=' + direccion +'&key=AIzaSyBH1VN3540Ux8Y92wDv61horvr8SUqNd_s' , 
+	    				url:'https://maps.googleapis.com/maps/api/geocode/json?components=administrative_area:Medellin|country:Colombia&address=' + direccion +'&key=AIzaSyCRtUQ2WV0L2gMnb9DKiFn1PTHJQLH3suA' , 
 	    				dataType: 'json', 
 	    				async: false, 
 	    				success: function(data){ 
@@ -350,7 +350,7 @@ function buscarMapa(dir) {
     var resultado;
     
     $.ajax({ 
-	    				url:'https://maps.googleapis.com/maps/api/geocode/json?components=administrative_area:Medellin|country:Colombia&address=' + direccion +'&key=AIzaSyBH1VN3540Ux8Y92wDv61horvr8SUqNd_s' , 
+	    				url:'https://maps.googleapis.com/maps/api/geocode/json?components=administrative_area:Medellin|country:Colombia&address=' + direccion +'&key=AIzaSyCRtUQ2WV0L2gMnb9DKiFn1PTHJQLH3suA' , 
 	    				dataType: 'json', 
 	    				async: false, 
 	    				success: function(data){ 
@@ -553,11 +553,15 @@ function enviarPedidoTienda(){
 															    					}
 															    				},
 																				error: function(){
-																				    alert('Se produjo en la actualización del número del pedido de la tienda en el sistema central');
+																				    alert('Se produjo error en la actualización del número del pedido de la tienda en el sistema central');
 																				    //Posiblemente aca sería necesario actualizar el estado
 																				 } 
 
 																			});
+												    					}
+												    					else if(resPedPixel.numerofactura == -1)
+												    					{
+												    						$.alert('No se ha iniciado el día de facturación en la tienda, por favor comuniquese con la misma, el pedido en cuestión no fue enviado' );
 												    					}
 																		console.log("numero pedido pixel " +resPedPixel.numerofactura);
 																	} 

@@ -3,6 +3,8 @@ import java.util.ArrayList;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
+import capaDAO.DireccionFueraZonaDAO;
 import capaDAO.EspecialidadDAO;
 import capaDAO.EstadoPedidoDAO;
 import capaDAO.ExcepcionPrecioDAO;
@@ -17,6 +19,7 @@ import capaDAO.TipoLiquidoDAO;
 import capaDAO.GeneralDAO;
 import capaDAO.TiempoPedidoDAO;
 import capaModelo.Correo;
+import capaModelo.DireccionFueraZona;
 import capaModelo.Especialidad;
 import capaModelo.EstadoPedido;
 import capaModelo.ExcepcionPrecio;
@@ -615,7 +618,7 @@ public class ParametrosCtrl {
 			public String insertarTienda(String nombre, String dsn)
 			{
 				JSONArray listJSON = new JSONArray();
-				Tienda Tie = new Tienda(0,nombre,dsn);
+				Tienda Tie = new Tienda(0,nombre,dsn,"",0);
 				int idTieIns = TiendaDAO.insertarTienda(Tie);
 				JSONObject ResultadoJSON = new JSONObject();
 				ResultadoJSON.put("idtienda", idTieIns);
@@ -683,7 +686,7 @@ public class ParametrosCtrl {
 			public String editarTienda(int idtienda, String nombre, String dsn)
 			{
 				JSONArray listJSON = new JSONArray();
-				Tienda Tie = new Tienda(idtienda,nombre,dsn);
+				Tienda Tie = new Tienda(idtienda,nombre,dsn,"",0);
 				String resultado =TiendaDAO.editarTienda(Tie);
 				JSONObject ResultadoJSON = new JSONObject();
 				ResultadoJSON.put("resultado", resultado);
@@ -932,6 +935,41 @@ public class ParametrosCtrl {
 				Respuesta.put("tiempopedido", respues);
 				listJSON.add(Respuesta);
 				return(Respuesta.toString());
+			}
+			
+			public String insertarDirFueraZona(String direccion, String municipio, int idCliente, double latitud, double longitud, String telefono, String nombre, String apellido)
+			{
+				DireccionFueraZona dirFuera = new DireccionFueraZona(0, direccion, municipio, idCliente, latitud, longitud, telefono, nombre, apellido);
+				int id = DireccionFueraZonaDAO.insertarDirFueraZona(dirFuera);
+				JSONArray listJSON = new JSONArray();
+				JSONObject Respuesta = new JSONObject();
+				Respuesta.put("id", id);
+				listJSON.add(Respuesta);
+				return(Respuesta.toString());
+			}
+			
+			public String ConsultaDirFueraZona(String fechainicial, String fechafinal, String municipio)
+			{
+				ArrayList <DireccionFueraZona> dirsFuera = DireccionFueraZonaDAO.ConsultaDirFueraZona(fechainicial, fechafinal, municipio);
+				JSONArray listJSON = new JSONArray();
+				JSONObject ResultadoJSON = new JSONObject();
+				for (DireccionFueraZona dirTemp : dirsFuera) 
+				{
+					ResultadoJSON = new JSONObject();
+					ResultadoJSON.put("id", dirTemp.getId());
+					ResultadoJSON.put("direccion", dirTemp.getDireccion());
+					ResultadoJSON.put("municipio", dirTemp.getMunicipio());
+					ResultadoJSON.put("idcliente", dirTemp.getIdCliente());
+					ResultadoJSON.put("latitud", dirTemp.getLatitud());
+					ResultadoJSON.put("longitud", dirTemp.getLongitud());
+					ResultadoJSON.put("telefono", dirTemp.getTelefono());
+					ResultadoJSON.put("nombre", dirTemp.getNombre());
+					ResultadoJSON.put("apellido", dirTemp.getApellido());
+					ResultadoJSON.put("fecha_ingreso", dirTemp.getFechaIngreso());
+					listJSON.add(ResultadoJSON);
+				}
+				return listJSON.toJSONString();
+				
 			}
 			
 			

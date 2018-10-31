@@ -68,6 +68,9 @@ public class InsertarPedidoPixel {
 		this.idformapagotienda = idformapagotienda;
 	}
 	
-
+	public InsertarPedidoPixel()
+	{
+		
+	}
 	
 }

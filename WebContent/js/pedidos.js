@@ -7,6 +7,8 @@ var tiendasBloqueadas;
 var productosIncluidos;
 var table;
 var dtpedido;
+var dtEncabezadoPedido;
+var dtDetallePedido;
 var productos;
 var excepciones;
 var idPedido = 0;
@@ -33,6 +35,7 @@ var controlaCantidadIngredientes = "N";
 var cantidadIngredientes = 0;
 var excepcionSeleccionada = null;
 var gaseosaHomologadaTienda;
+var formas;
 
 
 // A continuación  la ejecucion luego de cargada la pagina
@@ -85,6 +88,7 @@ $("#fechapedido").change(function(){
 	$("#valorpago").val('0');
 	$("#valordevolver").val('0');
 	$('input:radio[name=adicion]')[1].checked = true;
+	$('#ultimospedidos').attr('disabled', true);
 	// Se define evento para campo valor a devolver.
 	$("#valorpago").change(function(){
 			$("#valordevolver").val($("#valorpago").val() - $("#totalpedido").val() );
@@ -103,6 +107,8 @@ $("#fechapedido").change(function(){
             { "mData": "zona" },
             { "mData": "observacion" },
             { "mData": "telefono" },
+            { "mData": "latitud" , "visible": false },
+            { "mData": "longitud" , "visible": false },
             { "mData": "memcode"  , "visible": false }
         ]
     	} );
@@ -172,6 +178,49 @@ $("#fechapedido").change(function(){
 
     	} );
 
+    //Inicializamos los DataTables para historia de pedidos cliente
+    dtDetallePedido = $('#grid-detallepedido').DataTable( {
+    		"aoColumns": [
+    		{ "mData": "iddetallepedido" },
+            { "mData": "nombreproducto" },
+            { "mData": "cantidad" },
+            { "mData": "especialidad1" },
+            { "mData": "especialidad2" },
+            { "mData": "valorunitario" , "visible": false},
+            { "mData": "valortotal" },
+            { "mData": "adicion" },
+            { "mData": "observacion" },
+            { "mData": "liquido" },
+            { "mData": "excepcion" }
+            
+            
+        ]
+    	} );
+
+    dtEncabezadoPedido = $('#grid-encabezadopedido').DataTable( {
+    		"aoColumns": [
+    		{ "mData": "idpedido" },
+            { "mData": "tienda" },
+            { "mData": "fechainsercion" },
+            { "mData": "cliente" },
+            { "mData": "direccion" },
+            { "mData": "telefono" },
+            { "mData": "totalneto" , "visible": false},
+            { "mData": "estadopedido" , "visible": false },
+            { "mData": "usuariopedido" , "visible": false },
+            { "mData": "enviadopixel"  , "visible": false },
+            { "mData": "estadoenviotienda" , "visible": false },
+            { "mData": "numposheader" , "visible": false  },
+            { "mData": "formapago" , "visible": false  },
+            { "mData": "tiempopedido" , "visible": false },
+            { "mData": "idtienda", "visible": false },
+            { "mData": "urltienda", "visible": false },
+            { "mData": "stringpixel", "visible": false }
+        ]
+    	} );
+
+     
+
     // Lo anterior permite el cambio de color en cada item de pedido
 
 
@@ -216,22 +265,42 @@ $("#fechapedido").change(function(){
         memcode = datos.memcode;
         idCliente = datos.idCliente;
         var municipio = datos.municipio;
-        //Cambiamos la manera de buscar el mapa
-        //var dirbuscar = datos.direccion + " " + municipio.toLowerCase();
-        //buscarMapa(dirbuscar);
+        //Traemos los valores de la latitud y longitud 
+        var latCliente = datos.latitud;
+        var lonCliente = datos.longitud;
         if(datos.nomenclatura == '' || datos.nomenclatura == null || datos.numnomenclatura1 == '' || datos.numnomenclatura1 == null || datos.numnomenclatura2 == '' || datos.numnomenclatura2 == null )
         {
-        	if(($('#direccion').val() != null) && ($('#direccion').val() != '') && ($("#selectMunicipio").val() != null) && ($("#selectMunicipio").val() != ''))
+        	if ((latCliente == 0) && (lonCliente == 0))
         	{
-        		buscarMapaDigitado();
+        		if(($('#direccion').val() != null) && ($('#direccion').val() != '') && ($("#selectMunicipio").val() != null) && ($("#selectMunicipio").val() != ''))
+	        	{
+	        		buscarMapaDigitado();
+	        	}
+
+        	}
+        	else
+        	{
+        		//Llamar método  que geolocalizar dado latitud y longitud
+        		geocodeSinServicio(latCliente, lonCliente);
         	}
 
         }
         else
         {
-        	buscarMapaDigitado1();
+        	if ((latCliente == 0) && (lonCliente == 0))
+        	{
+        		buscarMapaDigitado1();
+        	}
+        	else
+        	{
+        		//Llamar método  que geolocalizar dado latitud y longitud
+        		geocodeSinServicio(latCliente, lonCliente);
+        	}
         }
-        
+
+        //En este punto luego de buscar la direccion del cliente, buscaremos si este tiene pedidos
+        $('#ultimospedidos').attr('disabled', false);
+
      } );
 
     $("#selectTiendas").change(function(){
@@ -249,8 +318,36 @@ $("#fechapedido").change(function(){
     	}
         getProductosTienda(idtien);
     });
- 	
 
+    //Incluimos acción para el cambio la forma de pago
+    $("#selectformapago").change(function(){
+    	//Tomamos el idformapago seleccionado
+    	var idformapago =  $("#selectformapago").val();
+    	var tipoForma = "";
+    	for(var i = 0; i < formas.length;i++){
+    		var cadaForma  = formas[i];
+    		if(idformapago == cadaForma.idformapago)
+			{
+				if(cadaForma.tipoformapago == 'TRANSFERENCIA')
+				{
+					$("#valorpago").val($("#totalpedido").val());
+					$("#valordevolver").val("0");
+					$('input:radio[name=requiereDevuelta]')[0].checked = true;
+					$('#valorpago').attr('disabled', true);
+				}
+				else
+				{
+					$('#valorpago').attr('disabled', false);
+				}
+				break;
+			}
+			
+		}
+    });
+
+ 	
+    //Implementamos acción cuando se selecciona que la forma de pago es tarjeta para que se deje automaticamente pago completo
+ 	
     // Se definen los eventos para para cuando demos clic sobre los botones de forma pizza de pizza entera o pizza mitad
  	$("input[name=formapizza]:radio").click(function() { 
                 
@@ -1903,6 +2000,11 @@ function cerrarModalAdiciones()
 	$('#addAdicion').modal('hide');
 }
 
+function cerrarModalUltimosPedidos()
+{
+	$('#ultimosPedidosCliente').modal('hide');
+}
+
 function ocultarModalAdiciones()
 {
 	$('#addAdicion').modal('hide');
@@ -2036,6 +2138,7 @@ function ReiniciarPedido()
 																	//Volvemos a habilitar el select de tienda
 																	$('#selectTiendas').attr('disabled', false);
 																	$('#limpiar').attr('disabled', false);
+																	$('#ultimospedidos').attr('disabled', true);
 																	$('#validaDir').prop('checked', true);
 														}
 														else
@@ -2181,7 +2284,7 @@ function ConfirmarPedido()
 							    				type: 'post', 
 	    										data: {'datos' : resJSON }, 
 							    				async: false, 
-							    				success: function(data1){ 
+							    			success: function(data1){ 
 												var resPedPixel = data1[0];
 												if(resPedPixel.numerofactura > 0)
 						    					{
@@ -2190,7 +2293,11 @@ function ConfirmarPedido()
 
 						    						});
 						    					}
-												console.log("numero pedido pixel " +resPedPixel.numerofactura);
+						    					else if(resPedPixel.numerofactura == -1)
+						    					{
+						    						$.alert('No se ha iniciado el día de facturación en la tienda ' + tempTienda + ', por favor comuniquese con la misma, el pedido en cuestión no fue enviado' );
+						    					}
+												
 											} 
 									});
 									var strClr = "";
@@ -2256,7 +2363,7 @@ function ConfirmarPedido()
 									$('#selectTiendas').attr('disabled', false);
 									$('#limpiar').attr('disabled', false);
 									$('#validaDir').prop('checked', true);
-
+									$('#ultimospedidos').attr('disabled', true);
 								},
 								error: function(){
 								    alert('Se produjo un error en la inserción del Pedido, favor revisar logs y reintentar');
@@ -3504,7 +3611,7 @@ function buscarMapaDigitado() {
     var resultado;
     
     $.ajax({ 
-	    				url:'https://maps.googleapis.com/maps/api/geocode/json?components=administrative_area:Medellin|country:Colombia&address=' + direccion +'&key=AIzaSyBH1VN3540Ux8Y92wDv61horvr8SUqNd_s' , 
+	    				url:'https://maps.googleapis.com/maps/api/geocode/json?components=administrative_area:Medellin|country:Colombia&address=' + direccion +'&key=AIzaSyCRtUQ2WV0L2gMnb9DKiFn1PTHJQLH3suA' , 
 	    				dataType: 'json', 
 	    				async: false, 
 	    				success: function(data){ 
@@ -3523,6 +3630,7 @@ function buscarMapaDigitado() {
 // Método para el nuevo esquema de direcciones
 function buscarMapaDigitado1() {
 
+	//Se valida si es el esquema viejo de direcciones
 	if($("#selectNomenclaturas").val() == '' || $("#selectNomenclaturas").val() == null || $("#numNomen").val() == '' || $("#numNomen").val() == null || $("#numNomen2").val() == '' || $("#numNomen2").val() == null )
         {
         	if(($('#direccion').val() != null) && ($('#direccion').val() != '') && ($("#selectMunicipio").val() != null) && ($("#selectMunicipio").val() != ''))
@@ -3536,12 +3644,17 @@ function buscarMapaDigitado1() {
     // Obtenemos la dirección y la asignamos a una variable
     var direccion = $("#selectNomenclaturas").val() +  " "  + $("#numNomen").val() + " # " + $("#numNomen2").val() ;
     var municipio = $("#selectMunicipio").val();
+    if(municipio == '' || municipio== null)
+    {
+    	$.alert('Debe ingresar el municipio para buscar la dirección.');
+    	return;
+    }
     municipio = municipio.toLowerCase();
     direccion = direccion + " " + municipio + " Antioquia Colombia";
     var resultado;
     
     $.ajax({ 
-	    				url:'https://maps.googleapis.com/maps/api/geocode/json?components=administrative_area:Medellin|country:Colombia&address=' + direccion +'&key=AIzaSyBH1VN3540Ux8Y92wDv61horvr8SUqNd_s' , 
+	    				url:'https://maps.googleapis.com/maps/api/geocode/json?components=administrative_area:Medellin|country:Colombia&address=' + direccion +'&key=AIzaSyCRtUQ2WV0L2gMnb9DKiFn1PTHJQLH3suA' , 
 	    				dataType: 'json', 
 	    				async: false, 
 	    				success: function(data){ 
@@ -3566,7 +3679,7 @@ function buscarMapa(dir) {
     var resultado;
     
     $.ajax({ 
-	    				url:'https://maps.googleapis.com/maps/api/geocode/json?components=administrative_area:Medellin|country:Colombia&address=' + direccion +'&key=AIzaSyBH1VN3540Ux8Y92wDv61horvr8SUqNd_s' , 
+	    				url:'https://maps.googleapis.com/maps/api/geocode/json?components=administrative_area:Medellin|country:Colombia&address=' + direccion +'&key=AIzaSyCRtUQ2WV0L2gMnb9DKiFn1PTHJQLH3suA' , 
 	    				dataType: 'json', 
 	    				async: false, 
 	    				success: function(data){ 
@@ -3616,6 +3729,31 @@ function geocodeResult(results, status) {
         // lanzamos un mensaje con el error
         alert("La Geolocalización no tuvo éxito debido a: " + status);
     }
+}
+
+function geocodeSinServicio(lat, long) 
+{
+    longitud = long;
+    latitud = lat;
+    var map = new google.maps.Map($("#mapas").get(0), {
+		zoom: 7,
+		center: new google.maps.LatLng(6.22339, -75.6281),
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	});
+
+    var ctaLayer = new google.maps.KmlLayer({
+		url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/PizzaAmericana-ZonasDeRepartoTotales-Ver_02.kml',
+		map: map,
+		scrollwheel: false,
+		zoom: 17
+	});
+    var infowindow = new google.maps.InfoWindow();
+	var marker, i;
+    marker = new google.maps.Marker({
+	   	position: new google.maps.LatLng(latitud, longitud),
+	   	map: map,
+	   	icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+	});
 }
 
 function cambiaColorCelda(elemento)
@@ -3800,6 +3938,7 @@ function limpiarSeleccionCliente()
         $('#selectTiendas').attr('disabled', false);
         $("#selectMunicipio").val("");
         $('#validaDir').prop('checked', true);
+        $('#ultimospedidos').attr('disabled', true);
         //$("#validaDir input[type=checkbox]").prop('checked', true);
         memcode = 0;
         idCliente = 0;
@@ -3850,5 +3989,98 @@ function validarFechaMenorActual(date1){
       {
         return false;
       }
+}
+
+function consultarUltimosPedidos()
+{
+		limpiarModalOtrosPedidos();
+    	$('#grid-encabezadopedido').on('click', 'tr', function () {
+    	var datosPedidoClick = dtEncabezadoPedido.row( this ).data();
+        $('#NumPedidoClick').val(datosPedidoClick.idpedido);
+        $('#ClienteClick').val(datosPedidoClick.cliente);
+        $('#estadopedidoClick').val(datosPedidoClick.estadopedido);
+        var tempEstadoPedidoPixel = datosPedidoClick.enviadopixel;
+        if (tempEstadoPedidoPixel == 0)
+        {
+        	$('#estadotiendaClick').val("PENDIENTE TIENDA");
+        	$("#estadotiendaClick").attr("disabled", true).css("background-color","#FF0000");
+        }
+        else
+        {
+        	$('#estadotiendaClick').val("ENVIADO A TIENDA");
+        	$("#estadotiendaClick").attr("disabled", true).css("background-color","#00FF00");
+        }
+        $('#numpedidotiendaClick').val(datosPedidoClick.numposheader);
+        // La idea es tomar el id pedido seleccionado y con esto ir a buscar la información.
+        
+        $.getJSON(server + 'GetClientePorID?idcliente=' + datosPedidoClick.idcliente, function(data1){
+	                		
+	                		$('#telefonoClick').val(data1[0].telefono);
+	                		$('#nombresClick').val(data1[0].nombrecliente);
+	                		$('#direccionClick').val(data1[0].direccion);
+	                		$('#municipioClick').val(data1[0].nombremunicipio);
+	                		$('#zonaClick').val(data1[0].zona);
+	                		$('#observacionDirClick').val(data1[0].observacion);
+	                		$('#tiendaClick').val(data1[0].nombretienda);
+
+							
+					});
+        if ( $.fn.dataTable.isDataTable( '#grid-detallepedido' ) ) {
+    		dtDetallePedido = $('#grid-detallepedido').DataTable();
+    	}
+        $.getJSON(server + 'ConsultarDetallePedido?numeropedido=' + datosPedidoClick.idpedido, function(data1){
+	                		dtDetallePedido.clear().draw();
+	                		for(var i = 0; i < data1.length;i++){
+								dtDetallePedido.row.add(data1[i]).draw();
+							}
+	                		
+							
+					});
+
+        //Obtenemos la forma de pago
+        $.getJSON(server + 'ObtenerFormaPagoPedido?idpedido=' + datosPedidoClick.idpedido, function(data2){
+	                		$('#totalpedidoClick').val(data2[0].valortotal);
+	                		$('#valorpagoClick').val(data2[0].valorformapago);
+	                		var valorDevolver =  data2[0].valorformapago - data2[0].valortotal;
+	                		$('#valordevolverClick').val(valorDevolver);
+	                		$('#formapagoClick').val(data2[0].nombre);
+	                });
+     
+
+     } );
+	$.getJSON(server + 'ConsultaUltimosPedidosCliente?idcliente=' + idCliente, function(data1){
+	                		
+	                		dtEncabezadoPedido.clear().draw();
+							for(var i = 0; i < data1.length;i++){
+								dtEncabezadoPedido.row.add(data1[i]).draw();
+							}
+							
+					});
+	$('div').click( function( e ) {
+		e.stopPropagation();
+	});
+	$('#ultimosPedidosCliente').modal('show');
+}
+
+//Método que se encarga de limpiar la información de los pedidos clientes cada vez que se da sobre el botón consultar
+function limpiarModalOtrosPedidos()
+{
+	$('#NumPedidoClick').val('');
+    $('#ClienteClick').val('');
+    $('#estadopedidoClick').val('');
+    $('#estadotiendaClick').val('');
+    $('#numpedidotiendaClick').val('');
+    $('#telefonoClick').val('');
+	$('#nombresClick').val('');
+	$('#direccionClick').val('');
+	$('#municipioClick').val('');
+	$('#zonaClick').val('');
+	$('#observacionDirClick').val('');
+	$('#tiendaClick').val('');
+	dtDetallePedido.clear().draw();
+	$('#totalpedidoClick').val('');
+	$('#valorpagoClick').val('');
+	$('#valordevolverClick').val('');
+	$('#formapagoClick').val('');
 }
 

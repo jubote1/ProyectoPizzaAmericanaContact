@@ -12,9 +12,16 @@ public class Tienda {
 	private String nombreTienda;
 	private String dsnTienda;
 	private String url;
-	
+	private int pos;
 		
 	
+	
+	public int getPos() {
+		return pos;
+	}
+	public void setPos(int pos) {
+		this.pos = pos;
+	}
 	public String getUrl() {
 		return url;
 	}
@@ -40,19 +47,14 @@ public class Tienda {
 		this.dsnTienda = dsnTienda;
 	}
 	
-	public Tienda(int idTienda, String nombreTienda, String dsnTienda) {
-		super();
-		this.idTienda = idTienda;
-		this.nombreTienda = nombreTienda;
-		this.dsnTienda = dsnTienda;
-	}
 	
-	public Tienda(int idTienda, String nombreTienda, String dsnTienda, String url) {
+	public Tienda(int idTienda, String nombreTienda, String dsnTienda, String url, int pos) {
 		super();
 		this.idTienda = idTienda;
 		this.nombreTienda = nombreTienda;
 		this.dsnTienda = dsnTienda;
 		this.url = url;
+		this.pos = pos;
 	}
 	
 	public Tienda()
