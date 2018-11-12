@@ -22,7 +22,7 @@ public class PedidoPOSPMDAO {
 	{
 		int numFactura = 0;
 		//Debemos obtener el idTienda del Pedido que vamos a finalizar
-				Tienda tiendaPedido = PedidoPOSPMDAO.obtenerTiendaPedido(idpedido);
+				Tienda tiendaPedido = PedidoDAO.obtenerTiendaPedido(idpedido);
 				
 				//Llamado Inserciï¿½n Pixel
 				//En este punto es donde debemos intervenir para la holmologación
@@ -31,7 +31,7 @@ public class PedidoPOSPMDAO {
 				//La invocación del pedido ya no se realizará así
 				//OJO
 				//Main principal = new Main();
-				Cliente cliente = PedidoPOSPMDAO.obtenerClienteporID(idcliente);
+				Cliente cliente = ClienteDAO.obtenerClienteporID(idcliente);
 				boolean indicadorAct = false;
 				if(insertado == 0)
 				{
@@ -49,40 +49,7 @@ public class PedidoPOSPMDAO {
 	}
 	
 	
-	public static Tienda obtenerTiendaPedido(int idpedido)
-	{
-		Logger logger = Logger.getLogger("log_file");
-		ConexionBaseDatos con = new ConexionBaseDatos();
-		Connection con1 = con.obtenerConexionBDPrincipal();
-		Tienda tienda = new Tienda();
-		try
-		{
-			Statement stm = con1.createStatement();
-			String consulta = "select p.idtienda from pedido p where idpedido = " + idpedido;
-			logger.info(consulta);
-			ResultSet rs = stm.executeQuery(consulta);
-			int idTienda;
-			while(rs.next()){
-				idTienda = rs.getInt("idtienda");
-				tienda = TiendaDAO.retornarTienda(idTienda);
-				break;
-			}
-			rs.close();
-			stm.close();
-			con1.close();
-		}catch (Exception e){
-			logger.error(e.toString());
-			try
-			{
-				con1.close();
-			}catch(Exception e1)
-			{
-			}
-		}
-		return(tienda);
 		
-	}
-	
 		
 	/**
 	 * Método que se encarga de generar la homologación para los productos en el sistema POS de PIzza Americana, porl o visto 
@@ -107,6 +74,8 @@ public class PedidoPOSPMDAO {
 		int idproductogasext;
 		ArrayList<DetallePedidoAdicion> adicionDetallePedido = new ArrayList();
 		ArrayList<ModificadorDetallePedido> modificadoresDetallePedido = new ArrayList();
+		int idDetalleMaster;
+		int idDetalleModificador = 1;
 		for (DetallePedido cadaDetallePedido: pedidoPOSPM)
 		{
 			adicionDetallePedido = PedidoPOSPMDAO.ObtenerAdicionDetallePedido(cadaDetallePedido.getIddetallepedido());
@@ -114,6 +83,8 @@ public class PedidoPOSPMDAO {
 			//Aqui tendremos la lï¿½gica para generar un array list
 			//Definimos la cantidad del item que se va a pasar al otro sistema
 			int cantidad = (int) cadaDetallePedido.getCantidad();
+			//Tomamos el idDetalleMaster que está procesando
+			idDetalleMaster = cadaDetallePedido.getIddetallepedido();
 			// Este caso se puede dar o para otro producto, o para pizzas un solo ingrediente
 			if(cadaDetallePedido.getIdespecialidad1() == 0 && cadaDetallePedido.getIdespecialidad2() == 0)
 			{
@@ -121,20 +92,20 @@ public class PedidoPOSPMDAO {
 				idSaborTipoLiquido = cadaDetallePedido.getIdsabortipoliquido();
 				//Realizamos cambio para soportar tema 
 				idproductoext = PedidoPOSPMDAO.RetornarIdproductoMaestroExterno(cadaDetallePedido.getIdproducto(), cadaDetallePedido.getIdexcepcion(), idtienda);
-				pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cantidadPixel));
+				pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cantidadPixel,true,0,0,idDetalleMaster));
 				logger.debug(idproductoext + " , " + cantidadPixel);
 				for(DetallePedidoAdicion cadaAdicion: adicionDetallePedido)
 				{
 					if(cadaAdicion.getCantidad1() > 0)
 					{
 						idproductoext = PedidoPOSPMDAO.RetornarIdproductoExterno(cadaAdicion.getIdproducto(), 0, idtienda);
-						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad1()));
+						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad1(),false,idDetalleMaster,0,0));
 						logger.debug(idproductoext + " , " + cadaAdicion.getCantidad1());
 					}
 					else if(cadaAdicion.getCantidad2() > 0)
 					{
 						idproductoext = PedidoPOSPMDAO.RetornarIdproductoExterno(cadaAdicion.getIdproducto(), 0, idtienda);
-						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad2()));
+						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad2(),false,idDetalleMaster,0,0));
 						logger.debug(idproductoext + " , " + cadaAdicion.getCantidad2());
 					}
 					
@@ -146,14 +117,14 @@ public class PedidoPOSPMDAO {
 					if(cadaModificador.getIdproductoespecialidad1()>0)
 					{
 						idproductoext = PedidoPOSPMDAO.RetornarIdproductoExterno(cadaModificador.getIdproductoespecialidad1(), 0, idtienda);
-						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()));
+						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad(), false,idDetalleMaster,idDetalleMaster,0));
 						logger.debug(idproductoext + " , " + cadaModificador.getCantidad());
 					}
 					
 					if(cadaModificador.getIdproductoespecialidad2()>0)
 					{
 						idproductoext = PedidoPOSPMDAO.RetornarIdproductoExterno(cadaModificador.getIdproductoespecialidad2(), 0, idtienda);
-						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()));
+						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad(), false,idDetalleMaster,idDetalleMaster,0));
 						logger.debug(idproductoext + " , " + cadaModificador.getCantidad());
 					}
 					
@@ -163,13 +134,14 @@ public class PedidoPOSPMDAO {
 				if (idSaborTipoLiquido > 0)
 				{
 					idproductoext = PedidoPOSPMDAO.RetornarIdprodGaseosaPromo(idSaborTipoLiquido, idtienda);
-					pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cantidadPixel));
+					pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cantidadPixel,false,idDetalleMaster,0,0));
 					logger.debug(idproductoext + " , " + cantidadPixel);
 					
 				}
 				//Poner separador 0,0
-				pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(0, 0));
-				logger.debug(0 + " , " + 0);
+				//Decidimos no separar lo productos
+				//pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(0, 0));
+				//logger.debug(0 + " , " + 0);
 				
 			}
 			else
@@ -182,11 +154,12 @@ public class PedidoPOSPMDAO {
 						//En las pizzas y con base en la pizza que se estï¿½ facturando, al principio debo de tener un master item
 						//Master ITEM Se harï¿½ la homologaciï¿½n entre el cï¿½digo producto y la excepciï¿½n de precio
 						idproductomaestroext = PedidoPOSPMDAO.RetornarIdproductoMaestroExterno(cadaDetallePedido.getIdproducto(), cadaDetallePedido.getIdexcepcion(), idtienda);
+						idDetalleMaster = cadaDetallePedido.getIddetallepedido();
 						int idproductopizza = 0;
 						cantidadPixel = 0.5;
 						idSaborTipoLiquido = cadaDetallePedido.getIdsabortipoliquido();
 						//Adicionamos el producto maestro con cantidad 1
-						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductomaestroext, 1));
+						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductomaestroext, 1,true,0,0,idDetalleMaster));
 						logger.debug(idproductomaestroext + " , " + cantidadPixel);
 						
 						idproductoextsep = PedidoPOSPMDAO.RetornarIdproductoExterno(10000, 0, idtienda);
@@ -194,7 +167,8 @@ public class PedidoPOSPMDAO {
 						logger.debug(idproductoextsep + " , " + cantidadPixel);
 						
 						idproductopizza = PedidoPOSPMDAO.RetornarIdproductoExterno(cadaDetallePedido.getIdproducto(), cadaDetallePedido.getIdespecialidad1(), idtienda);
-						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductopizza, cantidadPixel));
+						idDetalleModificador = idproductopizza;
+						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductopizza, cantidadPixel,false,idDetalleMaster,0,0));
 						logger.debug(idproductopizza + " , " + cantidadPixel);
 						
 						//Aqui se ingresan la adiciones y los modificadores
@@ -203,7 +177,7 @@ public class PedidoPOSPMDAO {
 							if(cadaAdicion.getIdespecialidad1() > 0)
 							{
 								idproductoext = PedidoPOSPMDAO.RetornarIdproductoExterno(cadaAdicion.getIdproducto(), 0, idtienda);
-								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad1()));
+								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad1(),false,idDetalleMaster,0,0));
 								logger.debug(idproductoext + " , " + cadaAdicion.getCantidad1());
 							}
 						}
@@ -215,7 +189,7 @@ public class PedidoPOSPMDAO {
 							if(cadaModificador.getIdproductoespecialidad1()>0)
 							{
 								idproductoext = PedidoPOSPMDAO.RetornarIdproductoExterno(cadaModificador.getIdproductoespecialidad1(), 0, idtienda);
-								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()/2));
+								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()/2, false, idDetalleMaster,idDetalleModificador,0));
 								logger.debug(idproductoext + " , " + cadaModificador.getCantidad()/2);
 							}
 							
@@ -224,7 +198,7 @@ public class PedidoPOSPMDAO {
 						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoextsep, cantidadPixel));
 						logger.debug(idproductoextsep + " , " + cantidadPixel);
 						
-						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductopizza, cantidadPixel));
+						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductopizza, cantidadPixel,false,idDetalleMaster,0,0));
 						logger.debug(idproductopizza + " , " + cantidadPixel);
 						
 						for(DetallePedidoAdicion cadaAdicion: adicionDetallePedido)
@@ -232,7 +206,7 @@ public class PedidoPOSPMDAO {
 							if(cadaAdicion.getIdespecialidad2() > 0)
 							{
 								idproductoext = PedidoPOSPMDAO.RetornarIdproductoExterno(cadaAdicion.getIdproducto(), 0, idtienda);
-								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad2()));
+								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad2(),false,idDetalleMaster,0,0));
 								logger.debug(idproductoext + " , " + cadaAdicion.getCantidad2());
 							}
 						}
@@ -242,7 +216,7 @@ public class PedidoPOSPMDAO {
 							if(cadaModificador.getIdproductoespecialidad1()>0)
 							{
 								idproductoext = PedidoPOSPMDAO.RetornarIdproductoExterno(cadaModificador.getIdproductoespecialidad1(), 0, idtienda);
-								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()/2));
+								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()/2, false, idDetalleMaster,idDetalleModificador,0));
 								logger.debug(idproductoext + " , " + cadaModificador.getCantidad()/2);
 							}
 							
@@ -255,13 +229,14 @@ public class PedidoPOSPMDAO {
 						if (idSaborTipoLiquido > 0)
 						{
 							idproductoext = PedidoPOSPMDAO.RetornarIdprodGaseosaPromo(idSaborTipoLiquido, idtienda);
-							pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, 1));
+							pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, 1,false, idDetalleMaster, 0, 0));
 							logger.debug(idproductoext + " , " + cantidadPixel);
 							
 						}
 						//Poner separador 0,0
-						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(0, 0));
-						logger.debug(0 + " , " + 0);
+						//Decidimos no separar lo productos
+						//pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(0, 0));
+						//logger.debug(0 + " , " + 0);
 						
 					}else
 					{
@@ -269,9 +244,11 @@ public class PedidoPOSPMDAO {
 						//Master ITEM Se harï¿½ la homologaciï¿½n entre el cï¿½digo producto y la excepciï¿½n de precio
 						idproductomaestroext = PedidoPOSPMDAO.RetornarIdproductoMaestroExterno(cadaDetallePedido.getIdproducto(), cadaDetallePedido.getIdexcepcion(), idtienda);
 						cantidadPixel = 0.5;
+						//Tomamos el idDetalleMaster para agregarlo a lo items detalle hijos
+						idDetalleMaster = cadaDetallePedido.getIddetallepedido();
 						idSaborTipoLiquido = cadaDetallePedido.getIdsabortipoliquido();
 						//Adicionamos el producto maestro con cantidad 1
-						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductomaestroext, 1));
+						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductomaestroext, 1,true,0,0,idDetalleMaster));
 						logger.debug(idproductomaestroext + " , " + cantidadPixel);
 						
 						idproductoextsep = PedidoPOSPMDAO.RetornarIdproductoExterno(10000, 0, idtienda);
@@ -279,7 +256,8 @@ public class PedidoPOSPMDAO {
 						logger.debug(idproductoextsep + " , " + cantidadPixel);
 						
 						idproductoext = PedidoPOSPMDAO.RetornarIdproductoExterno(cadaDetallePedido.getIdproducto(), cadaDetallePedido.getIdespecialidad1(), idtienda);
-						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cantidadPixel));
+						idDetalleModificador = idproductoext;
+						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cantidadPixel, false, idDetalleMaster,0,0));
 						logger.debug(idproductoext + " , " + cantidadPixel);
 						
 						for(DetallePedidoAdicion cadaAdicion: adicionDetallePedido)
@@ -287,7 +265,7 @@ public class PedidoPOSPMDAO {
 							if(cadaAdicion.getIdespecialidad1() > 0)
 							{
 								idproductoext = PedidoPOSPMDAO.RetornarIdproductoExterno(cadaAdicion.getIdproducto(), 0, idtienda);
-								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad1()));
+								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad1(),false,idDetalleMaster,0,0));
 								logger.debug(idproductoext + " , " + cadaAdicion.getCantidad1());
 							}
 						}
@@ -297,7 +275,7 @@ public class PedidoPOSPMDAO {
 							if(cadaModificador.getIdproductoespecialidad1()>0)
 							{
 								idproductoext = PedidoPOSPMDAO.RetornarIdproductoExterno(cadaModificador.getIdproductoespecialidad1(), 0, idtienda);
-								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()/2));
+								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()/2, false,idDetalleMaster,idDetalleModificador,0));
 								logger.debug(idproductoext + " , " + cadaModificador.getCantidad()/2);
 							}
 							
@@ -307,7 +285,8 @@ public class PedidoPOSPMDAO {
 						logger.debug(idproductoextsep + " , " + cantidadPixel);
 						
 						idproductoext = PedidoPOSPMDAO.RetornarIdproductoExterno(cadaDetallePedido.getIdproducto(), cadaDetallePedido.getIdespecialidad2(), idtienda);
-						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cantidadPixel));
+						idDetalleModificador = idproductoext;
+						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cantidadPixel, false,idDetalleMaster,0,0));
 						logger.debug(idproductoext + " , " + cantidadPixel);
 						
 						for(DetallePedidoAdicion cadaAdicion: adicionDetallePedido)
@@ -315,7 +294,7 @@ public class PedidoPOSPMDAO {
 							if(cadaAdicion.getIdespecialidad2() > 0)
 							{
 								idproductoext = PedidoPOSPMDAO.RetornarIdproductoExterno(cadaAdicion.getIdproducto(), 0, idtienda);
-								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad2()));
+								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaAdicion.getCantidad2(),false,idDetalleMaster,0,0));
 								logger.debug(idproductoext + " , " + cadaAdicion.getCantidad2());
 							}
 						}
@@ -325,7 +304,7 @@ public class PedidoPOSPMDAO {
 							if(cadaModificador.getIdproductoespecialidad2()>0)
 							{
 								idproductoext = PedidoPOSPMDAO.RetornarIdproductoExterno(cadaModificador.getIdproductoespecialidad2(), 0, idtienda);
-								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()/2));
+								pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, cadaModificador.getCantidad()/2, false,idDetalleMaster,idDetalleModificador,0));
 								logger.debug(idproductoext + " , " + cadaModificador.getCantidad()/2);
 							}
 							
@@ -338,13 +317,14 @@ public class PedidoPOSPMDAO {
 						if (idSaborTipoLiquido > 0)
 						{
 							idproductoext = PedidoPOSPMDAO.RetornarIdprodGaseosaPromo(idSaborTipoLiquido, idtienda);
-							pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, 1));
+							pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(idproductoext, 1,false,idDetalleMaster,0,0));
 							logger.debug(idproductoext + " , " + cantidadPixel);
 							
 						}
 						//Poner separador 0,0
-						pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(0, 0));
-						logger.debug(0 + " , " + 0);
+						//Decidimos no separar lo productos
+						//pedidoDefinitivoPOSMP.add(new DetallePedidoPixel(0, 0));
+						//logger.debug(0 + " , " + 0);
 						
 					}
 
@@ -354,101 +334,7 @@ public class PedidoPOSPMDAO {
 		return(pedidoDefinitivoPOSMP);
 	}
 	
-	public static Cliente obtenerClienteporID(int id)
-	{
-		Logger logger = Logger.getLogger("log_file");
-		Cliente clienteConsultado = new Cliente(); 
-		ConexionBaseDatos con = new ConexionBaseDatos();
-		Connection con1 = con.obtenerConexionBDPrincipal();
-		try
-		{
-			Statement stm = con1.createStatement();
-			String consulta = "select a.idcliente, b.nombre nombreTienda, a.idtienda, a.nombre, a.apellido, a.nombrecompania, a.direccion, a.zona, a.observacion, a.telefono, c.nombre nombremunicipio, a.latitud, a.longitud, a.memcode, a.idnomenclatura, a.num_nomencla1, a.num_nomencla2, a.num3, d.nomenclatura from cliente a JOIN tienda b ON a.idtienda = b.idtienda JOIN municipio c ON a.idmunicipio = c.idmunicipio left join nomenclatura_direccion d on a.idnomenclatura = d.idnomenclatura  where a.idcliente = " + id +"";
-			logger.info(consulta);
-			ResultSet rs = stm.executeQuery(consulta);
-			int idcliente;
-			String nombreTienda;
-			String nombreCliente;
-			String apellido;
-			String nombreCompania;
-			String direccion;
-			String zona;
-			String observacion;
-			String telefono;
-			String municipio;
-			float latitud;
-			float longitud;
-			int idTienda;
-			int memcode;
-			int idnomenclatura;
-			String numNomenclatura1;
-			String numNomenclatura2;
-			String num3;
-			String nomenclatura;
-			while(rs.next()){
-				idcliente = rs.getInt("idcliente");
-				nombreTienda = rs.getString("nombreTienda");
-				nombreCliente = rs.getString("nombre");
-				apellido = rs.getString("apellido");
-				nombreCompania = rs.getString("nombrecompania");
-				direccion = rs.getString("direccion");
-				zona = rs.getString("zona");
-				observacion = rs.getString("observacion");
-				telefono = rs.getString("telefono");
-				municipio = rs.getString("nombremunicipio");
-				latitud = rs.getFloat("latitud");
-				longitud = rs.getFloat("longitud");
-				idTienda = rs.getInt("idtienda");
-				memcode = rs.getInt("memcode");
-				idnomenclatura = rs.getInt("idnomenclatura");
-				numNomenclatura1 = rs.getString("num_nomencla1");
-				numNomenclatura2 = rs.getString("num_nomencla2");
-				num3 = rs.getString("num3");
-				nomenclatura = rs.getString("nomenclatura");
-				clienteConsultado = new Cliente( idcliente, telefono, nombreCliente, apellido, nombreCompania, direccion,municipio,latitud, longitud, zona, observacion, nombreTienda, idTienda,memcode,idnomenclatura, numNomenclatura1, numNomenclatura2, num3, nomenclatura);
-				
-			}
-		}catch (Exception e){
-			logger.error(e.toString());
-		}
-		return(clienteConsultado);
-		
-	}
-	
-	
-	public static int actualizarClienteMemcode(int idCliente, int memcode)
-	{
-		Logger logger = Logger.getLogger("log_file");
-		int idClienteActualizado = 0;
-		ConexionBaseDatos con = new ConexionBaseDatos();
-		Connection con1 = con.obtenerConexionBDPrincipal();
-		try
-		{
-			//Para actualizar el cliente el idcliente debe ser diferente de vacï¿½o.
-			Statement stm = con1.createStatement();
-			String update = "update cliente set memcode = " + memcode + "  where idcliente = " + idCliente; 
-			logger.info(update);
-			stm.executeUpdate(update);
-			idClienteActualizado = idCliente;
-			
-			stm.close();
-			con1.close();
-		}
-		catch (Exception e){
-			logger.error(e.toString());
-			try
-			{
-				con1.close();
-			}catch(Exception e1)
-			{
-			}
-			return(0);
-		}
-		logger.info("id cliente actualizado" + idClienteActualizado);
-		return(idClienteActualizado);
-	}
-	
-	
+
 		
 	public static ArrayList<DetallePedido> ConsultarDetallePedidoSinAdiciones(int numeropedido)
 	{

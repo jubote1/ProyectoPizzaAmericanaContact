@@ -56,17 +56,18 @@ public class CRUDExcepcionPrecio extends HttpServlet {
 			String descripcion = request.getParameter("descripcion");
 			String incluye_liquido = request.getParameter("incluye_liquido");
 			int idtipoliquido = Integer.parseInt(request.getParameter("idtipoliquido"));
-			respuesta = ParametrosCtrl.insertarExcepcionPrecio(idproducto, precio, descripcion, incluye_liquido, idtipoliquido);
+			String habilitado = request.getParameter("habilitado");
+			respuesta = ParametrosCtrl.insertarExcepcionPrecio(idproducto, precio, descripcion, incluye_liquido, idtipoliquido,habilitado);
 		}else if (operacion ==2)
 		{
-			System.out.println("ingrese");
 			int idexcedit= Integer.parseInt(request.getParameter("idexcepcion"));
 			int idproducto = Integer.parseInt(request.getParameter("idproducto"));
 			double precio = Double.parseDouble(request.getParameter("precio"));
 			String descripcion = request.getParameter("descripcion");
 			String incluye_liquido = request.getParameter("incluye_liquido");
 			int idtipoliquido = Integer.parseInt(request.getParameter("idtipoliquido"));
-			respuesta = ParametrosCtrl.editarExcepcionPrecio(idexcedit, idproducto, precio, descripcion, incluye_liquido, idtipoliquido);
+			String habilitado = request.getParameter("habilitado");
+			respuesta = ParametrosCtrl.editarExcepcionPrecio(idexcedit, idproducto, precio, descripcion, incluye_liquido, idtipoliquido,habilitado);
 		}else if (operacion ==3 )
 		{
 			int idexceli = Integer.parseInt(request.getParameter("idexcepcion"));

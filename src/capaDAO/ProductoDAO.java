@@ -36,7 +36,7 @@ public class ProductoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select * from producto";
+			String consulta = "select * from producto where habilitado = 'S'";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			while(rs.next()){
@@ -51,7 +51,8 @@ public class ProductoDAO {
 				String incluye_liquido = rs.getString("incluye_liquido");
 				int idtipoliquido = rs.getInt("idtipo_liquido");
 				String manejacantidad = rs.getString("manejacantidad");
-				Producto producto = new Producto(idproducto, idreceta, nombre, descripcion, impuesto,tipo,productoasociaadicion, preciogeneral, incluye_liquido, idtipoliquido, manejacantidad);
+				String habilitado = rs.getString("habilitado");
+				Producto producto = new Producto(idproducto, idreceta, nombre, descripcion, impuesto,tipo,productoasociaadicion, preciogeneral, incluye_liquido, idtipoliquido, manejacantidad,habilitado);
 				productos.add(producto);
 			}
 			rs.close();
@@ -85,7 +86,7 @@ public class ProductoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select p.idproducto, p.idreceta, r.nombre nombrereceta, p.nombre,  p.descripcion, p.impuesto, p.tipo, p.preciogeneral, p.incluye_liquido, p.idtipo_liquido, t.nombre nombreliquido   from  producto p LEFT JOIN tipo_liquido t ON (p.idtipo_liquido = t.idtipo_liquido) LEFT JOIN RECETA r ON (p.idreceta = r.idreceta)";
+			String consulta = "select p.idproducto, p.idreceta, r.nombre nombrereceta, p.nombre,  p.descripcion, p.impuesto, p.tipo, p.preciogeneral, p.incluye_liquido, p.idtipo_liquido, t.nombre nombreliquido, p.habilitado from  producto p LEFT JOIN tipo_liquido t ON (p.idtipo_liquido = t.idtipo_liquido) LEFT JOIN RECETA r ON (p.idreceta = r.idreceta)";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			while(rs.next()){
@@ -100,7 +101,8 @@ public class ProductoDAO {
 				String incluye_liquido  = rs.getString("incluye_liquido");
 				int idtipoliquido = rs.getInt("idtipo_liquido");
 				String nombreliquido = rs.getString("nombreliquido");
-				Producto producto = new Producto(idproducto,idreceta, nombrereceta, nombre, descripcion, impuesto, tipo, preciogeneral, incluye_liquido, idtipoliquido, nombreliquido);
+				String habilitado = rs.getString("habilitado");
+				Producto producto = new Producto(idproducto,idreceta, nombrereceta, nombre, descripcion, impuesto, tipo, preciogeneral, incluye_liquido, idtipoliquido, nombreliquido,habilitado);
 				productos.add(producto);
 			}
 			rs.close();
@@ -127,7 +129,7 @@ public class ProductoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select p.idproducto, p.idreceta, p.nombre, p.descripcion, p.impuesto, p.tipo, p.producto_asocia_adicion, p.preciogeneral, p.incluye_liquido, p.idtipo_liquido, p.manejacantidad from producto p where p.idproducto not in (select b.idproducto from producto_no_existente b where idtienda ="+ idtienda +" ) order by nombre asc";
+			String consulta = "select p.idproducto, p.idreceta, p.nombre, p.descripcion, p.impuesto, p.tipo, p.producto_asocia_adicion, p.preciogeneral, p.incluye_liquido, p.idtipo_liquido, p.manejacantidad from producto p where p.idproducto not in (select b.idproducto from producto_no_existente b where idtienda ="+ idtienda +" ) and p.habilitado = 'S' order by nombre asc";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idProducto;
@@ -153,7 +155,7 @@ public class ProductoDAO {
 				incluye_liquido = rs.getString("incluye_liquido");
 				idtipo_liquido = rs.getInt("idtipo_liquido");
 				manejacantidad = rs.getString("manejacantidad");
-				Producto prod = new Producto(idProducto, idReceta, nombre, descripcion,impuesto, tipo,productoasociaadicion, precio, incluye_liquido, idtipo_liquido, manejacantidad);
+				Producto prod = new Producto(idProducto, idReceta, nombre, descripcion,impuesto, tipo,productoasociaadicion, precio, incluye_liquido, idtipo_liquido, manejacantidad,"S");
 				todosProducto.add(prod);
 			}
 			rs.close();
@@ -187,7 +189,7 @@ public class ProductoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String insert = "insert into producto (idreceta,nombre,descripcion, impuesto,tipo,preciogeneral,incluye_liquido,idtipo_liquido) values (" + pro.getIdReceta() + ", '" + pro.getNombre() + "' , '" + pro.getDescripcion() + "' , " + pro.getImpuesto() + " , '" + pro.getTipo() + "', " + pro.getPreciogeneral() + " , '" + pro.getIncluye_liquido() + "' ," + pro.getIdtipo_liquido()  +  ")"; 
+			String insert = "insert into producto (idreceta,nombre,descripcion, impuesto,tipo,preciogeneral,incluye_liquido,idtipo_liquido,habilitado) values (" + pro.getIdReceta() + ", '" + pro.getNombre() + "' , '" + pro.getDescripcion() + "' , " + pro.getImpuesto() + " , '" + pro.getTipo() + "', " + pro.getPreciogeneral() + " , '" + pro.getIncluye_liquido() + "' ," + pro.getIdtipo_liquido() + ", '" + pro.getHabilitado() + "')"; 
 			logger.info(insert);
 			stm.executeUpdate(insert);
 			ResultSet rs = stm.getGeneratedKeys();
@@ -252,11 +254,11 @@ public class ProductoDAO {
 		Logger logger = Logger.getLogger("log_file");
 		ConexionBaseDatos con = new ConexionBaseDatos();
 		Connection con1 = con.obtenerConexionBDPrincipal();
-		Producto Pro = new Producto(0, 0, "", "", 0, "", 0);
+		Producto Pro = new Producto(0, 0, "", "", 0, "", 0,"");
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select idproducto,idreceta,nombre, descripcion,impuesto,tipo,producto_asocia_adicion,preciogeneral,incluye_liquido,idtipo_liquido, manejacantidad from  producto  where idproducto = " + idproducto; 
+			String consulta = "select idproducto,idreceta,nombre, descripcion,impuesto,tipo,producto_asocia_adicion,preciogeneral,incluye_liquido,idtipo_liquido, manejacantidad,habilitado from  producto  where idproducto = " + idproducto; 
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idproduc = 0;
@@ -270,6 +272,7 @@ public class ProductoDAO {
 			String incluye_liquido = "";
 			int idtipo_liquido = 0;
 			String manejacantidad = "";
+			String habilitado = "";
 			while(rs.next()){
 				idproduc = rs.getInt("idproducto");
 				idreceta  = rs.getInt("idreceta");
@@ -282,9 +285,10 @@ public class ProductoDAO {
 				incluye_liquido = rs.getString("incluye_liquido");
 				idtipo_liquido = rs.getInt("idtipo_liquido");
 				manejacantidad = rs.getString("manejacantidad");
+				habilitado = rs.getString("habilitado");
 				break;
 			}
-			Pro = new Producto(idproduc,idreceta,nombre,descripcion,impuesto,tipo,productoasociaadicion,preciogeneral,incluye_liquido,idtipo_liquido, manejacantidad);
+			Pro = new Producto(idproduc,idreceta,nombre,descripcion,impuesto,tipo,productoasociaadicion,preciogeneral,incluye_liquido,idtipo_liquido, manejacantidad,habilitado);
 			stm.close();
 			con1.close();
 		}
@@ -315,7 +319,7 @@ public class ProductoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String update = "update producto set idreceta =" + Pro.getIdReceta() + ", nombre = '" + Pro.getNombre() + "', descripcion = '" + Pro.getDescripcion() + "', impuesto=" + Pro.getImpuesto()  + ", tipo = '" + Pro.getTipo() + "', preciogeneral = " + Pro.getPreciogeneral() + " , incluye_liquido = '" + Pro.getIncluye_liquido() + "' , idtipo_liquido =" + Pro.getIdtipo_liquido() +"  where idproducto = " + Pro.getIdProducto(); 
+			String update = "update producto set habilitado = '" + Pro.getHabilitado() +"' ,  idreceta =" + Pro.getIdReceta() + ", nombre = '" + Pro.getNombre() + "', descripcion = '" + Pro.getDescripcion() + "', impuesto=" + Pro.getImpuesto()  + ", tipo = '" + Pro.getTipo() + "', preciogeneral = " + Pro.getPreciogeneral() + " , incluye_liquido = '" + Pro.getIncluye_liquido() + "' , idtipo_liquido =" + Pro.getIdtipo_liquido() +"  where idproducto = " + Pro.getIdProducto(); 
 			logger.info(update);
 			stm.executeUpdate(update);
 			resultado = "exitoso";

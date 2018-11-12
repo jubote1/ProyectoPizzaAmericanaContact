@@ -31,6 +31,7 @@ public class TiendaCtrl {
 		JSONObject urlJSON = new JSONObject();
 		urlJSON.put("urltienda", tienda.getUrl());
 		urlJSON.put("dsnodbc", tienda.getDsnTienda());
+		urlJSON.put("pos", tienda.getPos());
 		listJSON.add(urlJSON);
 		return listJSON.toJSONString();
 	}

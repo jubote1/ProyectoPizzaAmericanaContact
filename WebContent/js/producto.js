@@ -139,14 +139,20 @@ function guardarProducto()
 	var tipo = $('#tipo').val();
 	var preciogeneral = $('#preciogeneral').val();
 	var incluye_liquido = $('#incluyeLiquido').val();
-	var tipoliquido = $('#selectTipoLiquido').val(); 
+	var tipoliquido = $('#selectTipoLiquido').val();
 	var idproducto;
-	$.getJSON(server + 'CRUDProducto?idoperacion=1&idreceta=' + idreceta + "&nombre=" + nombre + "&descripcion=" + descripcion + "&impuesto=" + impuesto + "&tipo=" +tipo + "&preciogeneral=" +preciogeneral+ "&incluye_liquido=" + incluye_liquido + "&idtipoliquido=" + tipoliquido, function(data){
+	var habilitado = '';
+	if($("#checkHabilitado").is(':checked')) {  
+            habilitado = 'S'; 
+        } else {  
+            habilitado = 'N';
+        } 
+	$.getJSON(server + 'CRUDProducto?idoperacion=1&idreceta=' + idreceta + "&nombre=" + nombre + "&descripcion=" + descripcion + "&impuesto=" + impuesto + "&tipo=" +tipo + "&preciogeneral=" +preciogeneral+ "&incluye_liquido=" + incluye_liquido + "&idtipoliquido=" + tipoliquido+ "&habilitado=" + habilitado, function(data){
 		var respuesta = data[0];
 		idproducto = respuesta.idproducto;
 				
 	});
-	pintarExcepciones();
+	pintarProductos();
 }
 
 function eliminarProducto(idproducto)
@@ -280,6 +286,7 @@ function editarProducto(idproducto)
     				async: false, 
     				success: function(data){ 
 						var respuesta = data[0];
+						
 						$('#userForm')
 				                .find('[name="idproductoedit"]').val(respuesta.idproducto).end()
 				                .find('[name="selectRecetasedit"]').val(respuesta.idreceta).end()
@@ -290,7 +297,7 @@ function editarProducto(idproducto)
 				                .find('[name="preciogeneraledit"]').val(respuesta.preciogeneral).end()
 				                .find('[name="incluyeLiquidoedit"]').val(respuesta.incluye_liquido).end()
 				                .find('[name="selectTipoLiquidoedit"]').val(respuesta.idtipoliquido).end()
-				                
+				                			                
 
 				            // Show the dialog
 				            bootbox
@@ -311,6 +318,14 @@ function editarProducto(idproducto)
 				                    $('#userForm').hide().appendTo('body');
 				                })
 				                .modal('show');
+				                if(respuesta.habilitado == 'S')
+				                {
+				                	$('#checkHabilitadoedit').prop('checked',true);
+				                }
+				                else
+				                {
+				                	$('#checkHabilitadoedit').prop('checked',false);
+				                }
 					} 
 		});
 
@@ -331,9 +346,15 @@ function confirmarEditarProducto()
                 var preciogeneral = $('input:text[name=preciogeneraledit]').val();
                 var incluye_liquido = $('#incluyeLiquidoedit').val();
                 var idtipoliquido = $('#selectTipoLiquidoedit').val();
+                var habilitado = '';
+				if($("#checkHabilitadoedit").is(':checked')) {  
+			            habilitado = 'S'; 
+			        } else {  
+			            habilitado = 'N';
+			        } 
             // The url and method might be different in your application
             $.ajax({ 
-    				url: server + 'CRUDProducto?idoperacion=2&idproducto='+ idproducto+'&idreceta=' + idreceta + "&nombre=" + nombre + "&descripcion=" + descripcion +"&impuesto=" + impuesto + "&tipo=" + tipo + "&preciogeneral=" + preciogeneral + "&incluye_liquido=" + incluye_liquido + "&idtipoliquido=" + idtipoliquido, 
+    				url: server + 'CRUDProducto?idoperacion=2&idproducto='+ idproducto+'&idreceta=' + idreceta + "&nombre=" + nombre + "&descripcion=" + descripcion +"&impuesto=" + impuesto + "&tipo=" + tipo + "&preciogeneral=" + preciogeneral + "&incluye_liquido=" + incluye_liquido + "&idtipoliquido=" + idtipoliquido+ "&habilitado=" + habilitado, 
     				dataType: 'json', 
     				async: false, 
     				success: function(data){

@@ -17,10 +17,24 @@ public class ExcepcionPrecio {
 	private String controlaCantidadIngredientes;
 	private int cantidadIngrediantes;
 	private String partiradiciones;
+	private String habilitado;
 	
 	
 	
-	
+	public String getHabilitado() {
+		return habilitado;
+	}
+
+
+
+
+	public void setHabilitado(String habilitado) {
+		this.habilitado = habilitado;
+	}
+
+
+
+
 	public String getPartiradiciones() {
 		return partiradiciones;
 	}
@@ -35,21 +49,9 @@ public class ExcepcionPrecio {
 
 
 
-	public ExcepcionPrecio(int idProducto, double precio, String descripcion, String incluyeliquido,
-			int idtipoliquido) {
-		super();
-		this.idProducto = idProducto;
-		this.precio = precio;
-		this.descripcion = descripcion;
-		this.incluyeliquido = incluyeliquido;
-		this.idtipoliquido = idtipoliquido;
-	}
-	
-	
-	
 	
 	public ExcepcionPrecio(int idExcepcion, int idProducto, double precio, String descripcion, String incluyeliquido,
-			int idtipoliquido) {
+			int idtipoliquido, String habilitado) {
 		super();
 		this.idExcepcion = idExcepcion;
 		this.idProducto = idProducto;
@@ -57,13 +59,13 @@ public class ExcepcionPrecio {
 		this.descripcion = descripcion;
 		this.incluyeliquido = incluyeliquido;
 		this.idtipoliquido = idtipoliquido;
+		this.habilitado = habilitado;
 	}
 
 
-	
-	
+//Constructor elaborado principalmente para Grid donde se muetra la informacion de las excepciones precio
 	public ExcepcionPrecio(int idExcepcion, int idProducto, String nombreProducto, double precio, String descripcion,
-			String incluyeliquido, int idtipoliquido, String nombreLiquido) {
+			String incluyeliquido, int idtipoliquido, String nombreLiquido, String habilitado) {
 		super();
 		this.idExcepcion = idExcepcion;
 		this.idProducto = idProducto;
@@ -73,6 +75,7 @@ public class ExcepcionPrecio {
 		this.incluyeliquido = incluyeliquido;
 		this.idtipoliquido = idtipoliquido;
 		this.nombreLiquido = nombreLiquido;
+		this.habilitado = habilitado;
 	}
 
 

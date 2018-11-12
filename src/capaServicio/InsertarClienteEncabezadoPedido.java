@@ -75,7 +75,6 @@ public class InsertarClienteEncabezadoPedido extends HttpServlet {
         String numNomenclatura = request.getParameter("numnomenclatura1");
         String numNomenclatura2 = request.getParameter("numnomenclatura2");
         String num3 = request.getParameter("num3");
-        System.out.println("tienda" +tienda+ "municipio" + municipio);
         float latitud;
         float longitud;
         int idCliente;

@@ -14,6 +14,7 @@ var idformapago;
 var totalpedido;
 var valorformapago;
 var stringPixel;
+var tiendas;
 
 
 $(document).ready(function() {
@@ -24,7 +25,8 @@ $(document).ready(function() {
 	server = loc.href.substring(0, loc.href.length - ((loc.pathname + loc.search + loc.hash).length - pathName.length));
 	//Inicializamos los municipios
 	getListaMunicipios();
-
+	getListaTiendas();
+	getLlenarHoras();
 
 	    dtDirecciones = $('#grid-direcciones').DataTable( {
 	    		"aoColumns": [
@@ -50,18 +52,125 @@ $(document).ready(function() {
  	
 } );
 
+// Método que invoca el servicio para listar las tiendas donde se pondrán tomar domicilios.
+function getListaTiendas(){
+	$.getJSON(server + 'GetTiendas', function(data){
+		tiendas = data;
+		var str = '';
+		for(var i = 0; i < data.length;i++){
+			var cadaTienda  = data[i];
+			str +='<option value="'+ cadaTienda.nombre +'" id ="'+ cadaTienda.id +'">' + cadaTienda.nombre +'</option>';
+		}
+		$('#selectTiendas').html(str);
+		// Realizamos cambio para que la tienda no esté seleccionada por defecto
+		$("#selectTiendas").val('');
+	});
+}
+
+function getLlenarHoras(){
+	var str = '';
+	str +='<option value="12:00" id ="12:00">12:00</option>';
+	str +='<option value="12:30" id ="12:30">12:30</option>';
+	str +='<option value="13:00" id ="13:00">13:00</option>';
+	str +='<option value="13:30" id ="13:30">13:30</option>';
+	str +='<option value="14:00" id ="14:00">14:00</option>';
+	str +='<option value="14:30" id ="14:30">14:30</option>';
+	str +='<option value="15:00" id ="15:00">15:00</option>';
+	str +='<option value="15:30" id ="15:30">15:30</option>';
+	str +='<option value="16:00" id ="16:00">16:00</option>';
+	str +='<option value="16:30" id ="16:30">16:40</option>';
+	str +='<option value="17:00" id ="17:00">17:00</option>';
+	str +='<option value="17:30" id ="17:30">17:30</option>';
+	str +='<option value="18:00" id ="18:00">18:00</option>';
+	str +='<option value="18:30" id ="18:30">18:30</option>';
+	str +='<option value="19:00" id ="19:00">19:00</option>';
+	str +='<option value="19:30" id ="19:30">19:30</option>';
+	str +='<option value="20:00" id ="20:00">20:00</option>';
+	str +='<option value="20:30" id ="20:30">20:30</option>';
+	str +='<option value="21:00" id ="21:00">21:00</option>';
+	str +='<option value="21:30" id ="21:30">21:30</option>';
+	str +='<option value="22:00" id ="22:00">22:00</option>';
+	str +='<option value="22:30" id ="22:30">22:30</option>';
+	str +='<option value="23:00" id ="23:00">23:00</option>';
+	$('#selectHoraInicial').html(str);
+	$('#selectHoraFinal').html(str);
+	$("#selectHoraInicial").val('');
+	$("#selectHoraFinal").val('');
+}
+
+function validarDatosConsulta()
+{
+	var fechaIni = $("#fechainicial").val();
+	var fechaFinal = $("#fechafinal").val();
+	var selMunicipio = $("#selectMunicipio").val();
+	var selTienda = $("#selectTiendas").val();
+	var horaIni = $("#selectHoraInicial").val();
+	var horaFin = $("#selectHoraFinal").val();
+	if(existeFecha(fechaIni))
+	{
+
+	}
+	else
+	{
+		$.alert('La fecha inicial está incorrecta');
+		return;
+	}
+	if(existeFecha(fechaFinal))
+	{
+
+	}
+	else
+	{
+		$.alert('La fecha Final está incorrecta');
+		return;
+	}
+	if((selMunicipio == '') || (selMunicipio == null))
+	{
+		$.alert('Debe seleccionar un municipio para la consulta');
+		return;
+	}
+	if((selTienda == '') || (selTienda == null))
+	{
+		$.alert('Debe seleccionar una Tienda para la consulta');
+		return;
+	}
+	if((horaIni != "" || horaIni != null)&&(horaFin != "" || horaFin != null))
+	{
+		if((horaIni != "" || horaIni!= null)&&(horaFin == "" || horaFin == null))
+		{
+			$.alert('Se ingreso hora Inicial debe tambien ingresar hora final');
+			return;
+		}
+		if((horaIni == "" || horaIni == null)&&(horaFin != "" || horaFin != null))
+		{
+			$.alert('Se ingreso hora Final debe tambien ingresar hora inicial');
+			return;
+		}
+	}
+	return(true);
+
+}
+
 function ubicarDireccionesPedidos()
 {
+	if(!validarDatosConsulta())
+	{
+		return;
+	}
+
 	if ( $.fn.dataTable.isDataTable( '#grid-direcciones' ) ) {
     	dtDirecciones = $('#grid-direcciones').DataTable();
     }
 	var fechaIni = $("#fechainicial").val();
 	var fechaFinal = $("#fechafinal").val();
 	var idMunicipio = $("#selectMunicipio option:selected").attr('id');
+	var idTienda = $("#selectTiendas option:selected").attr('id');;
+	var horaIni = $("#selectHoraInicial").val();
+	var horaFin = $("#selectHoraFinal").val();
 	var longitud;
 	var latitud;
 			$.ajax({ 
-			   	url: server + 'ConsultarDireccionesPedido?fechainicial=' + fechaIni + "&fechafinal="+ fechaFinal + "&idmunicipio="+idMunicipio, 
+			   	url: server + 'ConsultarDireccionesPedido?fechainicial=' + fechaIni + "&fechafinal="+ fechaFinal + "&idmunicipio="+idMunicipio+ "&idtienda="+idTienda+ "&horaini=" + horaIni + "&horafin="+horaFin, 
 			   	dataType: 'json',
 			   	type: 'post', 
 			   	async: false, 
@@ -138,90 +247,6 @@ function validarVigenciaLogueo()
 		    		
 }
 
-
-
-// Evento para cuando se da  CLICK EN EL BOTÓN BUSCAR
-function buscarMapa() {
-
-    // Obtenemos la dirección y la asignamos a una variable
-    var direccion = $('#direccion').val();
-    var municipio = $("#selectMunicipio").val();
-    municipio = municipio.loLowerCase();
-    direccion = direccion + " " + municipio;
-    var resultado;
-    
-    $.ajax({ 
-	    				url:'https://maps.googleapis.com/maps/api/geocode/json?components=administrative_area:Medellin|country:Colombia&address=' + direccion +'&key=AIzaSyCRtUQ2WV0L2gMnb9DKiFn1PTHJQLH3suA' , 
-	    				dataType: 'json', 
-	    				async: false, 
-	    				success: function(data){ 
-								resultado = data;
-							} 
-						});
-    // Creamos el Objeto Geocoder
-    var geocoder = new google.maps.Geocoder();
-    // Hacemos la petición indicando la dirección e invocamos la función
-    // geocodeResult enviando todo el resultado obtenido
-    geocoder.geocode({ 'address': direccion}, geocodeResult);
-    //geocodeResult(resultado.results,resultado.status);
-}
-
-//Georeferenciación de la dirección
-
-function buscarMapa(dir) {
-
-    // Obtenemos la dirección y la asignamos a una variable
-    var direccion = dir
-    var resultado;
-    
-    $.ajax({ 
-	    				url:'https://maps.googleapis.com/maps/api/geocode/json?components=administrative_area:Medellin|country:Colombia&address=' + direccion +'&key=AIzaSyCRtUQ2WV0L2gMnb9DKiFn1PTHJQLH3suA' , 
-	    				dataType: 'json', 
-	    				async: false, 
-	    				success: function(data){ 
-								resultado = data;
-								
-							} 
-						});
-    // Creamos el Objeto Geocoder
-    var geocoder = new google.maps.Geocoder();
-    // Hacemos la petición indicando la dirección e invocamos la función
-    // geocodeResult enviando todo el resultado obtenido
-    geocoder.geocode({ 'address': direccion}, geocodeResult);
-    //geocodeResult(resultado.results,resultado.status);
-}
-
-function geocodeResult(results, status) {
-    // Verificamos el estatus
-    if (status == 'OK') {
-        // Si hay resultados encontrados, centramos y repintamos el mapa
-        // esto para eliminar cualquier pin antes puesto
-        var mapOptions = {
-            center: results[0].geometry.location,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
-        longitud = results[0].geometry.location.lng;
-        latitud = results[0].geometry.location.lat;
-        map = new google.maps.Map($("#mapas").get(0), mapOptions);
-        // fitBounds acercará el mapa con el zoom adecuado de acuerdo a lo buscado
-        map.fitBounds(results[0].geometry.viewport);
-        // Dibujamos un marcador con la ubicación del primer resultado obtenido
-        var ctaLayer = new google.maps.KmlLayer({
-          url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/ZonasDeRepartoTotales.kml',
-          map: map,
-          zoom: 13
-        });
-        
-        var markerOptions = { position: results[0].geometry.location }
-        var marker = new google.maps.Marker(markerOptions);
-        marker.setMap(map);
-        
-    } else {
-        // En caso de no haber resultados o que haya ocurrido un error
-        // lanzamos un mensaje con el error
-        alert("Geocoding no tuvo éxito debido a: " + status);
-    }
-}
 
 
 

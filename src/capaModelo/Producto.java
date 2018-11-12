@@ -20,11 +20,17 @@ public class Producto {
 	private int idtipo_liquido;
 	private String nombreliquido;
 	private String manejacantidad;
+	private String habilitado;
 	
 	
 	
 	
-	
+	public String getHabilitado() {
+		return habilitado;
+	}
+	public void setHabilitado(String habilitado) {
+		this.habilitado = habilitado;
+	}
 	public String getManejacantidad() {
 		return manejacantidad;
 	}
@@ -103,7 +109,7 @@ public class Producto {
 	public void setTipo(String tipo) {
 		this.tipo = tipo;
 	}
-	public Producto(int idProducto, int idReceta, String nombre, String descripcion, float impuesto, String tipo, double preciogeneral) {
+	public Producto(int idProducto, int idReceta, String nombre, String descripcion, float impuesto, String tipo, double preciogeneral, String habilitado) {
 		super();
 		this.idProducto = idProducto;
 		this.idReceta = idReceta;
@@ -112,8 +118,9 @@ public class Producto {
 		this.impuesto = impuesto;
 		this.tipo = tipo;
 		this.preciogeneral = preciogeneral;
+		this.habilitado = habilitado;
 	}
-	public Producto(int idProducto, int idReceta, String nombre, String descripcion, float impuesto, String tipo, int productoasociaadicion ,double preciogeneral, String incluye_liquido, int idtipo_liquido, String manejacantidad) {
+	public Producto(int idProducto, int idReceta, String nombre, String descripcion, float impuesto, String tipo, int productoasociaadicion ,double preciogeneral, String incluye_liquido, int idtipo_liquido, String manejacantidad, String habilitado) {
 		super();
 		this.idProducto = idProducto;
 		this.idReceta = idReceta;
@@ -126,9 +133,10 @@ public class Producto {
 		this.incluye_liquido = incluye_liquido;
 		this.idtipo_liquido = idtipo_liquido;
 		this.manejacantidad = manejacantidad;
+		this.habilitado = habilitado;
 	}
 	
-	public Producto(int idProducto, int idReceta, String nombrereceta, String nombre, String descripcion, float impuesto, String tipo,double preciogeneral, String incluye_liquido, int idtipo_liquido, String nombreliquido) {
+	public Producto(int idProducto, int idReceta, String nombrereceta, String nombre, String descripcion, float impuesto, String tipo,double preciogeneral, String incluye_liquido, int idtipo_liquido, String nombreliquido, String habilitado) {
 		super();
 		this.idProducto = idProducto;
 		this.idReceta = idReceta;
@@ -141,6 +149,7 @@ public class Producto {
 		this.incluye_liquido = incluye_liquido;
 		this.idtipo_liquido = idtipo_liquido;
 		this.nombreliquido = nombreliquido;
+		this.habilitado = habilitado;
 	}
 	
 	

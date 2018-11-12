@@ -68,7 +68,8 @@ public class CRUDProducto extends HttpServlet {
 					double preciogeneral = Double.parseDouble(request.getParameter("preciogeneral"));
 					String incluye_liquido = request.getParameter("incluye_liquido");
 					int idtipoliquido = Integer.parseInt(request.getParameter("idtipoliquido"));
-					respuesta = ParametrosCtrl.insertaProducto(idreceta, nombre, descripcion, impuesto, tipo, preciogeneral, incluye_liquido, idtipoliquido);
+					String habilitado = request.getParameter("habilitado");
+					respuesta = ParametrosCtrl.insertaProducto(idreceta, nombre, descripcion, impuesto, tipo, preciogeneral, incluye_liquido, idtipoliquido,habilitado);
 				}else if (operacion ==2)
 				{
 					int idproducto= Integer.parseInt(request.getParameter("idproducto"));
@@ -87,7 +88,8 @@ public class CRUDProducto extends HttpServlet {
 					double preciogeneral = Double.parseDouble(request.getParameter("preciogeneral"));
 					String incluye_liquido = request.getParameter("incluye_liquido");
 					int idtipoliquido = Integer.parseInt(request.getParameter("idtipoliquido"));
-					respuesta = ParametrosCtrl.editarProducto(idproducto, idreceta, nombre, descripcion, impuesto, tipo, preciogeneral, incluye_liquido, idtipoliquido);
+					String habilitado = request.getParameter("habilitado");
+					respuesta = ParametrosCtrl.editarProducto(idproducto, idreceta, nombre, descripcion, impuesto, tipo, preciogeneral, incluye_liquido, idtipoliquido,habilitado);
 				}else if (operacion ==3 )
 				{
 					int idproducto = Integer.parseInt(request.getParameter("idproducto"));

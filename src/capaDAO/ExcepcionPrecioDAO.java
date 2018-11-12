@@ -30,7 +30,7 @@ public class ExcepcionPrecioDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select * from excepcion_precio order by descripcion asc";
+			String consulta = "select * from excepcion_precio where habilitado = 'S' order by descripcion asc";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			while(rs.next()){
@@ -76,7 +76,7 @@ public class ExcepcionPrecioDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select e.idexcepcion, e.idproducto, p.descripcion producto, e.precio, e.descripcion, e.incluye_liquido, e.idtipoliquido, t.nombre nombreliquido   from  producto p, excepcion_precio e LEFT JOIN tipo_liquido t ON (e.idtipoliquido = t.idtipo_liquido) where  e.idproducto = p.idproducto";
+			String consulta = "select e.idexcepcion, e.idproducto, p.descripcion producto, e.precio, e.descripcion, e.incluye_liquido, e.idtipoliquido, t.nombre nombreliquido, e.habilitado   from  producto p, excepcion_precio e LEFT JOIN tipo_liquido t ON (e.idtipoliquido = t.idtipo_liquido) where  e.idproducto = p.idproducto";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			while(rs.next()){
@@ -88,7 +88,8 @@ public class ExcepcionPrecioDAO {
 				String incluye_liquido  = rs.getString("incluye_liquido");
 				int idtipoliquido = rs.getInt("idtipoliquido");
 				String nombreliquido = rs.getString("nombreliquido");
-				ExcepcionPrecio excepcion = new ExcepcionPrecio(idExcepcion, idProducto, producto, precio, descripcion, incluye_liquido, idtipoliquido, nombreliquido);
+				String habilitado = rs.getString("habilitado");
+				ExcepcionPrecio excepcion = new ExcepcionPrecio(idExcepcion, idProducto, producto, precio, descripcion, incluye_liquido, idtipoliquido, nombreliquido,habilitado);
 				excepciones.add(excepcion);
 			}
 			rs.close();
@@ -123,7 +124,7 @@ public class ExcepcionPrecioDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String insert = "insert into excepcion_precio (idproducto,precio,descripcion,incluye_liquido,idtipoliquido) values (" + Exc.getIdProducto() + "," + Exc.getPrecio() + ", '" + Exc.getDescripcion() + "' , '" + Exc.getIncluyeliquido() + "' , " + Exc.getIdtipoliquido()  +  ")"; 
+			String insert = "insert into excepcion_precio (idproducto,precio,descripcion,incluye_liquido,idtipoliquido,habilitado) values (" + Exc.getIdProducto() + "," + Exc.getPrecio() + ", '" + Exc.getDescripcion() + "' , '" + Exc.getIncluyeliquido() + "' , " + Exc.getIdtipoliquido()  + " , '"+ Exc.getHabilitado() +"')"; 
 			logger.info(insert);
 			stm.executeUpdate(insert);
 			ResultSet rs = stm.getGeneratedKeys();
@@ -187,11 +188,11 @@ public class ExcepcionPrecioDAO {
 		Logger logger = Logger.getLogger("log_file");
 		ConexionBaseDatos con = new ConexionBaseDatos();
 		Connection con1 = con.obtenerConexionBDPrincipal();
-		ExcepcionPrecio Esc = new ExcepcionPrecio(0,0,0,"","",0);
+		ExcepcionPrecio Esc = new ExcepcionPrecio(0,0,0,"","",0,"");
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select idexcepcion,idproducto,precio,descripcion,incluye_liquido,idtipoliquido from  excepcion_precio  where idexcepcion = " + idexcepcion; 
+			String consulta = "select idexcepcion,idproducto,precio,descripcion,incluye_liquido,idtipoliquido,habilitado from  excepcion_precio  where idexcepcion = " + idexcepcion; 
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idexc = 0;
@@ -200,6 +201,7 @@ public class ExcepcionPrecioDAO {
 			String desc = "";
 			String inc_liq = "";
 			int idtipliq = 0;
+			String habilitado = "";
 			while(rs.next()){
 				idexc = rs.getInt("idexcepcion");
 				idpro = rs.getInt("idproducto");
@@ -207,9 +209,10 @@ public class ExcepcionPrecioDAO {
 				desc = rs.getString("descripcion");
 				inc_liq = rs.getString("incluye_liquido");
 				idtipliq = rs.getInt("idtipoliquido");
+				habilitado = rs.getString("habilitado");
 				break;
 			}
-			Esc = new ExcepcionPrecio(idexc, idpro,precio, desc,inc_liq,idtipliq);
+			Esc = new ExcepcionPrecio(idexc, idpro,precio, desc,inc_liq,idtipliq,habilitado);
 			stm.close();
 			con1.close();
 		}
@@ -239,7 +242,7 @@ public class ExcepcionPrecioDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String update = "update excepcion_precio set idproducto =" + Esc.getIdProducto() + ", precio = " + Esc.getPrecio() + ", descripcion = '" + Esc.getDescripcion() + "' , incluye_liquido = '" + Esc.getIncluyeliquido() + "' , idtipoliquido =" + Esc.getIdtipoliquido() +"  where idexcepcion = " + Esc.getIdExcepcion(); 
+			String update = "update excepcion_precio set habilitado = '"+ Esc.getHabilitado() +"' , idproducto =" + Esc.getIdProducto() + ", precio = " + Esc.getPrecio() + ", descripcion = '" + Esc.getDescripcion() + "' , incluye_liquido = '" + Esc.getIncluyeliquido() + "' , idtipoliquido =" + Esc.getIdtipoliquido() +"  where idexcepcion = " + Esc.getIdExcepcion(); 
 			logger.info(update);
 			stm.executeUpdate(update);
 			resultado = "exitoso";

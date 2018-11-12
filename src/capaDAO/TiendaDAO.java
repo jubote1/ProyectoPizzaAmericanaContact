@@ -263,13 +263,14 @@ public class TiendaDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select url, dsn from tienda where idtienda = " + idtienda; 
+			String consulta = "select url, dsn, pos from tienda where idtienda = " + idtienda; 
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			while(rs.next()){
 				tienda.setUrl(rs.getString("url"));
 				tienda.setDsnTienda(rs.getString("dsn"));
 				tienda.setIdTienda(idtienda);
+				tienda.setPos(rs.getInt("pos"));
 				break;
 			}
 			stm.close();

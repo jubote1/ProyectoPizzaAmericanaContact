@@ -40,8 +40,35 @@ public class ConsultarDireccionesPedido extends HttpServlet {
 		String fechaInicial = request.getParameter("fechainicial");
 		String fechaFinal = request.getParameter("fechafinal");
 		String idMunicipio = request.getParameter("idmunicipio");
+		String idTienda = request.getParameter("idtienda");
+		String horaIni ="";
+		String horaFin = "";
+		try
+		{
+			horaIni = request.getParameter("horaini");
+			if(horaIni.length() == 0 || horaIni.equals(new String("null")) )
+			{
+				horaIni = "";
+			}
+		}catch(Exception e)
+		{
+			horaIni = "";
+		}
+		
+		try
+		{
+			horaFin = request.getParameter("horafin");
+			if(horaFin.length() == 0 || horaFin.equals(new String("null")))
+			{
+				horaFin = "";
+			}
+		}catch(Exception e)
+		{
+			horaFin = "";
+		}
+		System.out.println("HORA INI Y FIN " + horaIni + horaFin);
 		PedidoCtrl pedCtrl = new PedidoCtrl();
-		String respuesta = pedCtrl.ConsultarDireccionesPedido(fechaInicial, fechaFinal, idMunicipio);
+		String respuesta = pedCtrl.ConsultarDireccionesPedido(fechaInicial, fechaFinal, idMunicipio, idTienda, horaIni, horaFin);
         PrintWriter out = response.getWriter();
 		out.write(respuesta);
 	}

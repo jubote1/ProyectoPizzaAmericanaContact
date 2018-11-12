@@ -113,7 +113,13 @@ function guardarExcepcionPrecio()
 	var incluye_liquido = $('#incluyeLiquido').val();
 	var tipoliquido = $('#selectTipoLiquido').val(); 
 	var idexcepcion;
-	$.getJSON(server + 'CRUDExcepcionPrecio?idoperacion=1&idproducto=' + idproducto + "&precio=" + precio + "&descripcion=" + descripcion + "&incluye_liquido=" + incluye_liquido + "&idtipoliquido=" + tipoliquido, function(data){
+	var habilitado = '';
+	if($("#checkHabilitado").is(':checked')) {  
+            habilitado = 'S'; 
+        } else {  
+            habilitado = 'N';
+        } 
+	$.getJSON(server + 'CRUDExcepcionPrecio?idoperacion=1&idproducto=' + idproducto + "&precio=" + precio + "&descripcion=" + descripcion + "&incluye_liquido=" + incluye_liquido + "&idtipoliquido=" + tipoliquido + "&habilitado=" + habilitado, function(data){
 		var respuesta = data[0];
 		idexcepcion = respuesta.idexcepcion;
 				
@@ -278,6 +284,14 @@ function editarExcepcion(idexcepcion)
 				                    $('#userForm').hide().appendTo('body');
 				                })
 				                .modal('show');
+				                if(respuesta.habilitado == 'S')
+				                {
+				                	$('#checkHabilitadoedit').prop('checked',true);
+				                }
+				                else
+				                {
+				                	$('#checkHabilitadoedit').prop('checked',false);
+				                }
 					} 
 		});
 
@@ -295,9 +309,15 @@ function confirmarEditarExcepcion()
                 var idproducto =  $('#selectProductosedit').val();
                 var incluye_liquido = $('#incluyeLiquidoedit').val();
                 var idtipoliquido = $('#selectTipoLiquidoedit').val();
+                var habilitado = '';
+                if($("#checkHabilitadoedit").is(':checked')) {  
+			            habilitado = 'S'; 
+			        } else {  
+			            habilitado = 'N';
+			        } 
             // The url and method might be different in your application
             $.ajax({ 
-    				url: server + 'CRUDExcepcionPrecio?idoperacion=2&idexcepcion='+ idexcepcion+'&precio=' + precio + "&descripcion=" + descripcion + "&idproducto=" + idproducto + "&incluye_liquido=" + incluye_liquido + "&idtipoliquido=" + idtipoliquido, 
+    				url: server + 'CRUDExcepcionPrecio?idoperacion=2&idexcepcion='+ idexcepcion+'&precio=' + precio + "&descripcion=" + descripcion + "&idproducto=" + idproducto + "&incluye_liquido=" + incluye_liquido + "&idtipoliquido=" + idtipoliquido + "&habilitado=" + habilitado, 
     				dataType: 'json', 
     				async: false, 
     				success: function(data){

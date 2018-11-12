@@ -172,14 +172,13 @@ public int InsertarClientePedidoEncabezado(int idCliente,String telefono, String
 	//Validar si el cliente ya existe en la base de datos
 	//Llamamos el mï¿½todo ya existente para saber si el cliente con el telï¿½fono ya existe
 	// Esta pendiente convertir el nombre tienda a tienda
-	System.out.println(numNomenclatura + " ojo " + numNomenclatura2);
 	int idTienda = TiendaDAO.obteneridTienda(tienda);
-	System.out.println("idtienda " + idTienda);
 	int idMunicipio = MunicipioDAO.obteneridMunicipio(municipio);
+	// Se crea el objeto cliente con todas las características enviadas
 	Cliente clienteRevisar = new Cliente(idCliente, telefono, nombres, apellidos, nombreCompania, direccion,municipio, idMunicipio, latitud, longitud, zona,  observacion,  tienda, idTienda, memcode, idnomenclatura, numNomenclatura, numNomenclatura2, num3, "");
+	// Se inician las variables para la iniciación de la creación o la actualización
 	int idRespuestaCreacion = 0;
 	int idRespuestaActualizacion = 0;
-	System.out.println("idCliente " + idCliente + " memcode " + memcode);
 	if ((idCliente > 0) && (memcode > 0) )
 	{
 		idRespuestaActualizacion = ClienteDAO.actualizarCliente(clienteRevisar);

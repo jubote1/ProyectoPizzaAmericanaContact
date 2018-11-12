@@ -225,10 +225,10 @@ public class ParametrosCtrl {
 	 * @param idtipoliquido En caso de incluir líquido se recibe parámetro del tipo liquido que incluye.
 	 * @return Se retorna el id excepción creado según los parámetros enviados.
 	 */
-		public String insertarExcepcionPrecio(int idproducto, double precio, String descripcion, String incluye_liquido, int  idtipoliquido)
+		public String insertarExcepcionPrecio(int idproducto, double precio, String descripcion, String incluye_liquido, int  idtipoliquido, String habilitado)
 		{
 			JSONArray listJSON = new JSONArray();
-			ExcepcionPrecio Esc = new ExcepcionPrecio(idproducto, precio, descripcion, incluye_liquido, idtipoliquido);
+			ExcepcionPrecio Esc = new ExcepcionPrecio(0,idproducto, precio, descripcion, incluye_liquido, idtipoliquido,habilitado);
 			int idEscIns = ExcepcionPrecioDAO.insertarExcepcionPrecio(Esc);
 			JSONObject ResultadoJSON = new JSONObject();
 			ResultadoJSON.put("idexcepcion", idEscIns);
@@ -254,6 +254,7 @@ public class ParametrosCtrl {
 			ResultadoJSON.put("descripcion", Esc.getDescripcion());
 			ResultadoJSON.put("incluye_liquido", Esc.getIncluyeliquido());
 			ResultadoJSON.put("idtipoliquido", Esc.getIdtipoliquido());
+			ResultadoJSON.put("habilitado", Esc.getHabilitado());
 			listJSON.add(ResultadoJSON);
 			return listJSON.toJSONString();
 		}
@@ -275,6 +276,7 @@ public class ParametrosCtrl {
 				cadaExcepcionJSON.put("descripcion", Esc.getDescripcion());
 				cadaExcepcionJSON.put("incluye_liquido", Esc.getIncluyeliquido());
 				cadaExcepcionJSON.put("idtipoliquido", Esc.getIdtipoliquido());
+				cadaExcepcionJSON.put("habilitado", Esc.getHabilitado());
 				listJSON.add(cadaExcepcionJSON);
 			}
 			return listJSON.toJSONString();
@@ -347,10 +349,10 @@ public class ParametrosCtrl {
 		 * @param idtipoliquido idtipoliquido valor a  editar
 		 * @return se retorna el resultado del proceso de la edición.
 		 */
-		public String editarExcepcionPrecio(int idexcepcion, int idproducto, double precio, String descripcion, String incluye_liquido, int idtipoliquido)
+		public String editarExcepcionPrecio(int idexcepcion, int idproducto, double precio, String descripcion, String incluye_liquido, int idtipoliquido, String habilitado)
 		{
 			JSONArray listJSON = new JSONArray();
-			ExcepcionPrecio Esc = new ExcepcionPrecio(idexcepcion, idproducto, precio, descripcion, incluye_liquido, idtipoliquido);
+			ExcepcionPrecio Esc = new ExcepcionPrecio(idexcepcion, idproducto, precio, descripcion, incluye_liquido, idtipoliquido,habilitado);
 			String resultado = ExcepcionPrecioDAO.editarExcepcionPrecio(Esc);
 			JSONObject ResultadoJSON = new JSONObject();
 			ResultadoJSON.put("resultado", resultado);
@@ -374,10 +376,10 @@ public class ParametrosCtrl {
 		 * @param idtipo_liquido Dependiendo de si el producto incluye liquido o no, se parametriza el tipo liquido que manera el producto.
 		 * @return Se retorna el idproducto creado.
 		 */
-			public String insertaProducto(int idreceta,String nombre, String descripcion, float impuesto, String tipo, double preciogeneral, String incluye_liquido, int idtipo_liquido)
+			public String insertaProducto(int idreceta,String nombre, String descripcion, float impuesto, String tipo, double preciogeneral, String incluye_liquido, int idtipo_liquido, String habilitado)
 			{
 				JSONArray listJSON = new JSONArray();
-				Producto Pro = new Producto(0,idreceta,nombre, descripcion, impuesto, tipo, 0, preciogeneral,  incluye_liquido, idtipo_liquido,"");
+				Producto Pro = new Producto(0,idreceta,nombre, descripcion, impuesto, tipo, 0, preciogeneral,  incluye_liquido, idtipo_liquido,"",habilitado);
 				int idProIns = ProductoDAO.insertarProducto(Pro);
 				JSONObject ResultadoJSON = new JSONObject();
 				ResultadoJSON.put("idproducto", idProIns);
@@ -404,6 +406,7 @@ public class ParametrosCtrl {
 				ResultadoJSON.put("preciogeneral", Pro.getPreciogeneral());
 				ResultadoJSON.put("incluye_liquido", Pro.getIncluye_liquido());
 				ResultadoJSON.put("idtipo_liquido", Pro.getIdtipo_liquido());
+				ResultadoJSON.put("habilitado", Pro.getHabilitado());
 				listJSON.add(ResultadoJSON);
 				return listJSON.toJSONString();
 			}
@@ -428,6 +431,7 @@ public class ParametrosCtrl {
 					ResultadoJSON.put("preciogeneral", Pro.getPreciogeneral());
 					ResultadoJSON.put("incluye_liquido", Pro.getIncluye_liquido());
 					ResultadoJSON.put("idtipo_liquido", Pro.getIdtipo_liquido());
+					ResultadoJSON.put("habilitado", Pro.getHabilitado());
 					listJSON.add(ResultadoJSON);
 				}
 				return listJSON.toJSONString();
@@ -454,6 +458,7 @@ public class ParametrosCtrl {
 					ResultadoJSON.put("incluye_liquido", Pro.getIncluye_liquido());
 					ResultadoJSON.put("idtipo_liquido", Pro.getIdtipo_liquido());
 					ResultadoJSON.put("nombreliquido", Pro.getNombreliquido());
+					ResultadoJSON.put("habilitado", Pro.getHabilitado());
 					listJSON.add(ResultadoJSON);
 				}
 				return listJSON.toJSONString();
@@ -487,10 +492,10 @@ public class ParametrosCtrl {
 			 * @param idtipo_liquido
 			 * @return Se retorna el valor del resultado del producto.
 			 */
-			public String editarProducto(int idproducto,int idreceta,String nombre, String descripcion, float impuesto, String tipo, double preciogeneral, String incluye_liquido, int idtipo_liquido)
+			public String editarProducto(int idproducto,int idreceta,String nombre, String descripcion, float impuesto, String tipo, double preciogeneral, String incluye_liquido, int idtipo_liquido,String habilitado)
 			{
 				JSONArray listJSON = new JSONArray();
-				Producto Pro = new Producto(idproducto,idreceta,nombre,descripcion, impuesto, tipo,0, preciogeneral, incluye_liquido, idtipo_liquido,"");
+				Producto Pro = new Producto(idproducto,idreceta,nombre,descripcion, impuesto, tipo,0, preciogeneral, incluye_liquido, idtipo_liquido,"",habilitado);
 				String resultado =ProductoDAO.editarProducto(Pro);
 				JSONObject ResultadoJSON = new JSONObject();
 				ResultadoJSON.put("resultado", resultado);

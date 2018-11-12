@@ -94,7 +94,7 @@ public class PedidoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select p.idproducto, p.idreceta, p.nombre, p.descripcion, p.impuesto, p.tipo, p.preciogeneral from producto p where tipo = 'OTROS' ";
+			String consulta = "select p.idproducto, p.idreceta, p.nombre, p.descripcion, p.impuesto, p.tipo, p.preciogeneral from producto p where tipo = 'OTROS'  and habilitado = 'S'";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idProducto;
@@ -112,7 +112,7 @@ public class PedidoDAO {
 				impuesto = rs.getFloat("impuesto");
 				tipo = rs.getString("tipo");
 				precio = rs.getDouble("preciogeneral");
-				Producto prod = new Producto(idProducto, idReceta, nombre, descripcion,impuesto, tipo,precio);
+				Producto prod = new Producto(idProducto, idReceta, nombre, descripcion,impuesto, tipo,precio,"S");
 				otrosProducto.add(prod);
 			}
 			rs.close();
@@ -144,7 +144,7 @@ public class PedidoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select p.idproducto, p.idreceta, p.nombre, p.descripcion, p.impuesto, p.tipo, p.preciogeneral from producto p where tipo = 'ADICION' ";
+			String consulta = "select p.idproducto, p.idreceta, p.nombre, p.descripcion, p.impuesto, p.tipo, p.preciogeneral from producto p where tipo = 'ADICION' and habilitado = 'S'";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idProducto;
@@ -162,7 +162,7 @@ public class PedidoDAO {
 				impuesto = rs.getFloat("impuesto");
 				tipo = rs.getString("tipo");
 				precio = rs.getDouble("preciogeneral");
-				Producto prod = new Producto(idProducto, idReceta, nombre, descripcion,impuesto, tipo,precio);
+				Producto prod = new Producto(idProducto, idReceta, nombre, descripcion,impuesto, tipo,precio,"S");
 				adicionProducto.add(prod);
 			}
 			rs.close();
@@ -193,7 +193,7 @@ public class PedidoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select p.idproducto, p.idreceta, p.nombre, p.descripcion, p.impuesto, p.tipo, p.producto_asocia_adicion, p.preciogeneral, p.incluye_liquido, p.idtipo_liquido, p.manejacantidad from producto p order by nombre asc ";
+			String consulta = "select p.idproducto, p.idreceta, p.nombre, p.descripcion, p.impuesto, p.tipo, p.producto_asocia_adicion, p.preciogeneral, p.incluye_liquido, p.idtipo_liquido, p.manejacantidad from producto p where p.habilitado = 'S' order by nombre asc ";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idProducto;
@@ -219,7 +219,7 @@ public class PedidoDAO {
 				incluye_liquido = rs.getString("incluye_liquido");
 				idtipo_liquido = rs.getInt("idtipo_liquido");
 				manejacantidad = rs.getString("manejacantidad");
-				Producto prod = new Producto(idProducto, idReceta, nombre, descripcion,impuesto, tipo,productoasociaadicion, precio, incluye_liquido, idtipo_liquido, manejacantidad);
+				Producto prod = new Producto(idProducto, idReceta, nombre, descripcion,impuesto, tipo,productoasociaadicion, precio, incluye_liquido, idtipo_liquido, manejacantidad, "S");
 				todosProducto.add(prod);
 			}
 			rs.close();
@@ -912,6 +912,30 @@ public class PedidoDAO {
 		
 		// Recolectamos todos los datos para realizar la inserción en el POS tienda
 		InsertarPedidoPixel pedidoPixel = PedidoPixelDAO.confirmarPedidoPixel(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado, idformapagotienda);
+		return(pedidoPixel);
+	}
+	
+	public static InsertarPedidoPixel finalizarPedidoReenvioPOSPM(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		
+		//Debemos obtener el idTienda del Pedido que vamos a finalizar
+		Tienda tiendaPedido = PedidoDAO.obtenerTiendaPedido(idpedido);
+		
+		
+		//Recuperar la formapago de la tienda homologada
+		int idformapagotienda = PedidoDAO.obtenerFormaPagoHomologadaTienda(tiendaPedido.getIdTienda(), idformapago);
+		Cliente cliente = ClienteDAO.obtenerClienteporID(idcliente);
+		boolean indicadorAct = false;
+		if(insertado == 0)
+		{
+			indicadorAct = true;
+		}
+		
+		// Recolectamos todos los datos para realizar la inserción en el POS tienda
+		InsertarPedidoPixel pedidoPixel = PedidoPOSPMDAO.confirmarPedidoPOSPM(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado, idformapagotienda);
 		return(pedidoPixel);
 	}
 	
@@ -1903,7 +1927,7 @@ public class PedidoDAO {
 		return(consultaPedidos);
 	}
 	
-	public static ArrayList<DireccionFueraZona> ConsultarDireccionesPedido(String fechainicial, String fechafinal, String strIdMuni)
+	public static ArrayList<DireccionFueraZona> ConsultarDireccionesPedido(String fechainicial, String fechafinal, String strIdMuni, String idTienda, String horaIni, String horaFin)
 	{
 		Logger logger = Logger.getLogger("log_file");
 		ArrayList <DireccionFueraZona> consultaDirs = new ArrayList();
@@ -1913,14 +1937,30 @@ public class PedidoDAO {
 		//Modificamos consulta para incluir el número de pedidos que tiene el cliente, para realizar un control
 		//Validamos si el municipio es igual a cero es porque vamos a consultar todos los municipio, sino es así
 		// es porque la consulta deberá filtrar por municipio.
-		if(strIdMuni.equals(new String ("TODOS")))
+		String horaInicial = fechaini.substring(0,10) + " " + horaIni +":00";
+		String horaFinal = fechafin.substring(0,10) + " " + horaFin +":00";
+		if((horaIni.equals(new String("")))&&(horaFin.equals(new String(""))))
 		{
-			consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "'";
+			if(strIdMuni.equals(new String ("TODOS")))
+			{
+				consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and a.idtienda = " + idTienda;
+			}else
+			{
+				int idMunicipio = Integer.parseInt(strIdMuni);
+				consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and b.idmunicipio = " + idMunicipio + " and a.idtienda = " + idTienda;
+			}
 		}else
 		{
-			int idMunicipio = Integer.parseInt(strIdMuni);
-			consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and b.idmunicipio = " + idMunicipio;
+			if(strIdMuni.equals(new String ("TODOS")))
+			{
+				consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and a.idtienda = " + idTienda + " and fechainsercion >= '" + horaInicial + "' and fechainsercion <= '" + horaFinal +"'";
+			}else
+			{
+				int idMunicipio = Integer.parseInt(strIdMuni);
+				consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and b.idmunicipio = " + idMunicipio + " and a.idtienda = " + idTienda + " and fechainsercion >= '" + horaInicial + "' and fechainsercion <= '" + horaFinal +"'";
+			}
 		}
+		
 		logger.info(consulta);
 		ConexionBaseDatos con = new ConexionBaseDatos();
 		Connection con1 = con.obtenerConexionBDPrincipal();

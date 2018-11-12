@@ -335,18 +335,39 @@ public class PedidoCtrl {
 		respuesta.put("valorformapago", pedidoPixel.getValorformapago());
 		respuesta.put("idformapagotienda", pedidoPixel.getIdformapagotienda());
 		respuesta.put("pos", pos);
+		respuesta.put("usuariopedido", "CONTACT");
+		respuesta.put("tiempopedido", tiempopedido);
 		ArrayList<DetallePedidoPixel> detPedPOS = new ArrayList();
 		detPedPOS = pedidoPixel.getEnvioPixel();
 		//Se realiza un ciclo For para obtener y formatear en json cada uno de los detalles pedidos
 		int contador = 1;
-		for(DetallePedidoPixel detPed: detPedPOS)
+		//Validamos si que pos es para saber que datos enviamos
+		if(pos == 2)
 		{
-			
-			respuesta.put("idproductoext" + contador, detPed.getIdproductoext() );
-			respuesta.put("cantidad" + contador, detPed.getCantidad());
-			System.out.println("idproductoext " + detPed.getIdproductoext() + " cantidad " + detPed.getCantidad() );
-			contador++;
-			
+			for(DetallePedidoPixel detPed: detPedPOS)
+			{
+				
+				respuesta.put("idproductoext" + contador, detPed.getIdproductoext() );
+				respuesta.put("cantidad" + contador, detPed.getCantidad());
+				System.out.println("idproductoext " + detPed.getIdproductoext() + " cantidad " + detPed.getCantidad() );
+				contador++;
+				
+			}
+		}else if (pos == 1)
+		{
+			for(DetallePedidoPixel detPed: detPedPOS)
+			{
+				
+				respuesta.put("idproductoext" + contador, detPed.getIdproductoext() );
+				respuesta.put("cantidad" + contador, detPed.getCantidad());
+				respuesta.put("esmaster" + contador, detPed.isEsMaster());
+				respuesta.put("idmaster" + contador, detPed.getIdMaster());
+				respuesta.put("idmodificador" + contador, detPed.getIdModificador());
+				respuesta.put("iddetalle" + contador, detPed.getIdDetallePedido());
+				//System.out.println("idproductoext " + detPed.getIdproductoext() + " cantidad " + detPed.getCantidad() + " iddetalle " + detPed.getIdDetallePedido());
+				contador++;
+				
+			}
 		}
 		contador--;
 		respuesta.put("cantidaditempedido", contador);
@@ -363,12 +384,20 @@ public class PedidoCtrl {
 			clienteJSON.put("direccion", pedidoPixel.getCliente().getDireccion() );
 		}
 		clienteJSON.put("telefono", pedidoPixel.getCliente().getTelefono());
-		clienteJSON.put("apellidos", pedidoPixel.getCliente().getApellidos());
 		clienteJSON.put("idcliente", pedidoPixel.getCliente().getIdcliente());
 		clienteJSON.put("memcode", pedidoPixel.getCliente().getMemcode());
 		clienteJSON.put("zonadireccion", pedidoPixel.getCliente().getZonaDireccion());
 		clienteJSON.put("observacion", pedidoPixel.getCliente().getObservacion());
 		clienteJSON.put("memcode", pedidoPixel.getCliente().getMemcode());
+		clienteJSON.put("idnomenclatura", pedidoPixel.getCliente().getIdnomenclatura());
+		clienteJSON.put("nomenclatura", pedidoPixel.getCliente().getNomenclatura());
+		clienteJSON.put("numnomenclatura", pedidoPixel.getCliente().getNumNomenclatura());
+		clienteJSON.put("numnomenclatura2", pedidoPixel.getCliente().getNumNomenclatura2());
+		clienteJSON.put("num3", pedidoPixel.getCliente().getNum3());
+		clienteJSON.put("municipio", pedidoPixel.getCliente().getMunicipio());
+		clienteJSON.put("idmunicipio", pedidoPixel.getCliente().getIdMunicipio());
+		clienteJSON.put("latitud", pedidoPixel.getCliente().getLatitud());
+		clienteJSON.put("longitud", pedidoPixel.getCliente().getLontitud());
 		listJSONCliente.add(clienteJSON);
 		respuesta.put("cliente", listJSONCliente.toString());
 		listJSON.add(respuesta);
@@ -390,8 +419,22 @@ public class PedidoCtrl {
 	 */
 	public String FinalizarPedidoReenvio(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado)
 	{
-		InsertarPedidoPixel pedidoPixel = PedidoDAO.finalizarPedidoReenvio(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado);
-		String tiendaPixel = PedidoDAO.obtenerUrlTienda(idpedido);
+		
+		Tienda tienda = PedidoDAO.obtenerTiendaPedido(idpedido);
+		String tiendaPixel = tienda.getUrl();
+		//Capturamos el parámetro de para que POS irá el destino del pedido, con base en esto se formará la información para enviar
+		int pos = tienda.getPos();
+		//Validamos si el Pos es igual a 2 el envío será para PIXEL, en caso contrario será para POS Pizza Americana
+		InsertarPedidoPixel pedidoPixel = new InsertarPedidoPixel();
+		if(pos == 2)
+		{
+			pedidoPixel = PedidoDAO.finalizarPedidoReenvio(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado);
+		}else if (pos == 1)
+		{
+			pedidoPixel = PedidoDAO.finalizarPedidoReenvioPOSPM(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado);
+		}
+		
+		
 		JSONArray listJSON = new JSONArray();
 		JSONArray listJSONCliente = new JSONArray();
 		JSONObject respuesta = new JSONObject();
@@ -404,17 +447,38 @@ public class PedidoCtrl {
 		respuesta.put("indicadoract", pedidoPixel.getIndicadorAct());
 		respuesta.put("valorformapago", pedidoPixel.getValorformapago());
 		respuesta.put("idformapagotienda", pedidoPixel.getIdformapagotienda());
+		respuesta.put("pos", pos);
+		respuesta.put("usuariopedido", "CONTACT");
+		respuesta.put("tiempopedido", 0);
 		ArrayList<DetallePedidoPixel> detPedPixel = pedidoPixel.getEnvioPixel();
 		//Se realiza un ciclo For para obtener y formatear en json cada uno de los detalles pedidos
 		int contador = 1;
-		for(DetallePedidoPixel detPed: detPedPixel)
+		if(pos == 2)
 		{
-			
-			respuesta.put("idproductoext" + contador, detPed.getIdproductoext() );
-			respuesta.put("cantidad" + contador, detPed.getCantidad());
-			System.out.println("idproductoext " + detPed.getIdproductoext() + " cantidad " + detPed.getCantidad() );
-			contador++;
-			
+			for(DetallePedidoPixel detPed: detPedPixel)
+			{
+				
+				respuesta.put("idproductoext" + contador, detPed.getIdproductoext() );
+				respuesta.put("cantidad" + contador, detPed.getCantidad());
+				System.out.println("idproductoext " + detPed.getIdproductoext() + " cantidad " + detPed.getCantidad() );
+				contador++;
+				
+			}
+		}else if (pos == 1)
+		{
+			for(DetallePedidoPixel detPed: detPedPixel)
+			{
+				
+				respuesta.put("idproductoext" + contador, detPed.getIdproductoext() );
+				respuesta.put("cantidad" + contador, detPed.getCantidad());
+				respuesta.put("esmaster" + contador, detPed.isEsMaster());
+				respuesta.put("idmaster" + contador, detPed.getIdMaster());
+				respuesta.put("idmodificador" + contador, detPed.getIdModificador());
+				respuesta.put("iddetalle" + contador, detPed.getIdDetallePedido());
+				//System.out.println("idproductoext " + detPed.getIdproductoext() + " cantidad " + detPed.getCantidad() + " iddetalle " + detPed.getIdDetallePedido());
+				contador++;
+				
+			}
 		}
 		contador--;
 		respuesta.put("cantidaditempedido", contador);
@@ -431,6 +495,15 @@ public class PedidoCtrl {
 		clienteJSON.put("zonadireccion", pedidoPixel.getCliente().getZonaDireccion());
 		clienteJSON.put("observacion", pedidoPixel.getCliente().getObservacion());
 		clienteJSON.put("memcode", pedidoPixel.getCliente().getMemcode());
+		clienteJSON.put("idnomenclatura", pedidoPixel.getCliente().getIdnomenclatura());
+		clienteJSON.put("nomenclatura", pedidoPixel.getCliente().getNomenclatura());
+		clienteJSON.put("numnomenclatura", pedidoPixel.getCliente().getNumNomenclatura());
+		clienteJSON.put("numnomenclatura2", pedidoPixel.getCliente().getNumNomenclatura2());
+		clienteJSON.put("num3", pedidoPixel.getCliente().getNum3());
+		clienteJSON.put("municipio", pedidoPixel.getCliente().getMunicipio());
+		clienteJSON.put("idmunicipio", pedidoPixel.getCliente().getIdMunicipio());
+		clienteJSON.put("latitud", pedidoPixel.getCliente().getLatitud());
+		clienteJSON.put("longitud", pedidoPixel.getCliente().getLontitud());
 		listJSONCliente.add(clienteJSON);
 		respuesta.put("cliente", listJSONCliente.toString());
 		listJSON.add(respuesta);
@@ -737,9 +810,9 @@ public class PedidoCtrl {
 		
 	}
 	
-	public String ConsultarDireccionesPedido(String fechainicial, String fechafinal, String idMunicipio)
+	public String ConsultarDireccionesPedido(String fechainicial, String fechafinal, String idMunicipio, String idTienda, String horaIni, String horaFin)
 	{
-		ArrayList <DireccionFueraZona> dirsPedido = PedidoDAO.ConsultarDireccionesPedido(fechainicial, fechafinal, idMunicipio);
+		ArrayList <DireccionFueraZona> dirsPedido = PedidoDAO.ConsultarDireccionesPedido(fechainicial, fechafinal, idMunicipio, idTienda, horaIni, horaFin);
 		JSONArray listJSON = new JSONArray();
 		JSONObject ResultadoJSON = new JSONObject();
 		for (DireccionFueraZona dirTemp : dirsPedido) 
