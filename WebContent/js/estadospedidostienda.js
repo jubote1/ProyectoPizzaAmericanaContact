@@ -120,6 +120,7 @@ function consultarEstadosPedido()
     		table = $('#grid-pedidostienda').DataTable();
     }
     var dsnodbc;
+    var pos;
     // servicio para obtener info tienda
     
     $.ajax({ 
@@ -130,11 +131,12 @@ function consultarEstadosPedido()
 	    					console.log(data2);
 							urlTienda = data2[0].urltienda;
 	                		dsnodbc = data2[0].dsnodbc;
+	                		pos = data2[0].pos;
 							
 						} 
 						});
     //
-	$.getJSON(urlTienda + 'ConsultarEstadosPedidoTienda?dsnodbc=' + dsnodbc , function(data1){
+	$.getJSON(urlTienda + 'ConsultarEstadosPedidoTienda?dsnodbc=' + dsnodbc + "&pos=" + pos , function(data1){
 	                		
 	                		console.log(data1);
 	                		table.clear().draw();
