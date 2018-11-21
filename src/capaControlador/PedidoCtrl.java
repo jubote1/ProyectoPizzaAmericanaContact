@@ -233,6 +233,15 @@ public class PedidoCtrl {
 			cadaExcepcionJSON.put("controlacantidadingredientes", exc.getControlaCantidadIngredientes());
 			cadaExcepcionJSON.put("cantidadingredientes", exc.getCantidadIngrediantes());
 			cadaExcepcionJSON.put("partiradiciones", exc.getPartiradiciones());
+			cadaExcepcionJSON.put("horainicial", exc.getHoraInicial());
+			cadaExcepcionJSON.put("horafinal", exc.getHoraFinal());
+			cadaExcepcionJSON.put("lunes", exc.getLunes());
+			cadaExcepcionJSON.put("martes", exc.getMartes());
+			cadaExcepcionJSON.put("miercoles", exc.getMiercoles());
+			cadaExcepcionJSON.put("jueves", exc.getJueves());
+			cadaExcepcionJSON.put("viernes", exc.getViernes());
+			cadaExcepcionJSON.put("sabado", exc.getSabado());
+			cadaExcepcionJSON.put("domingo", exc.getDomingo());
 			listJSON.add(cadaExcepcionJSON);
 		}
 		

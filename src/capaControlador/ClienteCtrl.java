@@ -200,7 +200,50 @@ public int InsertarClientePedidoEncabezado(int idCliente,String telefono, String
 			return(idRespuestaCreacion);
 		}
 	}
+	
 	return(0);
+}
+
+
+public String InsertarClientePedidoEncabezadoJSON(int idCliente,String telefono, String nombres, String apellidos, String nombreCompania, String direccion, String municipio, float latitud, float longitud, String zona,  String observacion, String tienda, int memcode, int idnomenclatura, String numNomenclatura, String numNomenclatura2, String num3 )
+{
+	//Validar si el cliente ya existe en la base de datos
+	//Llamamos el mï¿½todo ya existente para saber si el cliente con el telï¿½fono ya existe
+	// Esta pendiente convertir el nombre tienda a tienda
+	int idTienda = TiendaDAO.obteneridTienda(tienda);
+	int idMunicipio = MunicipioDAO.obteneridMunicipio(municipio);
+	// Se crea el objeto cliente con todas las características enviadas
+	Cliente clienteRevisar = new Cliente(idCliente, telefono, nombres, apellidos, nombreCompania, direccion,municipio, idMunicipio, latitud, longitud, zona,  observacion,  tienda, idTienda, memcode, idnomenclatura, numNomenclatura, numNomenclatura2, num3, "");
+	// Se inician las variables para la iniciación de la creación o la actualización
+	int idRespuestaCreacion = 0;
+	int idRespuestaActualizacion = 0;
+	int idClienteResp = 0;
+	if ((idCliente > 0) && (memcode > 0) )
+	{
+		idRespuestaActualizacion = ClienteDAO.actualizarCliente(clienteRevisar);
+	}else if((idCliente == 0 ) && (memcode == 0))
+	{
+		idRespuestaCreacion = ClienteDAO.insertarCliente(clienteRevisar);
+	}else if((idCliente > 0 ) && (memcode == 0))
+	{
+		idRespuestaActualizacion = ClienteDAO.actualizarCliente(clienteRevisar);
+	}
+		
+	if (idRespuestaActualizacion > 0)
+	{
+		idClienteResp = idRespuestaActualizacion;
+	}else
+	{
+		if (idRespuestaCreacion > 0)
+		{
+			idClienteResp = idRespuestaCreacion;
+		}
+	}
+	JSONArray listJSON = new JSONArray();
+	JSONObject Respuesta = new JSONObject();
+	Respuesta.put("idcliente", idClienteResp);
+	listJSON.add(Respuesta);
+	return(listJSON.toJSONString());
 }
 
 

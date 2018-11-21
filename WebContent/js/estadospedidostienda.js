@@ -132,7 +132,7 @@ function consultarEstadosPedido()
 							urlTienda = data2[0].urltienda;
 	                		dsnodbc = data2[0].dsnodbc;
 	                		pos = data2[0].pos;
-							
+								
 						} 
 						});
     //

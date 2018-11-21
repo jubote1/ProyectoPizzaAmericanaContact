@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import capaControlador.ParametrosCtrl;
+import capaModelo.ExcepcionPrecio;
 
 /**
  * Servlet implementation class CRUDExcepcionPrecio
@@ -57,7 +58,17 @@ public class CRUDExcepcionPrecio extends HttpServlet {
 			String incluye_liquido = request.getParameter("incluye_liquido");
 			int idtipoliquido = Integer.parseInt(request.getParameter("idtipoliquido"));
 			String habilitado = request.getParameter("habilitado");
-			respuesta = ParametrosCtrl.insertarExcepcionPrecio(idproducto, precio, descripcion, incluye_liquido, idtipoliquido,habilitado);
+			String horaInicial = request.getParameter("horainicial");
+			String horaFinal = request.getParameter("horafinal");
+			String lunes = request.getParameter("lunes");
+			String martes = request.getParameter("martes");
+			String miercoles = request.getParameter("miercoles");
+			String jueves = request.getParameter("jueves");
+			String viernes = request.getParameter("viernes");
+			String sabado = request.getParameter("sabado");
+			String domingo = request.getParameter("domingo");
+			ExcepcionPrecio Esc = new ExcepcionPrecio(0,idproducto, precio, descripcion, incluye_liquido, idtipoliquido,habilitado, horaInicial, horaFinal, lunes, martes, miercoles, jueves, viernes, sabado, domingo);
+			respuesta = ParametrosCtrl.insertarExcepcionPrecio(Esc);
 		}else if (operacion ==2)
 		{
 			int idexcedit= Integer.parseInt(request.getParameter("idexcepcion"));
@@ -67,7 +78,17 @@ public class CRUDExcepcionPrecio extends HttpServlet {
 			String incluye_liquido = request.getParameter("incluye_liquido");
 			int idtipoliquido = Integer.parseInt(request.getParameter("idtipoliquido"));
 			String habilitado = request.getParameter("habilitado");
-			respuesta = ParametrosCtrl.editarExcepcionPrecio(idexcedit, idproducto, precio, descripcion, incluye_liquido, idtipoliquido,habilitado);
+			String horaInicial = request.getParameter("horainicial");
+			String horaFinal = request.getParameter("horafinal");
+			String lunes = request.getParameter("lunes");
+			String martes = request.getParameter("martes");
+			String miercoles = request.getParameter("miercoles");
+			String jueves = request.getParameter("jueves");
+			String viernes = request.getParameter("viernes");
+			String sabado = request.getParameter("sabado");
+			String domingo = request.getParameter("domingo");
+			ExcepcionPrecio Esc = new ExcepcionPrecio(idexcedit, idproducto, precio, descripcion, incluye_liquido, idtipoliquido,habilitado, horaInicial, horaFinal, lunes, martes, miercoles, jueves, viernes, sabado, domingo);
+			respuesta = ParametrosCtrl.editarExcepcionPrecio( Esc);
 		}else if (operacion ==3 )
 		{
 			int idexceli = Integer.parseInt(request.getParameter("idexcepcion"));

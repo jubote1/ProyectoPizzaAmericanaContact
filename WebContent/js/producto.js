@@ -25,6 +25,7 @@ $(document).ready(function() {
             { "mData": "incluyeliquido" },
             { "mData": "idtipoliquido"  , "visible": false},
             { "mData": "nombreliquido" },
+            { "mData": "habilitado" },
             {
                 "mData": "accion",
                 className: "center",
@@ -266,7 +267,8 @@ function pintarProductos()
 					"preciogeneral": data1[i].preciogeneral,
 					"incluyeliquido": data1[i].incluye_liquido,
 					"idtipoliquido": data1[i].idtipo_liquido,  
-					"nombreliquido": data1[i].nombreliquido, 
+					"nombreliquido": data1[i].nombreliquido,
+					"habilitado": data1[i].habilitado, 
 					"accion":'<input type="button" class="btn btn-default btn-xs" onclick="eliminarProducto(' +data1[i].idproducto + ')" value="Eliminar"></button> <input type="button" onclick="editarProducto('+data1[i].idproducto+')" class="btn btn-default btn-xs editButton" ' + 'data-id="' + data1[i].idproducto + '" value="Edición"></button>'
 				}).draw();
 				//table.row.add(data1[i]).draw();

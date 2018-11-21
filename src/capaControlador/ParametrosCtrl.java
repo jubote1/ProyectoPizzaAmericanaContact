@@ -225,11 +225,10 @@ public class ParametrosCtrl {
 	 * @param idtipoliquido En caso de incluir líquido se recibe parámetro del tipo liquido que incluye.
 	 * @return Se retorna el id excepción creado según los parámetros enviados.
 	 */
-		public String insertarExcepcionPrecio(int idproducto, double precio, String descripcion, String incluye_liquido, int  idtipoliquido, String habilitado)
+		public String insertarExcepcionPrecio(ExcepcionPrecio exc)
 		{
 			JSONArray listJSON = new JSONArray();
-			ExcepcionPrecio Esc = new ExcepcionPrecio(0,idproducto, precio, descripcion, incluye_liquido, idtipoliquido,habilitado);
-			int idEscIns = ExcepcionPrecioDAO.insertarExcepcionPrecio(Esc);
+			int idEscIns = ExcepcionPrecioDAO.insertarExcepcionPrecio(exc);
 			JSONObject ResultadoJSON = new JSONObject();
 			ResultadoJSON.put("idexcepcion", idEscIns);
 			listJSON.add(ResultadoJSON);
@@ -255,6 +254,15 @@ public class ParametrosCtrl {
 			ResultadoJSON.put("incluye_liquido", Esc.getIncluyeliquido());
 			ResultadoJSON.put("idtipoliquido", Esc.getIdtipoliquido());
 			ResultadoJSON.put("habilitado", Esc.getHabilitado());
+			ResultadoJSON.put("horainicial", Esc.getHoraInicial());
+			ResultadoJSON.put("horafinal", Esc.getHoraFinal());
+			ResultadoJSON.put("lunes", Esc.getLunes());
+			ResultadoJSON.put("martes", Esc.getMartes());
+			ResultadoJSON.put("miercoles", Esc.getMiercoles());
+			ResultadoJSON.put("jueves", Esc.getJueves());
+			ResultadoJSON.put("viernes", Esc.getViernes());
+			ResultadoJSON.put("sabado", Esc.getSabado());
+			ResultadoJSON.put("domingo", Esc.getDomingo());
 			listJSON.add(ResultadoJSON);
 			return listJSON.toJSONString();
 		}
@@ -277,6 +285,15 @@ public class ParametrosCtrl {
 				cadaExcepcionJSON.put("incluye_liquido", Esc.getIncluyeliquido());
 				cadaExcepcionJSON.put("idtipoliquido", Esc.getIdtipoliquido());
 				cadaExcepcionJSON.put("habilitado", Esc.getHabilitado());
+				cadaExcepcionJSON.put("horainicial", Esc.getHoraInicial());
+				cadaExcepcionJSON.put("horafinal", Esc.getHoraFinal());
+				cadaExcepcionJSON.put("lunes", Esc.getLunes());
+				cadaExcepcionJSON.put("martes", Esc.getMartes());
+				cadaExcepcionJSON.put("miercoles", Esc.getMiercoles());
+				cadaExcepcionJSON.put("jueves", Esc.getJueves());
+				cadaExcepcionJSON.put("viernes", Esc.getViernes());
+				cadaExcepcionJSON.put("sabado", Esc.getSabado());
+				cadaExcepcionJSON.put("domingo", Esc.getDomingo());
 				listJSON.add(cadaExcepcionJSON);
 			}
 			return listJSON.toJSONString();
@@ -318,6 +335,16 @@ public class ParametrosCtrl {
 				cadaExcepcionJSON.put("incluye_liquido", Esc.getIncluyeliquido());
 				cadaExcepcionJSON.put("idtipoliquido", Esc.getIdtipoliquido());
 				cadaExcepcionJSON.put("nombreliquido", Esc.getNombreLiquido());
+				cadaExcepcionJSON.put("horainicial", Esc.getHoraInicial());
+				cadaExcepcionJSON.put("horafinal", Esc.getHoraFinal());
+				cadaExcepcionJSON.put("habilitado", Esc.getHabilitado());
+				cadaExcepcionJSON.put("lunes", Esc.getLunes());
+				cadaExcepcionJSON.put("martes", Esc.getMartes());
+				cadaExcepcionJSON.put("miercoles", Esc.getMiercoles());
+				cadaExcepcionJSON.put("jueves", Esc.getJueves());
+				cadaExcepcionJSON.put("viernes", Esc.getViernes());
+				cadaExcepcionJSON.put("sabado", Esc.getSabado());
+				cadaExcepcionJSON.put("domingo", Esc.getDomingo());
 				listJSON.add(cadaExcepcionJSON);
 			}
 			return listJSON.toJSONString();
@@ -330,10 +357,21 @@ public class ParametrosCtrl {
 		 */
 		public String eliminarExcepcionPrecio(int idexcepcion)
 		{
+			
 			JSONArray listJSON = new JSONArray();
-			ExcepcionPrecioDAO.eliminarExcepcionPrecio(idexcepcion);
-			JSONObject ResultadoJSON = new JSONObject();
-			ResultadoJSON.put("resultado", "exitoso");
+			JSONObject ResultadoJSON;
+			boolean tieneRegs = ExcepcionPrecioDAO.validarEliminarExcepcionPrecio(idexcepcion);
+			if(!tieneRegs)
+			{
+				ExcepcionPrecioDAO.eliminarExcepcionPrecio(idexcepcion);
+				ResultadoJSON = new JSONObject();
+				ResultadoJSON.put("resultado", "exitoso");
+			}
+			else
+			{
+				ResultadoJSON = new JSONObject();
+				ResultadoJSON.put("resultado", "error");
+			}
 			listJSON.add(ResultadoJSON);
 			return listJSON.toJSONString();
 		}
@@ -349,15 +387,13 @@ public class ParametrosCtrl {
 		 * @param idtipoliquido idtipoliquido valor a  editar
 		 * @return se retorna el resultado del proceso de la edición.
 		 */
-		public String editarExcepcionPrecio(int idexcepcion, int idproducto, double precio, String descripcion, String incluye_liquido, int idtipoliquido, String habilitado)
+		public String editarExcepcionPrecio(ExcepcionPrecio  exc)
 		{
 			JSONArray listJSON = new JSONArray();
-			ExcepcionPrecio Esc = new ExcepcionPrecio(idexcepcion, idproducto, precio, descripcion, incluye_liquido, idtipoliquido,habilitado);
-			String resultado = ExcepcionPrecioDAO.editarExcepcionPrecio(Esc);
+			String resultado = ExcepcionPrecioDAO.editarExcepcionPrecio(exc);
 			JSONObject ResultadoJSON = new JSONObject();
 			ResultadoJSON.put("resultado", resultado);
 			listJSON.add(ResultadoJSON);
-			System.out.println(listJSON.toJSONString());
 			return listJSON.toJSONString();
 		}
 		

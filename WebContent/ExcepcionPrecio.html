@@ -96,12 +96,36 @@
 							 <div class="form-group">
 							    <label for="labelHabilitado">Producto Habilitado</label>
 							    <input type='checkbox' id="checkHabilitado" placeholder="Producto Habilitado" class="form-control">
+							  <div class="form-group">
+							    <label for="labelLunes">Lunes</label>
+							    <input type='checkbox' id="checkLunes" placeholder="Aplica Lunes" class="form-control">
+							    <label for="labelMartes">Martes</label>
+							    <input type='checkbox' id="checkMartes" placeholder="Aplica Martes" class="form-control">
+							    <label for="labelMiercoles">Miercoles</label>
+							    <input type='checkbox' id="checkMiercoles" placeholder="Aplica Miercoles" class="form-control">
+							    <label for="labelJueves">Jueves</label>
+							    <input type='checkbox' id="checkJueves" placeholder="Aplica Jueves" class="form-control">
+							    <label for="labelViernes">Viernes</label>
+							    <input type='checkbox' id="checkViernes" placeholder="Aplica Viernes" class="form-control">
+							    <label for="labelSabado">Sabado</label>
+							    <input type='checkbox' id="checkSabado" placeholder="Aplica Sabado" class="form-control">
+							    <label for="labelDomingo">Domingo</label>
+							    <input type='checkbox' id="checkDomingo" placeholder="Aplica Domingo" class="form-control">
+							 </div>
+							 </div>
+							 <div class="form-group">
+							    <label for="labelProducto">Hora Inicial</label>
+							    <select id="selectHoraInicial" class="form-control"></select>
+							 </div>
+							 <div class="form-group">
+							    <label for="labelProducto">Hora Final</label>
+							    <select id="selectHoraFinal" class="form-control"></select>
 							 </div>
 							 
 				      </div>
 					      <div class="modal-footer">
 					        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-					        <button type="submit" onClick="guardarExcepcionPrecio()" class="btn btn-primary">Guardar Cambios</button>
+					        <button type="button" onClick="guardarExcepcionPrecio()" class="btn btn-primary">Guardar Cambios</button>
 					      </div>
 			      </form>
 			    </div>
@@ -160,6 +184,60 @@
          	<input type='checkbox' id="checkHabilitadoedit" placeholder="Producto Habilitado" class="form-control">
         </div>
     </div>
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Lunes</label>
+        <div class="col-xs-5">
+         	<input type='checkbox' id="checkLunesedit" placeholder="Aplica Promoción Lunes" class="form-control">
+        </div>
+    </div>
+    <div class="form-group">    
+        <label class="col-xs-3 control-label">Martes</label>
+        <div class="col-xs-5">
+         	<input type='checkbox' id="checkMartesedit" placeholder="Aplica Promoción Martes" class="form-control">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Miercoles</label>
+        <div class="col-xs-5">
+         	<input type='checkbox' id="checkMiercolesedit" placeholder="Aplica Promoción Miercoles" class="form-control">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Jueves</label>
+        <div class="col-xs-5">
+         	<input type='checkbox' id="checkJuevesedit" placeholder="Aplica Promoción Jueves" class="form-control">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Viernes</label>
+        <div class="col-xs-5">
+         	<input type='checkbox' id="checkViernesedit" placeholder="Aplica Promoción VIernes" class="form-control">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Sabado</label>
+        <div class="col-xs-5">
+         	<input type='checkbox' id="checkSabadoedit" placeholder="Aplica Promoción Sabado" class="form-control">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Domingo</label>
+        <div class="col-xs-5">
+         	<input type='checkbox' id="checkDomingoedit" placeholder="Aplica Promoción Domingo" class="form-control">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Hora Inicial</label>
+        <div class="col-xs-5">
+         	<select id="selectHoraInicialedit" class="form-control"></select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-3 control-label">Hora Final</label>
+        <div class="col-xs-5">
+         	<select id="selectHoraFinaledit" class="form-control"></select>
+        </div>
+    </div>
 
     <div class="form-group">
         <div class="col-xs-5 col-xs-offset-3">
@@ -179,6 +257,7 @@
 								                <th data-column-id="incluyeliquido">Incluye Liquido</th>
 								                <th data-column-id="idtipoliquido">Id Tipo Liquido</th>
 								                <th data-column-id="nombreliquido">Nombre Liquido</th>
+								                <th data-column-id="habilitado">Habilitado</th>
 								                <th width="120">Editar/Eliminar</th>
 								            </tr>
 								        </thead>

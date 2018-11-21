@@ -88,9 +88,9 @@ public class ActualizarCliente extends HttpServlet {
         	idnomenclatura = 0;
         }
         ClienteCtrl ClienCtrl = new ClienteCtrl();
-        int idcliente = ClienCtrl.InsertarClientePedidoEncabezado(idCliente,telefono, nombres, apellidos, nombreCompania,  direccion, municipio, latitud, longitud, zona, observacion, tienda, memcode, idnomenclatura, numNomenclatura, numNomenclatura2, num3);
+        String respuesta  = ClienCtrl.InsertarClientePedidoEncabezadoJSON(idCliente,telefono, nombres, apellidos, nombreCompania,  direccion, municipio, latitud, longitud, zona, observacion, tienda, memcode, idnomenclatura, numNomenclatura, numNomenclatura2, num3);
         PrintWriter out = response.getWriter();
-		out.write(idcliente);
+        out.write(respuesta);
 	}
 
 	/**

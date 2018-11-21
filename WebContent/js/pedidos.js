@@ -36,7 +36,7 @@ var cantidadIngredientes = 0;
 var excepcionSeleccionada = null;
 var gaseosaHomologadaTienda;
 var formas;
-
+var idOfertaCliente;
 
 // A continuación  la ejecucion luego de cargada la pagina
 $(document).ready(function() {
@@ -264,6 +264,35 @@ $("#fechapedido").change(function(){
         getProductosTienda(idtien);
         memcode = datos.memcode;
         idCliente = datos.idCliente;
+        //Validaremos si el cliente seleccionado tiene ofertas vigentes
+        $.getJSON(server + 'CRUDOfertaCliente?idoperacion=6&idcliente=' + idCliente, function(data1){
+        	if(data1.length > 0)
+        	{
+        		var mensajeOferta = "<br>";
+        		var obs = "";
+        		for(var i = 0; i < data1.length;i++){
+        			obs = data1[i].observacion;
+        			if(obs == null || obs == 'null')
+        			{
+        				obs = "";
+        			}
+        			mensajeOferta += data1[i].nombreoferta + "(" + obs + ")" + "<br>";
+        		}
+        			$.confirm(
+        			{
+							'title'		: 'El cliente tiene ofertas pendientes',
+							'content'	: 'El cliente tiene varias ofertas pendientes: ' + mensajeOferta + '.',
+							'buttons'	: {
+								'Enterado'	: {
+									'class'	: 'blue',
+									'action': function()
+									{
+									}
+								}
+							}
+					});
+        	}
+        });
         var municipio = datos.municipio;
         //Traemos los valores de la latitud y longitud 
         var latCliente = datos.latitud;
@@ -303,6 +332,7 @@ $("#fechapedido").change(function(){
 
      } );
 
+
     $("#selectTiendas").change(function(){
     	//Este podría ser el punto transversal donde intervenidos para validar si la tienda está bbloqueada
     	var idtien = $("#selectTiendas option:selected").attr('id');
@@ -318,6 +348,98 @@ $("#fechapedido").change(function(){
     	}
         getProductosTienda(idtien);
     });
+
+    //Se define acción al momento de seleccionar la excepción de precio para validar que maneje o no hora de promoción
+    $("#selectExcepcion").change(function(){
+    	var idExc = $("#selectExcepcion option:selected").val();
+    	var fueraHora = false;
+    	for(var i = 0; i < excepciones.length;i++)
+    	{
+    		var cadaExc = excepciones[i];
+    		if(cadaExc.idexcepcion == idExc)
+    		{
+    			//Realizamos validación de días
+    				//Recuperamos la fecha actual
+    				var fechaActual = new Date();
+    				//Definimos arreglos con los días de la semana
+    				var diasSemana = new Array("domingo","lunes","martes","miercoles","jueves","viernes","sabado");
+    				//Realizamos la validacion primero que todo del diá de la promoción
+    				var diaSemana = diasSemana[fechaActual.getDay()];
+    				if((diaSemana == "domingo")&&(cadaExc.domingo == "N"))
+    				{
+    					fueraHora = true;
+    					break;
+    				}else if((diaSemana == "lunes")&&(cadaExc.lunes == "N"))
+    				{
+    					fueraHora = true;
+    					break;
+    				}else if((diaSemana == "martes")&&(cadaExc.martes == "N"))
+    				{
+    					fueraHora = true;
+    					break;
+    				}else if((diaSemana == "miercoles")&&(cadaExc.miercoles == "N"))
+    				{
+    					fueraHora = true;
+    					break;
+    				}else if((diaSemana == "jueves")&&(cadaExc.jueves == "N"))
+    				{
+    					fueraHora = true;
+    					break;
+    				}else if((diaSemana == "viernes")&&(cadaExc.viernes == "N"))
+    				{
+    					fueraHora = true;
+    					break;
+    				}else if((diaSemana == "sabado")&&(cadaExc.sabado == "N"))
+    				{
+    					fueraHora = true;
+    					break;
+    				}    			
+    			//Realizmos validación de horas
+    			if((cadaExc.horafinal == null) && (cadaExc.horaInicial ==  null))
+    			{
+
+    			}else
+    			{
+
+    				//Tomamos la hora de promocion
+    				var horIniPromo = parseInt(cadaExc.horainicial.substring(0,2));
+    				var minIniPromo = parseInt(cadaExc.horainicial.substring(3,5));
+    				var horFinPromo = parseInt(cadaExc.horafinal.substring(0,2));
+    				var minFinPromo = parseInt(cadaExc.horafinal.substring(3,5));
+    				var horaAct = fechaActual.getHours();
+    				var minAct = fechaActual.getMinutes();
+    				if((horaAct < horIniPromo) || (horaAct > horFinPromo))
+    				{
+    					fueraHora = true;
+    					break;
+    				}
+    				if (horaAct == horIniPromo)
+    				{
+    					if(minAct < minIniPromo)
+    					{
+    						fueraHora = true;
+    						break;
+    					}
+    				}
+    				if (horaAct == horFinPromo)
+    				{
+    					if(minAct > minFinPromo)
+    					{
+    						fueraHora = true;
+    						break;
+    					}
+    				}
+    			}
+    		}
+    	}
+    	if(fueraHora)
+    	{
+    		//Alertamos de la situación de la promoción
+    		$.alert('La promoción seleccionada está fuera de horario o de día de la semana.');
+    		// Limpiamos la selección de la promoción
+    		$("#selectExcepcion").val("vacio");
+    	}
+    }); 
 
     //Incluimos acción para el cambio la forma de pago
     $("#selectformapago").change(function(){
