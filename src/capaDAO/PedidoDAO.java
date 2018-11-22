@@ -1848,7 +1848,10 @@ public class PedidoDAO {
 		return(gaseosaHomologada);
 	}
 	
-	
+	/**
+	 * Método que se encarga de retornar las gaseosas como producto homologada para cada tienda
+	 * @return
+	 */
 	public static ArrayList<HomologaGaseosaIncluida> obtenerHomologacionProductoGaseosa()
 	{
 		Logger logger = Logger.getLogger("log_file");
