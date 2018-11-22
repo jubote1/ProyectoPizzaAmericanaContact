@@ -1848,6 +1848,42 @@ public class PedidoDAO {
 		return(gaseosaHomologada);
 	}
 	
+	
+	public static ArrayList<HomologaGaseosaIncluida> obtenerHomologacionProductoGaseosa()
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		ArrayList<HomologaGaseosaIncluida> gaseosaHomologada = new ArrayList();
+		try
+		{
+			Statement stm = con1.createStatement();
+			String consulta = "select a.idtienda, a.idproductoint  "
+					+ "from homologacion_producto a, producto b where a.idproductoint = b.idproducto and b.tipo = 'GASEOSA'  " ;
+			logger.info(consulta);
+			ResultSet rs = stm.executeQuery(consulta);
+			int idtienda;
+			int idProducto;
+			while(rs.next()){
+				idtienda = rs.getInt("idtienda");
+				idProducto = rs.getInt("idproductoint");
+				gaseosaHomologada.add(new HomologaGaseosaIncluida(idtienda, idProducto));
+			}
+			rs.close();
+			stm.close();
+			con1.close();
+		}catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+		}
+		return(gaseosaHomologada);
+	}
+	
 	//Método que buscará traer los últimos pedidos de un cliente.
 	public static ArrayList<Pedido> ConsultaUltimosPedidosCliente(int idCliente)
 	{

@@ -135,6 +135,24 @@ public class PedidoCtrl {
 	}
 	
 	/**
+	 * Método que se encarga de retornar las gaseosas como producto homologada para cada tienda
+	 * @return
+	 */
+	public String obtenerHomologacionProductoGaseosa()
+	{
+		JSONArray listJSON = new JSONArray();
+		ArrayList<HomologaGaseosaIncluida> gaseosaHomologada = PedidoDAO.obtenerHomologacionProductoGaseosa();
+		for (HomologaGaseosaIncluida homologa : gaseosaHomologada) {
+			JSONObject cadaGaseosaJSON = new JSONObject();
+			cadaGaseosaJSON.put("idtienda", homologa.getIdtienda());
+			cadaGaseosaJSON.put("idproducto", homologa.getIdsabortipoliquido());
+			listJSON.add(cadaGaseosaJSON);
+		}
+		
+		return listJSON.toJSONString();
+	}
+	
+	/**
 	 * Método en la capa controladora que se encarga de invocar a la capa DAO y obtener todos los productos incluidos
 	 * posteriormente los formatea en el JSON y se los envía al servicio para ser retornados
 	 * @return Retorna un String en formato JSON con los productos incluidos parametrizados en el sistema.
