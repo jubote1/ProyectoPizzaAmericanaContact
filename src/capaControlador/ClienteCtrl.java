@@ -24,6 +24,7 @@ public class ClienteCtrl {
 	 * las incripciones del cliente que corresponden al número telefónico entregado como parámetro.
 	 * @return un valor String en formato json con el arreglo de inscripciones en la tabla cliente que responden al teléfono
 	 * enviado como parámetro
+	 * NOTA: En la capa DAO validamos el estado del  cliente.
 	 */
 	public String obtenerCliente(String tel){
 		JSONArray listJSON = new JSONArray();
@@ -55,6 +56,79 @@ public class ClienteCtrl {
 		//System.out.println(temp);
 		//System.out.println(listJSON.toJSONString());
 		return listJSON.toJSONString();
+	}
+	
+	/**
+	 * 
+	 * @param tel recibe el valor del teléfono para buscar al cliente en la base de datos y devolver en una estructura json
+	 * las incripciones del cliente que corresponden al número telefónico entregado como parámetro.
+	 * @return un valor String en formato json con el arreglo de inscripciones en la tabla cliente que responden al teléfono
+	 * enviado como parámetro
+	 * NOTA: En la capa DAO no para este en específico validamos el estado del  cliente.
+	 */
+	public String obtenerClienteTodos(String tel){
+		JSONArray listJSON = new JSONArray();
+		ArrayList<Cliente> clientes = ClienteDAO.obtenerClienteTodos(tel);
+		for (Cliente cliente : clientes) {
+			JSONObject cadaViajeJSON = new JSONObject();
+			cadaViajeJSON.put("idCliente", cliente.getIdcliente());
+			cadaViajeJSON.put("tienda", cliente.getTienda());
+			cadaViajeJSON.put("nombre", cliente.getNombres());
+			cadaViajeJSON.put("apellido", cliente.getApellidos());
+			cadaViajeJSON.put("nombrecompania", cliente.getNombreCompania());
+			cadaViajeJSON.put("direccion", cliente.getDireccion());
+			cadaViajeJSON.put("zona", cliente.getZonaDireccion());
+			cadaViajeJSON.put("observacion", cliente.getObservacion());
+			cadaViajeJSON.put("telefono", cliente.getTelefono());
+			cadaViajeJSON.put("municipio", cliente.getMunicipio());
+			cadaViajeJSON.put("longitud", cliente.getLontitud());
+			cadaViajeJSON.put("latitud", cliente.getLatitud());
+			cadaViajeJSON.put("memcode", cliente.getMemcode());
+			cadaViajeJSON.put("idnomenclatura", cliente.getIdnomenclatura());
+			cadaViajeJSON.put("numnomenclatura1", cliente.getNumNomenclatura());
+			cadaViajeJSON.put("numnomenclatura2", cliente.getNumNomenclatura2());
+			cadaViajeJSON.put("num3", cliente.getNum3());
+			cadaViajeJSON.put("nomenclatura", cliente.getNomenclatura());
+			cadaViajeJSON.put("estado", cliente.getEstado());
+			listJSON.add(cadaViajeJSON);
+		}
+		//String temp = listJSON.toJSONString();
+		//temp = temp.substring(0,1) + "\"cliente\":[" + temp.substring(1, temp.length()-1) + "]]";
+		//System.out.println(temp);
+		//System.out.println(listJSON.toJSONString());
+		return listJSON.toJSONString();
+	}
+	
+	public String inactivarCliente(int idCliente)
+	{
+		JSONArray listJSON = new JSONArray();
+		boolean respuesta = ClienteDAO.inactivarCliente(idCliente);
+		JSONObject Respuesta = new JSONObject();
+		if(respuesta)
+		{
+			Respuesta.put("resultado", "EXITOSO");
+		}else
+		{
+			Respuesta.put("resultado", "ERROR");
+		}
+		listJSON.add(Respuesta);
+		return(listJSON.toString());
+	}
+	
+	public String activarCliente(int idCliente)
+	{
+		JSONArray listJSON = new JSONArray();
+		boolean respuesta = ClienteDAO.activarCliente(idCliente);
+		JSONObject Respuesta = new JSONObject();
+		if(respuesta)
+		{
+			Respuesta.put("resultado", "EXITOSO");
+		}else
+		{
+			Respuesta.put("resultado", "ERROR");
+		}
+		listJSON.add(Respuesta);
+		return(listJSON.toString());
 	}
 	
 /**

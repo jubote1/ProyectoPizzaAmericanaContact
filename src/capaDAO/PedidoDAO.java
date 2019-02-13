@@ -1412,7 +1412,7 @@ public class PedidoDAO {
 	{
 		Logger logger = Logger.getLogger("log_file");
 		ArrayList <DetallePedido> consultaDetallePedidos = new ArrayList();
-		String consulta = "select a.iddetalle_pedido, a.idproducto, b.nombre, a.cantidad, a.idespecialidad1, a.idespecialidad2, concat(c.nombre , a.modespecialidad1) especialidad1, concat(d.nombre , a.modespecialidad2) especialidad2, "
+		String consulta = "select a.iddetalle_pedido, a.idproducto, b.nombre, a.cantidad, a.idespecialidad1, a.idespecialidad2, concat(c.nombre , a.modespecialidad1) especialidad1, concat(d.nombre , a.modespecialidad2) especialidad2, a.modespecialidad1, a.modespecialidad2, "
 				+ "a.valorUnitario, a.valorTotal, a.adicion, a.observacion, e.descripcion liquido , f.descripcion excepcion, a.idexcepcion, a.idsabortipoliquido  from detalle_pedido a left outer join especialidad "
 				+ "c on a.idespecialidad1 = c.idespecialidad left outer join especialidad d on a.idespecialidad2 = d.idespecialidad"
 				+ " left outer join sabor_x_tipo_liquido e on a.idsabortipoliquido = e.idsabor_x_tipo_liquido "
@@ -1430,8 +1430,10 @@ public class PedidoDAO {
 			String nombreproducto;
 			double cantidad;
 			String especialidad1;
+			String modEspecialidad1;
 			int idespecialidad1;
 			String especialidad2;
+			String modEspecialidad2;
 			int idespecialidad2;
 			double valorunitario;
 			double valortotal;
@@ -1459,7 +1461,11 @@ public class PedidoDAO {
 				excepcion = rs.getString("excepcion");
 				idexcepcion = rs.getInt("idexcepcion");
 				idsabortipoliquido = rs.getInt("idsabortipoliquido");
+				modEspecialidad1 = rs.getString("modespecialidad1");
+				modEspecialidad2 = rs.getString("modespecialidad2");
 				DetallePedido cadaDetallePedido = new DetallePedido(iddetallepedido, nombreproducto, idproducto, cantidad,especialidad1, idespecialidad1, especialidad2, idespecialidad2,valorunitario, valortotal,adicion,observacion,liquido, excepcion, numeropedido, idexcepcion, idsabortipoliquido,"");
+				cadaDetallePedido.setModespecialidad1(modEspecialidad1);
+				cadaDetallePedido.setModespecialidad2(modEspecialidad2);
 				consultaDetallePedidos.add(cadaDetallePedido);
 			}
 			rs.close();
@@ -1852,7 +1858,7 @@ public class PedidoDAO {
 	 * Método que se encarga de retornar las gaseosas como producto homologada para cada tienda
 	 * @return
 	 */
-	public static ArrayList<HomologaGaseosaIncluida> obtenerHomologacionProductoGaseosa()
+	public static ArrayList<HomologaGaseosaIncluida> obtenerHomologacionProductoGaseosa(int idTienda)
 	{
 		Logger logger = Logger.getLogger("log_file");
 		ConexionBaseDatos con = new ConexionBaseDatos();
@@ -1861,16 +1867,23 @@ public class PedidoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select a.idtienda, a.idproductoint  "
-					+ "from homologacion_producto a, producto b where a.idproductoint = b.idproducto and b.tipo = 'GASEOSA'  " ;
+			String consulta = "select a.idtienda, a.idproductoint, b.nombre, b.preciogeneral  "
+					+ "from homologacion_producto a, producto b where a.idproductoint = b.idproducto and b.tipo = 'GASEOSA' and a.idtienda = " + idTienda + " and b.idproducto not in (select idproducto from producto_no_existente where idtienda = " + idTienda +  ")";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idtienda;
 			int idProducto;
+			String nombre;
+			double precioGeneral;
 			while(rs.next()){
 				idtienda = rs.getInt("idtienda");
 				idProducto = rs.getInt("idproductoint");
-				gaseosaHomologada.add(new HomologaGaseosaIncluida(idtienda, idProducto));
+				nombre = rs.getString("nombre");
+				precioGeneral = Double.parseDouble(rs.getString("preciogeneral"));
+				HomologaGaseosaIncluida homGas = new HomologaGaseosaIncluida(idtienda, idProducto);
+				homGas.setNombre(nombre);
+				homGas.setPrecioGeneral(precioGeneral);
+				gaseosaHomologada.add(homGas);
 			}
 			rs.close();
 			stm.close();

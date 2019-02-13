@@ -12,12 +12,14 @@ import capaDAO.PedidoDAO;
 import capaDAO.ProductoDAO;
 import capaDAO.TiendaDAO;
 import capaDAO.ExcepcionPrecioDAO;
+import capaDAO.MarcacionPedidoDAO;
 import capaModelo.Especialidad;
 import capaModelo.Producto;
 import capaModelo.ExcepcionPrecio;
 import capaModelo.FormaPago;
 import capaModelo.HomologaGaseosaIncluida;
 import capaModelo.InsertarPedidoPixel;
+import capaModelo.MarcacionPedido;
 import capaModelo.SaborLiquido;
 import capaModelo.Tienda;
 import capaModelo.DetallePedido;
@@ -71,6 +73,17 @@ public class PedidoCtrl {
 		{
 			PedidoDAO.actualizarClienteMemcode(idcliente, membercode);
 		}
+		return(listJSON.toJSONString());
+		
+	}
+	
+	public String actualizarMemcode(int membercode, int idcliente)
+	{
+		JSONArray listJSON = new JSONArray();
+		JSONObject Respuesta = new JSONObject();
+		PedidoDAO.actualizarClienteMemcode(idcliente, membercode);
+		Respuesta.put("resultado", "OK");
+		listJSON.add(Respuesta);
 		return(listJSON.toJSONString());
 		
 	}
@@ -138,14 +151,16 @@ public class PedidoCtrl {
 	 * Método que se encarga de retornar las gaseosas como producto homologada para cada tienda
 	 * @return
 	 */
-	public String obtenerHomologacionProductoGaseosa()
+	public String obtenerHomologacionProductoGaseosa(int idtienda)
 	{
 		JSONArray listJSON = new JSONArray();
-		ArrayList<HomologaGaseosaIncluida> gaseosaHomologada = PedidoDAO.obtenerHomologacionProductoGaseosa();
+		ArrayList<HomologaGaseosaIncluida> gaseosaHomologada = PedidoDAO.obtenerHomologacionProductoGaseosa(idtienda);
 		for (HomologaGaseosaIncluida homologa : gaseosaHomologada) {
 			JSONObject cadaGaseosaJSON = new JSONObject();
 			cadaGaseosaJSON.put("idtienda", homologa.getIdtienda());
 			cadaGaseosaJSON.put("idproducto", homologa.getIdsabortipoliquido());
+			cadaGaseosaJSON.put("nombre", homologa.getNombre());
+			cadaGaseosaJSON.put("preciogeneral", homologa.getPrecioGeneral());
 			listJSON.add(cadaGaseosaJSON);
 		}
 		
@@ -235,6 +250,15 @@ public class PedidoCtrl {
 		int idmodificador = PedidoDAO.InsertarModificadorDetallePedido(modDetPedido);
 		JSONObject Respuesta = new JSONObject();
 		Respuesta.put("idmodificador", idmodificador);
+		listJSON.add(Respuesta);
+		return(listJSON.toJSONString());
+	}
+	
+	public String InsertarMarcacionPedido(MarcacionPedido marPedido){
+		MarcacionPedidoDAO.InsertarMarcacionPedido(marPedido);
+		JSONArray listJSON = new JSONArray();
+		JSONObject Respuesta = new JSONObject();
+		Respuesta.put("resultado", "OK");
 		listJSON.add(Respuesta);
 		return(listJSON.toJSONString());
 	}
@@ -376,7 +400,7 @@ public class PedidoCtrl {
 				
 				respuesta.put("idproductoext" + contador, detPed.getIdproductoext() );
 				respuesta.put("cantidad" + contador, detPed.getCantidad());
-				System.out.println("idproductoext " + detPed.getIdproductoext() + " cantidad " + detPed.getCantidad() );
+				//System.out.println("idproductoext " + detPed.getIdproductoext() + " cantidad " + detPed.getCantidad() );
 				contador++;
 				
 			}
@@ -665,7 +689,9 @@ public class PedidoCtrl {
 			cadaDetallePedidoJSON.put("nombreproducto", cadaDetallePedido.getNombreproducto());
 			cadaDetallePedidoJSON.put("cantidad", cadaDetallePedido.getCantidad());
 			cadaDetallePedidoJSON.put("especialidad1", cadaDetallePedido.getNombreespecialidad1());
+			cadaDetallePedidoJSON.put("modespecialidad1", cadaDetallePedido.getModespecialidad1());
 			cadaDetallePedidoJSON.put("especialidad2",cadaDetallePedido.getNombreespecialidad2());
+			cadaDetallePedidoJSON.put("modespecialidad2", cadaDetallePedido.getModespecialidad2());
 			cadaDetallePedidoJSON.put("valorunitario", cadaDetallePedido.getValorunitario());
 			cadaDetallePedidoJSON.put("valortotal", cadaDetallePedido.getValortotal());
 			cadaDetallePedidoJSON.put("adicion", cadaDetallePedido.getAdicion());

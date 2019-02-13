@@ -30,7 +30,7 @@ public class ClienteDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select a.idcliente, b.nombre nombreTienda, a.idtienda, a.nombre, a.apellido, a.nombrecompania, a.direccion, a.zona, a.observacion, a.telefono, c.nombre nombremunicipio, a.latitud, a.longitud, a.memcode, a.idnomenclatura, a.num_nomencla1, a.num_nomencla2, a.num3, d.nomenclatura from cliente a,tienda b, municipio c, nomenclatura_direccion d where a.idnomenclatura = d.idnomenclatura and a.idtienda = b.idtienda and a.idmunicipio = c.idmunicipio and a.telefono = '" + tel +"'";
+			String consulta = "select a.idcliente, b.nombre nombreTienda, a.idtienda, a.nombre, a.apellido, a.nombrecompania, a.direccion, a.zona, a.observacion, a.telefono, c.nombre nombremunicipio, a.latitud, a.longitud, a.memcode, a.idnomenclatura, a.num_nomencla1, a.num_nomencla2, a.num3, d.nomenclatura from cliente a,tienda b, municipio c, nomenclatura_direccion d where a.idnomenclatura = d.idnomenclatura and a.idtienda = b.idtienda and a.idmunicipio = c.idmunicipio and a.telefono = '" + tel +"' and activo = 1";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idcliente;
@@ -73,6 +73,86 @@ public class ClienteDAO {
 				num3 = rs.getString("num3");
 				nomenclatura = rs.getString("nomenclatura");
 				Cliente clien = new Cliente( idcliente, telefono, nombreCliente,apellido, nombreCompania, direccion,municipio,latitud, longitud, zona, observacion, nombreTienda, idTienda, memcode,idnomenclatura, numNomenclatura1, numNomenclatura2, num3, nomenclatura);
+				clientes.add(clien);
+			}
+			rs.close();
+			stm.close();
+			con1.close();
+		}catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+		}
+		return(clientes);
+		
+	}
+	
+	
+	/**
+	 * 
+	 * @param tel Dado el telefóno de un cliente se encarga de retornar en un array list de objetos tipo liente
+	 * la información de los registros que coincidente con dicho teléfono.
+	 * @return ArrayList de tipo cliente con la información de clientes que coinciden con el teléfono dado.
+	 */
+	public static ArrayList<Cliente> obtenerClienteTodos(String tel)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ArrayList<Cliente> clientes = new ArrayList();
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		try
+		{
+			Statement stm = con1.createStatement();
+			String consulta = "select a.idcliente, b.nombre nombreTienda, a.idtienda, a.nombre, a.apellido, a.nombrecompania, a.direccion, a.zona, a.observacion, a.telefono, c.nombre nombremunicipio, a.latitud, a.longitud, a.memcode, a.idnomenclatura, a.num_nomencla1, a.num_nomencla2, a.num3, d.nomenclatura, a.activo from cliente a,tienda b, municipio c, nomenclatura_direccion d where a.idnomenclatura = d.idnomenclatura and a.idtienda = b.idtienda and a.idmunicipio = c.idmunicipio and a.telefono = '" + tel +"'";
+			logger.info(consulta);
+			ResultSet rs = stm.executeQuery(consulta);
+			int idcliente;
+			String nombreTienda;
+			String nombreCliente;
+			String apellido;
+			String nombreCompania;
+			String direccion;
+			String zona;
+			String observacion;
+			String telefono;
+			String municipio;
+			float latitud;
+			float longitud;
+			int idTienda;
+			int memcode;
+			int idnomenclatura;
+			String numNomenclatura1;
+			String numNomenclatura2;
+			String num3;
+			String nomenclatura;
+			int estado;
+			while(rs.next()){
+				idcliente = rs.getInt("idcliente");
+				nombreTienda = rs.getString("nombreTienda");
+				nombreCliente = rs.getString("nombre");
+				apellido = rs.getString("apellido");
+				nombreCompania = rs.getString("nombrecompania");
+				direccion = rs.getString("direccion");
+				zona = rs.getString("zona");
+				observacion = rs.getString("observacion");
+				telefono = rs.getString("telefono");
+				municipio = rs.getString("nombremunicipio");
+				latitud = rs.getFloat("latitud");
+				longitud = rs.getFloat("longitud");
+				idTienda = rs.getInt("idtienda");
+				memcode = rs.getInt("memcode");
+				idnomenclatura = rs.getInt("idnomenclatura");
+				numNomenclatura1 = rs.getString("num_nomencla1");
+				numNomenclatura2 = rs.getString("num_nomencla2");
+				num3 = rs.getString("num3");
+				nomenclatura = rs.getString("nomenclatura");
+				estado = rs.getInt("activo");
+				Cliente clien = new Cliente( idcliente, telefono, nombreCliente,apellido, nombreCompania, direccion,municipio,latitud, longitud, zona, observacion, nombreTienda, idTienda, memcode,idnomenclatura, numNomenclatura1, numNomenclatura2, num3, nomenclatura);
+				clien.setEstado(estado);
 				clientes.add(clien);
 			}
 			rs.close();
@@ -390,6 +470,73 @@ public class ClienteDAO {
 			
 		}
 		
+	}
+	
+	
+	/**
+	 * Método en la capa DAO que se encarga de inactivar un cliente en caso de así se requiera
+	 * @param idCliente se recibe como parámetro el id del cliente, el cual es el identificador único.
+	 * @return Se retorna un valor boolean que indica si el proceso fue o no exitoso.
+	 */
+	public static boolean inactivarCliente(int idCliente)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		try
+		{
+			//Para actualizar el cliente el idcliente debe ser diferente de vacï¿½o.
+			Statement stm = con1.createStatement();
+			String update = "update cliente set activo = 0  where idcliente = " + idCliente; 
+			logger.info(update);
+			stm.executeUpdate(update);
+			stm.close();
+			con1.close();
+		}
+		catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+			return(false);
+		}
+		return(true);
+	}
+	
+	/**
+	 * Método en la capa DAO que se encarga de activar un cliente en caso de así se requiera
+	 * @param idCliente se recibe como parámetro el id del cliente, el cual es el identificador único.
+	 * @return Se retorna un valor boolean que indica si el proceso fue o no exitoso.
+	 */
+	public static boolean activarCliente(int idCliente)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		try
+		{
+			//Para actualizar el cliente el idcliente debe ser diferente de vacï¿½o.
+			Statement stm = con1.createStatement();
+			String update = "update cliente set activo = 1  where idcliente = " + idCliente; 
+			logger.info(update);
+			stm.executeUpdate(update);
+			stm.close();
+			con1.close();
+		}
+		catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+			return(false);
+		}
+		return(true);
 	}
 
 }

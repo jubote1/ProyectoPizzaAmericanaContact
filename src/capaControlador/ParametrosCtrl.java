@@ -17,6 +17,7 @@ import capaDAO.SaborTipoLiquidoDAO;
 import capaDAO.TiendaDAO;
 import capaDAO.TipoLiquidoDAO;
 import capaDAO.GeneralDAO;
+import capaDAO.MarcacionDAO;
 import capaDAO.TiempoPedidoDAO;
 import capaModelo.Correo;
 import capaModelo.DireccionFueraZona;
@@ -32,6 +33,7 @@ import capaModelo.TiempoPedido;
 import capaModelo.Tienda;
 import capaModelo.Municipio;
 import capaModelo.FormaPago;
+import capaModelo.Marcacion;
 /**
  * 
  * @author Juan David Botero Duque
@@ -313,6 +315,19 @@ public class ParametrosCtrl {
 				cadaTipoLiquidoJSON.put("nombre", tipliq.getNombre());
 				cadaTipoLiquidoJSON.put("capacidad", tipliq.getCapacidad());
 				listJSON.add(cadaTipoLiquidoJSON);
+			}
+			return listJSON.toJSONString();
+		}
+		
+		public String obtenerMarcaciones(){
+			JSONArray listJSON = new JSONArray();
+			ArrayList<Marcacion> marcaciones = MarcacionDAO.obtenerMarcaciones();
+			for (Marcacion mar : marcaciones) 
+			{
+				JSONObject cadaMarcacionJSON = new JSONObject();
+				cadaMarcacionJSON.put("idmarcacion", mar.getIdMarcacion());
+				cadaMarcacionJSON.put("nombremarcacion", mar.getNombreMarcacion());
+				listJSON.add(cadaMarcacionJSON);
 			}
 			return listJSON.toJSONString();
 		}

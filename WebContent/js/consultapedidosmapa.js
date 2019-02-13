@@ -182,7 +182,7 @@ function ubicarDireccionesPedidos()
 					    mapTypeId: google.maps.MapTypeId.ROADMAP
 					});
 					var ctaLayer = new google.maps.KmlLayer({
-				        url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/PizzaAmericana-ZonasDeRepartoTotales-Ver_02.kml',
+				        url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/PizzaAmericana-ZonasDeRepartoTotales-Ver_03.kml',
 				        map: map,
 				        scrollwheel: false,
 				        zoom: 17

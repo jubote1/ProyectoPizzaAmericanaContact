@@ -129,7 +129,7 @@ public class ConexionBaseDatos {
 		} catch (Exception ex) {
 
 		    // Mantener el control sobre el tipo de error
-		    System.out.println("SQLException: " + ex.getMessage());
+		    System.out.println("SQLException: " + ex.toString());
 
 		}
 		return(con); 

@@ -562,6 +562,40 @@ public class PedidoPOSPMDAO {
 		return(idProductoExt);
 	}
 	
+	public static String RetornarPrecioProductoMaestroExterno(int idproductoint, int idexcepcion, int idtienda)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		String precio = "";
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		try
+		{
+			Statement stm = con1.createStatement();
+			String consulta = "select precio from homologacion_producto where idproductoint = " + idproductoint + " and  idexcepcion = " + idexcepcion + " and idtienda =" + idtienda + " and idespecialidadint = 0" ; 
+			logger.info(consulta);
+			ResultSet rs = stm.executeQuery(consulta);
+			while(rs.next()){
+				precio = rs.getString("precio");
+				break;
+			}
+	        rs.close();
+			stm.close();
+			con1.close();
+		}
+		catch (Exception e){
+			logger.error(e.toString());
+			System.out.println(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+			return("");
+		}
+		return(precio);
+	}
+	
 	public static int RetornarIdprodGaseosaPromo(int idsabortipoliquidoint, int idtienda)
 	{
 		Logger logger = Logger.getLogger("log_file");

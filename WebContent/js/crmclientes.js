@@ -60,9 +60,21 @@ $(document).ready(function()
             { "mData": "zona" },
             { "mData": "observacion" },
             { "mData": "telefono" },
+            { "mData": "estado" },
+            { "mData": "municipio" , "visible": false },
             { "mData": "latitud" , "visible": false },
             { "mData": "longitud" , "visible": false },
-            { "mData": "memcode"  , "visible": false }
+            { "mData": "memcode"  , "visible": false },
+            { "mData": "idnomenclatura"  , "visible": false },
+            { "mData": "numnomenclatura1"  , "visible": false },
+            { "mData": "numnomenclatura2"  , "visible": false },
+            { "mData": "num3"  , "visible": false },
+            { "mData": "nomenclatura"  , "visible": false },
+            {
+                "mData": "accion",
+                className: "center",
+                defaultContent: '<input type="button" class="btn btn-default btn-xs" onclick="inactivarCliente()" value="Inactivar"></button>'
+            }
         ]
     	} );
 
@@ -232,11 +244,42 @@ function validarTelefono(){
     	table = $('#grid-clientes').DataTable();
     }
 	
-	$.getJSON(server + 'GetCliente?telefono=' + telefono.value, function(data1){
+	$.getJSON(server + 'GetClienteTodos?telefono=' + telefono.value, function(data1){
 			table.clear().draw();
 			for(var i = 0; i < data1.length;i++){
 				var cadaCliente  = data1[i];
-				table.row.add(data1[i]).draw();
+				//table.row.add(data1[i]).draw();
+                var estado;
+                if(data1[i].estado == 0)
+                {
+                    estado = "INACTIVO";
+                }else{
+                    estado = "ACTIVO";
+                }
+                table.row.add({
+                    "idCliente": data1[i].idCliente, 
+                    "tienda": data1[i].tienda,
+                    "nombre": data1[i].nombre,
+                    "apellido": data1[i].apellido, 
+                    "nombrecompania": data1[i].nombrecompania,
+                    "direccion": data1[i].direccion, 
+                    "zona": data1[i].zona,
+                    "observacion": data1[i].observacion,
+                    "telefono": data1[i].telefono,
+                    "estado": estado,
+                    "municipio": data1[i].municipio,    
+                    "latitud": data1[i].latitud, 
+                    "longitud": data1[i].longitud,
+                    "memcode": data1[i].memcode, 
+                    "idnomenclatura": data1[i].idnomenclatura,  
+                    "numnomenclatura1": data1[i].numnomenclatura1,  
+                    "numnomenclatura2": data1[i].numnomenclatura2,  
+                    "num3": data1[i].num3,  
+                    "nomenclatura": data1[i].nomenclatura,   
+                    "accion":'<input type="button" class="btn btn-default btn-xs" onclick="inactivarCliente(' +data1[i].idCliente + ')" value="Inactivar"></button> <input type="button" onclick="activarCliente('+data1[i].idCliente+')" class="btn btn-default btn-xs editButton" ' + 'data-id="' + data1[i].idCliente + '" value="Activar"></button>'
+                }).draw();
+
+
 			}
 		});
 		
@@ -298,9 +341,16 @@ function getListaMunicipios(){
 
 function actualizarCliente()
 {
+    var valida = ValidacionesDatos();
+    if (!valida)
+    {
+        return;
+    }
 	var tempTienda =  $("#selectTiendas option:selected").val();
     //Variable en la que alojamos el id de la tienda
+    var telef = telefono.value;
     var tienda = $("#selectTiendas option:selected").attr('id');
+    var idMunicipio = $("#selectMunicipio option:selected").attr('id');
     var tempMunicipio = $("#selectMunicipio option:selected").val();
     var idClienteTemporal;
     var nombresEncode = encodeURIComponent(nombres.value);
@@ -345,7 +395,7 @@ function actualizarCliente()
                                 async: false, 
                                 success: function(data){ 
                                     idClienteTemporal = data[0].idcliente;
-                                    console.log("CLIENTE CREADO ACTUALIZADO " + idClienteTemporal);
+                                    console.log("CLIENTE/CREADO ACTUALIZADO " + idClienteTemporal);
                                     var urlTienda;
                                     var pos;
                                     var dsnodbc;
@@ -361,18 +411,19 @@ function actualizarCliente()
                                         } 
                                     });
                                     //Se consume el servicio de la tienda para la actualización creación del cliente
-                                    $.getJSON(urlTienda + 'ActualizarCliente?telefono=' + telefono.value + "&nombres=" + nombresEncode + "&apellidos=" + apellidosEncode + "&nombreCompania=" + nombreCompaniaEncode +  "&direccion="  + direccionEncode  + "&tienda=" + tempTienda +  "&zona=" + zonaEncode + "&observacion=" + observacionDirEncode + "&municipio=" + tempMunicipio + "&longitud=" + longitud + "&latitud=" + latitud + "&memcode=" + memcode + "&idcliente=" + idCliente + "&idnomenclatura=" + nomenclatura + "&numnomenclatura1=" + numNomenclatura1 + "&numnomenclatura2=" + numNomenclatura2 +  "&num3=" + num3 + "&dsnodbc=" + dsnodbc + "&pos=" + pos , function(data1){
-                                        console.log(data1);
+                                     $.ajax({ 
+                                         url: urlTienda + 'ActualizarCliente?telefono=' + telef + "&nombres=" + nombresEncode + "&apellidos=" + apellidosEncode + "&nombreCompania=" + nombreCompaniaEncode +  "&direccion="  + direccionEncode  + "&tienda=" + tempTienda +  "&zona=" + zonaEncode + "&observacion=" + observacionDirEncode + "&municipio=" + tempMunicipio + "&longitud=" + longitud + "&latitud=" + latitud + "&memcode=" + memcode + "&idcliente=" + idCliente + "&idnomenclatura=" + nomenclatura + "&numnomenclatura1=" + numNomenclatura1 + "&numnomenclatura2=" + numNomenclatura2 +  "&num3=" + num3 + "&dsnodbc=" + dsnodbc + "&pos=" + pos + "&idmunicipio=" + idMunicipio + "&idtienda=" + tienda, 
+                                        dataType: 'json', 
+                                        async: false, 
+                                        success: function(data1){
+                                            idClienteTienda = data1[0].idclitienda;
+                                            $.getJSON(server + 'ActualizarMemcode?membercode=' + idClienteTienda + "&idcliente=" + idClienteTemporal, function(data3){
+                                                //console.log(data3);
+                                             });
+                                            $.alert('El cliente fue Creado/Actualizado correctamente.');
+
+                                        }
                                     });
-                                    // En este put
-                                    if(idClienteTemporal == idCliente)
-                                    {
-                                        $.alert('Se Actualizó el cliente correctamente');
-                                    }else if(idClienteTemporal != idCliente)
-                                    {
-                                        idCliente = idClienteTemporal;
-                                        $.alert('Se creó el nuevo cliente correctamente');
-                                    }
 
                                 } 
                             });   
@@ -643,7 +694,7 @@ function geocodeResult(results, status) {
         // Dibujamos un marcador con la ubicación del primer resultado obtenido
         //url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/ZonasDeRepartoTotales.kml',
         var ctaLayer = new google.maps.KmlLayer({
-          url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/PizzaAmericana-ZonasDeRepartoTotales-Ver_02.kml',
+          url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/PizzaAmericana-ZonasDeRepartoTotales-Ver_03.kml',
           map: map,
           scrollwheel: false,
           zoom: 17
@@ -815,4 +866,97 @@ function eliminarOfertaCliente(idofertacliente)
                 }
             }
         });
+}
+
+function inactivarCliente(idCliente)
+{
+    $.getJSON(server + 'InactivarCliente?idcliente=' + idCliente, function(data){
+        if(data[0].resultado == "EXITOSO")
+        {
+            $.alert('El cliente fue inactivado Correctamente.');
+            //Vuelve y se pinta la información
+            validarTelefono();
+        }
+
+                
+    });
+
+}
+
+function activarCliente(idCliente)
+{
+    $.getJSON(server + 'ActivarCliente?idcliente=' + idCliente, function(data){
+        if(data[0].resultado == "EXITOSO")
+        {
+            $.alert('El cliente fue activado Correctamente.');
+            //Vuelve y se pinta la información
+            validarTelefono();
+        }     
+    });
+}
+
+function ValidacionesDatos()
+{
+    //validamos campo de telefono
+    var tele =  telefono.value;
+    if (tele == '' || tele == null)
+    {
+        alert ('Debe ingresar un telefono para el cliente');
+        return;
+    }
+
+
+    if (!/^([0-9])*$/.test(tele))
+    {
+      alert("El valor " + tele + " no es un número");
+      return;
+    }
+
+    //validamos campo Nombres
+    var nomb = nombres.value;
+    if (nomb == '' || nomb == null)
+    {
+        alert ('Debe ingresar los nombres del Cliente');
+        return;
+    }
+        //validamos campo Direccion
+    var dir = direccion.value;
+    //if (dir == '' || dir == null)
+    //{
+    //  alert ('Debe ingresar la dirección del cliente');
+    //  return;
+    //}
+    var nomenclatura = $("#selectNomenclaturas option:selected").val();
+    var numNomen1 =  $("#numNomen").val();
+    var numNomen2 =  $("#numNomen2").val();
+    var num3 = $("#num3").val();
+    if($('#validaDir').is(':checked'))
+    {
+        if (nomenclatura == '' || nomenclatura == null || numNomen1== '' || numNomen1 == null || numNomen1 == 'null' || numNomen2== '' || numNomen2 == null || numNomen2  == 'null' || num3== '' || num3 == null || num3 == 'null')
+        {
+            alert ('Faltan datos de la dirección, por favor completarlos');
+            return;
+        }
+    }
+    else
+    {
+        if (dir == '' || dir == null)
+        {
+            alert ('Aunque tiene definido no validar dirección, debe por lo menos ingresar la indicación del sitio');
+            return;
+        }
+    }
+    var tien = $("#selectTiendas option:selected").val();
+    if (tien == '' || tien == null || tien == undefined)
+    {
+        alert ('Debe ingresar la tienda del pedido');
+        return;
+    }
+    var muni = $("#selectMunicipio option:selected").val();
+    if (muni == '' || muni == null|| muni == undefined)
+    {
+        alert ('Debe ingresar el Municipio del Cliente');
+        return;
+    }
+    return(true);
 }

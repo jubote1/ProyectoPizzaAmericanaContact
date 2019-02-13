@@ -27,7 +27,7 @@ public class Cliente {
 	private String numNomenclatura2;
 	private String num3;
 	private String nomenclatura;
-	
+	private int estado;
 	
 	
 	public Cliente(int id, String telefono, String nombres, String direccion, String zonaDireccion, String observacion,
@@ -318,8 +318,18 @@ public class Cliente {
 		}
 		return observacion;
 	}
+	
+	
 
 
+
+	public int getEstado() {
+		return estado;
+	}
+
+	public void setEstado(int estado) {
+		this.estado = estado;
+	}
 
 	public void setObservacion(String observacion) {
 		this.observacion = observacion;

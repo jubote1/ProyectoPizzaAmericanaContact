@@ -4,6 +4,23 @@ public class HomologaGaseosaIncluida {
 	
 	private int idtienda;
 	private int idsabortipoliquido;
+	private String nombre;
+	private double precioGeneral;
+	
+	
+	
+	public String getNombre() {
+		return nombre;
+	}
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+	public double getPrecioGeneral() {
+		return precioGeneral;
+	}
+	public void setPrecioGeneral(double precioGeneral) {
+		this.precioGeneral = precioGeneral;
+	}
 	public int getIdtienda() {
 		return idtienda;
 	}

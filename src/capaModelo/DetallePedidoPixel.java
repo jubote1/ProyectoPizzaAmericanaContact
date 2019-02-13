@@ -15,8 +15,6 @@ public class DetallePedidoPixel {
 	private int idDetallePedido;
 	private int idDetallePedIns;
 	
-	
-	
 	public int getIdDetallePedIns() {
 		return idDetallePedIns;
 	}

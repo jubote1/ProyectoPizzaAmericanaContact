@@ -4,6 +4,7 @@
 var server;
 var tiendas;
 var tiendasBloqueadas;
+var marcaciones;
 var productosIncluidos;
 var table;
 var dtpedido;
@@ -35,6 +36,7 @@ var controlaCantidadIngredientes = "N";
 var cantidadIngredientes = 0;
 var excepcionSeleccionada = null;
 var gaseosaHomologadaTienda;
+var productoGaseosaHomologadaTienda;
 var formas;
 var idOfertaCliente;
 
@@ -73,16 +75,20 @@ $("#fechapedido").change(function(){
 	//getTodosProductos();
 	
 	getListaTiendas();
+	//Obtenemos las homologaciones para los liquidos
 	getHomologacionGaseosaTienda();
 	getListaMunicipios();
 	getExcepcionesPrecios();
 	getFormasPago();
+	getMarcaciones();
 	obtenerProductosIncluidos();
 	getListaNomenclaturas();
 	setInterval('validarVigenciaLogueo()',600000);
 	obtenerTiendasBloqueadas();
 	setInterval('obtenerTiendasBloqueadas',300000);
 	$('#descDireccion').attr('disabled', true);
+	//Deshabilitamos el botón de transferir cliente
+	$('#transferircliente').attr('disabled', true);
 	// Llevamos a cero los campos cálculos de los totales
 	$("#totalpedido").val('0');
 	$("#valorpago").val('0');
@@ -262,6 +268,8 @@ $("#fechapedido").change(function(){
         }
         $('#descDireccion').val($("#selectNomenclaturas").val() +  " "  + $("#numNomen").val() + " # " + $("#numNomen2").val() + " - " + $("#num3").val() + " " + selMunicipio);
         getProductosTienda(idtien);
+        //Traemos las gaseosas homologadas y disponibles para la tienda
+        obtenerHomologacionProductoGaseosa(idtien);
         memcode = datos.memcode;
         idCliente = datos.idCliente;
         //Validaremos si el cliente seleccionado tiene ofertas vigentes
@@ -329,7 +337,7 @@ $("#fechapedido").change(function(){
 
         //En este punto luego de buscar la direccion del cliente, buscaremos si este tiene pedidos
         $('#ultimospedidos').attr('disabled', false);
-
+        $('#transferircliente').attr('disabled', false);
      } );
 
 
@@ -347,6 +355,8 @@ $("#fechapedido").change(function(){
 
     	}
         getProductosTienda(idtien);
+        //Traemos las gaseosas homologadas y disponibles para la tienda
+        obtenerHomologacionProductoGaseosa(idtiend);
     });
 
     //Se define acción al momento de seleccionar la excepción de precio para validar que maneje o no hora de promoción
@@ -450,7 +460,7 @@ $("#fechapedido").change(function(){
     		var cadaForma  = formas[i];
     		if(idformapago == cadaForma.idformapago)
 			{
-				if(cadaForma.tipoformapago == 'TRANSFERENCIA')
+				if(cadaForma.tipoformapago == 'TRANSFERENCIA' || cadaForma.tipoformapago == 'PAGO-ONLINE')
 				{
 					$("#valorpago").val($("#totalpedido").val());
 					$("#valordevolver").val("0");
@@ -830,8 +840,10 @@ function getListaTiendas(){
 			str +='<option value="'+ cadaTienda.nombre +'" id ="'+ cadaTienda.id +'">' + cadaTienda.nombre +'</option>';
 		}
 		$('#selectTiendas').html(str);
+		$('#selectTiendasTrasladar').html(str);
 		// Realizamos cambio para que la tienda no esté seleccionada por defecto
 		$("#selectTiendas").val('');
+		$("#selectTiendasTrasladar").val('');
 	});
 }
 
@@ -860,6 +872,12 @@ function getListaNomenclaturas(){
 function getHomologacionGaseosaTienda(){
 	$.getJSON(server + 'ObtenerHomologaGaseosaIncluida', function(data){
 		gaseosaHomologadaTienda = data;
+	});
+}
+
+function obtenerHomologacionProductoGaseosa(idtie){
+	$.getJSON(server + 'ObtenerHomologacionProductoGaseosa?idtienda='+ idtie, function(data){
+		productoGaseosaHomologadaTienda = data;
 	});
 }
 
@@ -900,6 +918,64 @@ function getListaMunicipios(){
 		$("#selectMunicipio").val('');
 	});
 
+}
+
+//Método que invoca el servicio para obtener lista de municipios parametrizados en el sistema
+function getMarcaciones(){
+
+	$.getJSON(server + 'ObtenerMarcaciones', function(data){
+		marcaciones = data;
+		var str = '<h2>Marcaciones Pedido</h2>';
+        str += '<table class="table table-bordered">';
+		str += '<tbody>';
+		for(var i = 0; i < data.length;i++){
+			var cadaMarcacion  = marcaciones[i];
+			str +='<tr> ';
+			str +='<td> ';
+			str += '<label><input type="checkbox" aria-label="..."' + '  value="'+ cadaMarcacion.nombremarcacion + '" id=checkMarca"' + cadaMarcacion.idmarcacion + '" name= "checkMarca' + cadaMarcacion.idmarcacion  +'">'  + cadaMarcacion.nombremarcacion +'</label>';
+			str += '</td>';
+			str +='<td> ';
+			str += '<label><input type="text" ' + '" id="txtObsMarcacion' + cadaMarcacion.idmarcacion + '" name= "txtObsMarcacion' + cadaMarcacion.idmarcacion +'" maxlength="50">'  +'</label>';
+			str += '</td>';
+			str += '</tr>';
+		}
+		$('#frmMarcaciones').html(str);
+	});
+
+}
+
+function procesarMarcaciones(idPedMarcado){
+	for(var i = 0; i < marcaciones.length; i++)
+	{
+		var cadaMarcacion  = marcaciones[i];
+		if($('input:checkbox[name=checkMarca'+cadaMarcacion.idmarcacion+']').is(':checked'))
+		{
+			var observacion = "";
+			observacion = $("#txtObsMarcacion"+cadaMarcacion.idmarcacion).val();
+			$.getJSON(server + 'InsertarMarcacionPedido?idpedido='+idPedMarcado+"&idmarcacion=" + cadaMarcacion.idmarcacion + "&observacion=" + observacion, function(data){
+				$("#txtObsMarcacion"+cadaMarcacion.idmarcacion).val('');
+				$('input:checkbox[name=checkMarca'+cadaMarcacion.idmarcacion+']').attr('checked',false);
+			});
+		}
+	}
+}
+
+function validarMarcaciones()
+{
+	for(var i = 0; i < marcaciones.length; i++)
+	{
+		var cadaMarcacion  = marcaciones[i];
+		if($('input:checkbox[name=checkMarca'+cadaMarcacion.idmarcacion+']').is(':checked'))
+		{
+			var observacion = "";
+			observacion = $("#txtObsMarcacion"+cadaMarcacion.idmarcacion).val();
+			if(observacion == '' || observacion == null)
+			{
+				return(false);
+			}
+		}
+	}
+	return(true);
 }
 
 //Método que invoca el servicio para obtener las excepciones de precio parametrizadas en el sistema
@@ -1667,37 +1743,31 @@ function getOtrosGaseosa()
 		var indfila =1;
 		
 	    str += '<tbody>';
-		for(var i = 0; i < productos.length;i++){
-				var cadaGaseosa  = productos[i];
+		for(var i = 0; i < productoGaseosaHomologadaTienda.length;i++){
+				var cadaGaseosa  = productoGaseosaHomologadaTienda[i];
 								
-				if (cadaGaseosa.tipo == "GASEOSA")
+				if (indfila == 1)
 				{
-						if (indfila == 1)
-						{
-							str +='<tr> ';
-							str +='<td onclick="cambiaColorCelda(this);"> ';
-							str += '<div class="col-md-7"> ';
-							str += '<label><input type="checkbox"' + '  value="'+ "GA" + cadaGaseosa.idproducto + '-' + cadaGaseosa.nombre +'" name="' + "GA" + cadaGaseosa.idproducto + '" onclick="revisarMarcacion(this)">' + cadaGaseosa.nombre + " $" + cadaGaseosa.preciogeneral +'</label>';
-							str += '</div>'
-							str += '</td>';
-						}
-						else
-						{
-							str +='<td onclick="cambiaColorCelda(this);"> ';
-							str += '<div class="col-md-7"> ';
-							str += '<label><input type="checkbox"' + '  value="'+ "GA" + cadaGaseosa.idproducto + '-' + cadaGaseosa.nombre +'" name="' + "GA" + cadaGaseosa.idproducto + '" onclick="revisarMarcacion(this)">' + cadaGaseosa.nombre + " $" + cadaGaseosa.preciogeneral +'</label>';
-							str += '</div>'
-							str += '</td> </tr>';
-						}
-						indfila = indfila +1;
-						if(indfila ==3)
-						{
-							indfila = 1;
-						}
-
-						
-					
-				}	
+					str +='<tr> ';
+					str +='<td onclick="cambiaColorCelda(this);"> ';
+					str += '<div class="col-md-7"> ';
+					str += '<label><input type="checkbox"' + '  value="'+ "GA" + cadaGaseosa.idproducto + '-' + cadaGaseosa.nombre +'" name="' + "GA" + cadaGaseosa.idproducto + '" onclick="revisarMarcacion(this)">' + cadaGaseosa.nombre + " $" + cadaGaseosa.preciogeneral +'</label>';
+					str += '</div>'
+					str += '</td>';
+				}
+				else
+				{
+					str +='<td onclick="cambiaColorCelda(this);"> ';
+					str += '<div class="col-md-7"> ';
+					str += '<label><input type="checkbox"' + '  value="'+ "GA" + cadaGaseosa.idproducto + '-' + cadaGaseosa.nombre +'" name="' + "GA" + cadaGaseosa.idproducto + '" onclick="revisarMarcacion(this)">' + cadaGaseosa.nombre + " $" + cadaGaseosa.preciogeneral +'</label>';
+					str += '</div>'
+					str += '</td> </tr>';
+				}
+				indfila = indfila +1;
+				if(indfila ==3)
+				{
+					indfila = 1;
+				}
 			}
 			str += '</tbody> </table>';
 			str += '<div class="modal-footer">';
@@ -1710,7 +1780,7 @@ function getOtrosGaseosa()
     			// ...
 			});
 			$('#addGaseosa').modal('show');
-			marcadorGaseosas = 1;
+			//marcadorGaseosas = 1;
 	}
 	else
 	{
@@ -1785,7 +1855,7 @@ function agregarGaseosa()
 		$("#valorpago").val(totalpedido);
 	}
 	$("#valordevolver").val($("#valorpago").val() - $("#totalpedido").val() );
-	marcadorGaseosa = 0;
+	marcadorGaseosas = 0;
 	$('#addGaseosa').modal('hide');
 }
 
@@ -2257,10 +2327,13 @@ function ReiniciarPedido()
 																	marcadorAdiciones = 0;
 																	marcardorProductoCon = 0;
 																	marcardorProductoSin = 0;
+																	marcadorAdicionales = 0;
+																	marcadorGaseosas = 0;
 																	//Volvemos a habilitar el select de tienda
 																	$('#selectTiendas').attr('disabled', false);
 																	$('#limpiar').attr('disabled', false);
 																	$('#ultimospedidos').attr('disabled', true);
+																	$('#transferircliente').attr('disabled', true);
 																	$('#validaDir').prop('checked', true);
 														}
 														else
@@ -2304,15 +2377,21 @@ function ReiniciarPedido()
 
 function ConfirmarPedido()
 {
-	
+	//Antes de finalizar el pedido validamos que si estén correctas las marcaciones
+	var validaMarcaciones = validarMarcaciones();
+	if(validaMarcaciones == false)
+	{
+		$.alert('Una o unas de las marcaciones de pedido no tienen observación.');
+		return;
+	}
 	if(idPedido == 0 )
 	{
-		alert("Para confirmar el pedido debe tener por lo menos un item agregado");
+		$.alert("Para confirmar el pedido debe tener por lo menos un item agregado");
 		return;
 	}
 	if(dtpedido.data().count() == 0)
 	{
-		alert('Debe agregar por lo menos un item al pedido para poderlo finalizar');
+		$.alert('Debe agregar por lo menos un item al pedido para poderlo finalizar');
 		return;
 	}
 	var valordevolver =  $("#valordevolver").val();
@@ -2392,7 +2471,8 @@ function ConfirmarPedido()
 		    				dataType: 'json', 
 		    				async: false, 
 		    				success: function(data){ 
-
+		    						//En este punto realizamos la inserción de los marcadores
+		    						procesarMarcaciones(idPedido);
 									resultado = data[0];
 									var resJSON = JSON.stringify(resultado);
 									var urlTienda = resultado.url;
@@ -2864,6 +2944,7 @@ function agregarEncabezadoPedido()
 		//Realizamos intervención para bloquear que se cambie la tienda
 		$('#selectTiendas').attr('disabled', true);
 		$('#limpiar').attr('disabled', true);
+		$('#transferircliente').attr('disabled', true);
 		//		
 	}
 }
@@ -2958,7 +3039,7 @@ function agregarProducto()
 						totalpedido = totalpedido + valortotal; 
 						otroProd = cadaProdu.idproducto+'-'+cadaProdu.nombre;
 						adicion = cadaProdu.idproducto + '-' + cadaProdu.nombre;
-						adiciones = adiciones + cadaProdu.idproducto + '-' + cadaProdu.nombre + '/';
+						adiciones = adiciones + cadaProdu.idproducto + '-' + cadaProdu.nombre + "-MIT1" + '/';
 						
 						//Primero deberíamos hacer la validación que se pueda insertar en la tabla  de base de datos y de allí si lanzar 
 						
@@ -3018,7 +3099,7 @@ function agregarProducto()
 						totalpedido = totalpedido + valortotal; 
 						otroProd = cadaProdu.idproducto+'-'+cadaProdu.nombre;
 						adicion = cadaProdu.idproducto + '-' + cadaProdu.nombre;
-						adiciones = adiciones + cadaProdu.idproducto + '-' + cadaProdu.nombre + '/';
+						adiciones = adiciones + cadaProdu.idproducto + '-' + cadaProdu.nombre + "-MIT2" + '/';
 						//Primero deberíamos hacer la validación que se pueda insertar en la tabla  de base de datos y de allí si lanzar 
 						
 						$.ajax({ 
@@ -3078,7 +3159,7 @@ function agregarProducto()
 						totalpedido  = totalpedido + valortotal; 
 						otroProd = cadaProdu.idproducto+'-'+cadaProdu.nombre;
 						adicion = cadaProdu.idproducto + '-' + cadaProdu.nombre;
-						adiciones = adiciones + cadaProdu.idproducto + '-' + cadaProdu.nombre + '/';
+						adiciones = adiciones + cadaProdu.idproducto + '-' + cadaProdu.nombre + "-MIT1" + '/';
 						//Primero deberíamos hacer la validación que se pueda insertar en la tabla  de base de datos y de allí si lanzar 
 						
 						$.ajax({ 
@@ -3648,6 +3729,8 @@ function agregarProducto()
 	    marcadorAdiciones = 0;
 	    marcardorProductoCon = 0;
 		marcardorProductoSin = 0;
+		marcadorAdicionales = 0;
+		marcadorGaseosas = 0;
 		contadorItem = contadorItem + 1;
 	    var strClr = "";
 	    $('#otrosproductos').html(strClr);
@@ -3834,7 +3917,7 @@ function geocodeResult(results, status) {
         // Dibujamos un marcador con la ubicación del primer resultado obtenido
         //url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/ZonasDeRepartoTotales.kml',
         var ctaLayer = new google.maps.KmlLayer({
-          url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/PizzaAmericana-ZonasDeRepartoTotales-Ver_02.kml',
+          url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/PizzaAmericana-ZonasDeRepartoTotales-Ver_03.kml',
           map: map,
           scrollwheel: false,
           zoom: 17
@@ -3864,7 +3947,7 @@ function geocodeSinServicio(lat, long)
 	});
 
     var ctaLayer = new google.maps.KmlLayer({
-		url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/PizzaAmericana-ZonasDeRepartoTotales-Ver_02.kml',
+		url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/PizzaAmericana-ZonasDeRepartoTotales-Ver_03.kml',
 		map: map,
 		scrollwheel: false,
 		zoom: 17
@@ -4061,6 +4144,7 @@ function limpiarSeleccionCliente()
         $("#selectMunicipio").val("");
         $('#validaDir').prop('checked', true);
         $('#ultimospedidos').attr('disabled', true);
+        $('#transferircliente').attr('disabled', true);
         //$("#validaDir input[type=checkbox]").prop('checked', true);
         memcode = 0;
         idCliente = 0;
@@ -4182,6 +4266,98 @@ function consultarUltimosPedidos()
 		e.stopPropagation();
 	});
 	$('#ultimosPedidosCliente').modal('show');
+}
+
+function transferirCliente()
+{
+	//Seleccionar la tienda origen
+	var tiendaOrigen = $("#selectTiendas option:selected").attr('id');
+	//Realiza la actualizacion
+	var telef = telefono.value;
+	var tempTienda =  $("#selectTiendasTrasladar option:selected").val();
+    //Variable en la que alojamos el id de la tienda
+    var tienda = $("#selectTiendasTrasladar option:selected").attr('id');
+    var idMunicipio = $("#selectMunicipio option:selected").attr('id');
+    //Realizamos la validación que la tienda origen y destino no sean las mismas
+    if(tiendaOrigen == tienda)
+    {
+    	$.alert('La tienda origen y destino no pueden ser las mismas.');
+    	$("#selectTiendasTrasladar").val('');
+ 		return;
+    }
+    var tempMunicipio = $("#selectMunicipio option:selected").val();
+    var idClienteCreado;
+    var idClienteTienda;
+    var nombresEncode = encodeURIComponent(nombres.value);
+    var apellidosEncode = encodeURIComponent(apellidos.value);
+    var nombreCompaniaEncode = encodeURIComponent(nombreCompania.value);;
+    var direccionEncode;
+    var validaDir = 'S';
+    var dirTemp = $("#selectNomenclaturas").val() +  " "  + $("#numNomen").val() + " # " + $("#numNomen2").val() + " - " + $("#num3").val();
+    if($('#validaDir').is(':checked'))
+    {
+        direccionEncode = encodeURIComponent($("#selectNomenclaturas").val() +  " "  + $("#numNomen").val() + " # " + $("#numNomen2").val() + " - " + $("#num3").val());
+    }else
+    {
+        validaDir = 'N';
+        direccionEncode = encodeURIComponent(direccion.value);
+    }
+    var zonaEncode = encodeURIComponent(zona.value); 
+    var observacionDirEncode = encodeURIComponent(observacionDir.value);
+    var nomenclatura = $("#selectNomenclaturas option:selected").attr('id');
+    var numNomenclatura1 = encodeURIComponent($("#numNomen").val());
+    var numNomenclatura2 = encodeURIComponent($("#numNomen2").val());
+    var num3 = encodeURIComponent($("#num3").val());
+                            $.ajax({ 
+                                url: server + 'ActualizarCliente?telefono=' + telef + "&nombres=" + nombresEncode + "&apellidos=" + apellidosEncode + "&nombreCompania=" + nombreCompaniaEncode +  "&direccion="  + direccionEncode  + "&tienda=" + tempTienda +  "&zona=" + zonaEncode + "&observacion=" + observacionDirEncode + "&municipio=" + tempMunicipio + "&longitud=" + longitud + "&latitud=" + latitud + "&memcode=0" + "&idcliente=0" + "&idnomenclatura=" + nomenclatura + "&numnomenclatura1=" + numNomenclatura1 + "&numnomenclatura2=" + numNomenclatura2 +  "&num3=" + num3, 
+                                dataType: 'json', 
+                                async: false, 
+                                success: function(data){
+
+                                    idClienteCreado = data[0].idcliente;
+                                    //console.log("CLIENTE CREADO ACTUALIZADO " + idClienteCreado);
+                                    var urlTienda;
+                                    var pos;
+                                    var dsnodbc;
+                                     $.ajax({ 
+                                         url: server + 'ObtenerUrlTienda?idtienda=' + tienda, 
+                                         dataType: 'json', 
+                                         async: false, 
+                                         success: function(data2){ 
+                                            //console.log(data2);
+                                            urlTienda = data2[0].urltienda;
+                                            pos = data2[0].pos;
+                                            dsnodbc = data2[0].dsnodbc;
+                                        } 
+                                    });
+                                    //Se consume el servicio de la tienda para la actualización creación del cliente
+                                     $.ajax({ 
+                               			 url: urlTienda + 'ActualizarCliente?telefono=' + telef + "&nombres=" + nombresEncode + "&apellidos=" + apellidosEncode + "&nombreCompania=" + nombreCompaniaEncode +  "&direccion="  + direccionEncode  + "&tienda=" + tempTienda +  "&zona=" + zonaEncode + "&observacion=" + observacionDirEncode + "&municipio=" + tempMunicipio + "&longitud=" + longitud + "&latitud=" + latitud + "&memcode=0" + "&idcliente=0" + "&idnomenclatura=" + nomenclatura + "&numnomenclatura1=" + numNomenclatura1 + "&numnomenclatura2=" + numNomenclatura2 +  "&num3=" + num3 + "&dsnodbc=" + dsnodbc + "&pos=" + pos + "&idmunicipio=" + idMunicipio + "&idtienda=" + tienda, 
+                                		dataType: 'json', 
+                                		async: false, 
+                                		success: function(data1){
+                                			idClienteTienda = data1[0].idclitienda;
+                                			$.getJSON(server + 'ActualizarMemcode?membercode=' + idClienteTienda + "&idcliente=" + idClienteCreado, function(data3){
+	                                        	//console.log(data3);
+	                                   		 });
+	                                        $.alert('Se creó el nuevo cliente correctamente');
+
+	                                	}
+                                	});
+                                    
+                                } 
+                            }); 
+    limpiarSeleccionCliente();
+     $('#telefono').val(telef);
+    validarTelefono(); 
+	$("#selectTiendasTrasladar").val('');
+	$('#transferircliente').attr('disabled', true);
+	$('#transCliente').modal('hide');
+}
+
+function mostrarTransferirCliente()
+{
+	$('#transCliente').modal('show');
 }
 
 //Método que se encarga de limpiar la información de los pedidos clientes cada vez que se da sobre el botón consultar

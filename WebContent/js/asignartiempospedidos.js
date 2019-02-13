@@ -98,6 +98,7 @@ function ConfirmarTiempo()
 					}
 					//Realizamos consumo en tienda para actualizar tiempo
 					var urlTienda = "";
+					var pos;
 					$.ajax({ 
 								url: server + 'ObtenerUrlTienda?idtienda=' + idtien , 
 								dataType: 'json',
@@ -106,7 +107,8 @@ function ConfirmarTiempo()
 								success: function(data3)
 								{
 									urlTienda = data3[0].urltienda;
-									$.getJSON(urlTienda + 'CRUDTiempoPedido?idoperacion=1&nuevotiempo='+nuevotiempo, function(data){
+									pos = data3[0].pos;
+									$.getJSON(urlTienda + 'CRUDTiempoPedido?idoperacion=1&nuevotiempo='+nuevotiempo+"&pos=" + pos, function(data){
 										alert('Se ha realizado actualización del tiempo en el sistema de Contact Center y en la tienda correspondiente');
 									});
 									
