@@ -13,9 +13,16 @@ public class Tienda {
 	private String dsnTienda;
 	private String url;
 	private int pos;
-		
+	private String hosbd;
 	
 	
+	
+	public String getHosbd() {
+		return hosbd;
+	}
+	public void setHosbd(String hosbd) {
+		this.hosbd = hosbd;
+	}
 	public int getPos() {
 		return pos;
 	}
@@ -48,13 +55,14 @@ public class Tienda {
 	}
 	
 	
-	public Tienda(int idTienda, String nombreTienda, String dsnTienda, String url, int pos) {
+	public Tienda(int idTienda, String nombreTienda, String dsnTienda, String url, int pos, String hosbd) {
 		super();
 		this.idTienda = idTienda;
 		this.nombreTienda = nombreTienda;
 		this.dsnTienda = dsnTienda;
 		this.url = url;
 		this.pos = pos;
+		this.hosbd = hosbd;
 	}
 	
 	public Tienda()

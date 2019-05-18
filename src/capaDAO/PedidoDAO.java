@@ -1189,7 +1189,7 @@ public class PedidoDAO {
 				formapago = rs.getString("formapago");
 				idformapago = rs.getInt("idforma_pago");
 				tiempopedido = rs.getDouble("tiempopedido");
-				Tienda tiendapedido = new Tienda(idtienda, nombreTienda, "", url, 0);
+				Tienda tiendapedido = new Tienda(idtienda, nombreTienda, "", url, 0, "");
 				Pedido cadaPedido = new Pedido(idpedido,  nombreTienda,totalBruto, impuesto, totalNeto,
 						estadoPedido, fechaPedido, nombreCliente, idcliente, enviadopixel,numposheader, tiendapedido, stringpixel, fechainsercion, usuariopedido, direccion, telefono, formapago, idformapago, tiempopedido);
 				consultaPedidos.add(cadaPedido);
@@ -1957,7 +1957,7 @@ public class PedidoDAO {
 				formapago = rs.getString("formapago");
 				idformapago = rs.getInt("idforma_pago");
 				tiempopedido = rs.getDouble("tiempopedido");
-				Tienda tiendapedido = new Tienda(idtienda, nombreTienda, "", url,0);
+				Tienda tiendapedido = new Tienda(idtienda, nombreTienda, "", url,0, "");
 				Pedido cadaPedido = new Pedido(idpedido,  nombreTienda,totalBruto, impuesto, totalNeto,
 						estadoPedido, fechaPedido, nombreCliente, idcliente, enviadopixel,numposheader, tiendapedido, stringpixel, fechainsercion, usuariopedido, direccion, telefono, formapago, idformapago, tiempopedido);
 				consultaPedidos.add(cadaPedido);

@@ -674,7 +674,7 @@ public class ParametrosCtrl {
 			public String insertarTienda(String nombre, String dsn)
 			{
 				JSONArray listJSON = new JSONArray();
-				Tienda Tie = new Tienda(0,nombre,dsn,"",0);
+				Tienda Tie = new Tienda(0,nombre,dsn,"",0, "");
 				int idTieIns = TiendaDAO.insertarTienda(Tie);
 				JSONObject ResultadoJSON = new JSONObject();
 				ResultadoJSON.put("idtienda", idTieIns);
@@ -742,7 +742,7 @@ public class ParametrosCtrl {
 			public String editarTienda(int idtienda, String nombre, String dsn)
 			{
 				JSONArray listJSON = new JSONArray();
-				Tienda Tie = new Tienda(idtienda,nombre,dsn,"",0);
+				Tienda Tie = new Tienda(idtienda,nombre,dsn,"",0, "");
 				String resultado =TiendaDAO.editarTienda(Tie);
 				JSONObject ResultadoJSON = new JSONObject();
 				ResultadoJSON.put("resultado", resultado);
@@ -963,6 +963,7 @@ public class ParametrosCtrl {
 				JSONObject Respuesta = new JSONObject();
 				boolean respues = TiempoPedidoDAO.actualizarTiempoPedido(nuevotiempo, idtienda, user);
 				//Realizaremos la validación para envío de correo
+				String respuestaHTML = "";
 				if(respues)
 				{
 					if (nuevotiempo > 70)
@@ -977,8 +978,21 @@ public class ParametrosCtrl {
 						ControladorEnvioCorreo contro = new ControladorEnvioCorreo(correo, correos);
 						contro.enviarCorreo();
 					}
+					respuestaHTML = "<html><b> <h1 align='center'><i>EL TIEMPO SE HA ACTUALIZADO CORRECTAMENTE EN EL CONTACT CENTER";
 				}
-				Respuesta.put("resultado", respues);
+				else
+				{
+					Correo correo = new Correo();
+					correo.setAsunto("ERROR ACTUALIZACION TIEMPO PEDIDO");
+					ArrayList correos = GeneralDAO.obtenerCorreosParametro("TIEMPOPEDIDOERROR");
+					correo.setContrasena("Pizzaamericana2017");
+					correo.setUsuarioCorreo("alertaspizzaamericana@gmail.com");
+					Tienda tienda = TiendaDAO.retornarTienda(idtienda);
+					correo.setMensaje("La tienda " + tienda.getNombreTienda() + " TUVO UN ERROR CUANDO ESTABA aumentando el tiempo de entrega a " + nuevotiempo + " minutos");
+					ControladorEnvioCorreo contro = new ControladorEnvioCorreo(correo, correos);
+					contro.enviarCorreo();
+				}
+				Respuesta.put("resultado", respuestaHTML);
 				listJSON.add(Respuesta);
 				return(Respuesta.toString());
 			}

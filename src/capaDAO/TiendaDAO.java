@@ -40,7 +40,8 @@ public class TiendaDAO {
 				String dsn = rs.getString("dsn");
 				String url = rs.getString("url");
 				int pos = rs.getInt("pos");
-				Tienda tien = new Tienda(idTienda, nombre, dsn, url, pos);
+				String hosbd = rs.getString("hosbd");
+				Tienda tien = new Tienda(idTienda, nombre, dsn, url, pos, hosbd);
 				tiendas.add(tien);
 			}
 			rs.close();
@@ -175,7 +176,7 @@ public class TiendaDAO {
 		Logger logger = Logger.getLogger("log_file");
 		ConexionBaseDatos con = new ConexionBaseDatos();
 		Connection con1 = con.obtenerConexionBDPrincipal();
-		Tienda Pro = new Tienda(0,"","", "",0);
+		Tienda Pro = new Tienda(0,"","", "",0, "");
 		try
 		{
 			Statement stm = con1.createStatement();
@@ -187,15 +188,17 @@ public class TiendaDAO {
 			String dsn = "";
 			String url = "";
 			int pos = 0;
+			String hosbd = "";
 			while(rs.next()){
 				idtien = rs.getInt("idtienda");
 				nombre = rs.getString("nombre");
 				dsn = rs.getString("dsn");
 				url = rs.getString("url");
 				pos = rs.getInt("pos");
+				hosbd = rs.getString("hosbd");
 				break;
 			}
-			Pro = new Tienda(idtien,nombre,dsn,url,pos);
+			Pro = new Tienda(idtien,nombre,dsn,url,pos,hosbd);
 			stm.close();
 			con1.close();
 		}

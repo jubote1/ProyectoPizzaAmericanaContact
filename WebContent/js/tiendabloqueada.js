@@ -87,6 +87,22 @@ function guardarTiendaBloqueada()
 	    		async: false, 
 	    		success: function(data){ 
 					
+					var urlTienda = "";
+					$.ajax({ 
+								url: server + 'ObtenerUrlTienda?idtienda=' + idtien , 
+								dataType: 'json',
+								type: 'get', 
+								async: false, 
+								success: function(data3)
+								{
+									var urlTienda = data3[0].urltienda;
+									$.getJSON(urlTienda + 'BloquearTienda', function(data){
+										alert('Se bloqueo la tienda en el contact Center y en el punto de venta');
+									});
+									
+								} 
+							});					
+
 				} 
 			});
 	$('#tienda').val('');
@@ -121,6 +137,21 @@ function eliminarTiendaBloqueada(idtienda)
 	    				success: function(data){ 
 								resultado = data[0];
 								//
+								var urlTienda = "";
+								$.ajax({ 
+									url: server + 'ObtenerUrlTienda?idtienda=' + idtienda , 
+									dataType: 'json',
+									type: 'get', 
+									async: false, 
+									success: function(data3)
+									{
+										var urlTienda = data3[0].urltienda;
+										$.getJSON(urlTienda + 'DesbloquearTienda', function(data){
+											alert('Se desbloqueo la tienda en el contact Center y en el punto de venta');
+										});
+										
+									} 
+								});			
 
 								if ( $.fn.dataTable.isDataTable( '#grid-tiendasBloqueadas' ) ) {
 							    	table = $('#grid-tiendasBloqueadas').DataTable();

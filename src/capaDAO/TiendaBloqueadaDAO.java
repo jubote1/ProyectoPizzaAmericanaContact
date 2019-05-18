@@ -77,9 +77,11 @@ public class TiendaBloqueadaDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
+			String logBloqueo = "insert into log_bloqueo_tienda (idtienda, accion) values (" + tienda.getIdtienda() + ", 'BLOQUEO')"; 
 			String insert = "insert into tienda_bloqueada (idtienda, comentario) values ( " + tienda.getIdtienda() + " , '" + tienda.getComentario() + "' )"; 
 			logger.info(insert);
 			stm.executeUpdate(insert);
+			stm.executeUpdate(logBloqueo);
 			stm.close();
 			con1.close();
 		}
@@ -108,9 +110,11 @@ public class TiendaBloqueadaDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
+			String logBloqueo = "insert into log_bloqueo_tienda (idtienda, accion) values (" + idtienda + ", 'DESBLOQUEO')"; 
 			String delete = "delete from tienda_bloqueada  where idtienda = " + idtienda; 
 			logger.info(delete);
 			stm.executeUpdate(delete);
+			stm.executeUpdate(logBloqueo);
 			stm.close();
 			con1.close();
 		}
