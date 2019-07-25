@@ -8,6 +8,7 @@ var productos;
 var memcode = 0;
 var idCliente = 0;
 var dtconsultasPQRS;
+var idSolicitudPQRS;
 
 // A continuación  la ejecucion luego de cargada la pagina
 $(document).ready(function() {
@@ -20,9 +21,11 @@ dtconsultasPQRS = $('#grid-consultaPQRS').DataTable( {
             { "mData": "cliente" },
             { "mData": "direccion" },
             { "mData": "telefono" },
-            { "mData": "comentario" },
+            { "mData": "comentario" , "visible": false },
             { "mData": "municipio" },
-            { "mData": "tienda" }
+            { "mData": "tienda" },
+            { "mData": "nombreorigen" },
+            { "mData": "accion" }
             ]
     	} );			
 
@@ -31,6 +34,24 @@ dtconsultasPQRS = $('#grid-consultaPQRS').DataTable( {
 	// En resumen se invocan todos servicios que se encargan de llenar la data del formulario.
 	getListaTiendas();
 	setInterval('validarVigenciaLogueo()',600000);
+
+//Colocamos acción al DataTable en caso de dar clic sobre el DATATABLE
+$('#grid-consultaPQRS tbody').on('click', 'tr', function () {
+        datos = table.row( this ).data();
+        $('#idSolicitudPQRS').val(datos.idconsultaPQRS);
+        $('#fecha').val(datos.fechasolicitud);
+        $('#tipoSolicitud').val(datos.tiposolicitud);
+        $('#telefono').val(datos.telefono);
+        $('#nombres').val(datos.cliente);
+        $('#direccion').val(datos.direccion);
+        $('#municipio').val(datos.municipio);
+        $("#tienda").val(datos.tienda);
+        $("#origen").val(datos.nombreorigen);
+        $('#comentariosVista').val(datos.comentario);
+     } );
+
+
+
 	} );
 
 
@@ -136,12 +157,23 @@ function consultarPQRS()
 	                		
 	                		table.clear().draw();
 							for(var i = 0; i < data1.length;i++){
-								
-								table.row.add(data1[i]).draw();
+							table.row.add({
+			                    "idconsultaPQRS": data1[i].idconsultaPQRS, 
+			                    "fechasolicitud": data1[i].fechasolicitud,
+			                    "tiposolicitud": data1[i].tiposolicitud,
+			                    "cliente": data1[i].cliente, 
+			                    "direccion": data1[i].direccion,
+			                    "telefono": data1[i].telefono,
+			                    "comentario": data1[i].comentario, 
+			                    "municipio": data1[i].municipio,
+			                    "tienda": data1[i].tienda,
+			                    "nombreorigen": data1[i].nombreorigen, 
+			                    "accion": '<button type="button" class="btn btn-default btn-xs" onclick="mostrarModalObservacion(' +data1[i].idconsultaPQRS + ')"><i class="fas fa-cart-plus fa-2x"></i></button>'
+			                }).draw();
 							}
 							
 					});
-
+	limpiarConsultaPQRS();
 
 }
 
@@ -196,4 +228,62 @@ function ValidacionesDatos()
 	}
 
 	return(1);
+}
+
+
+function mostrarModalObservacion(idSolPQRS)
+{
+	idSolicitudPQRS = idSolPQRS;
+	$('#adicionarObservacion').modal('show');
+}
+
+
+function guardarObservacionPQRS()
+{
+	var comentariosAd = encodeURIComponent($('#comentarios').val());
+	if(comentariosAd == '')
+	{
+		$.alert('El comentario a adicionar debe tener algún texto.' );
+		return;
+	}
+	var controlador = false;
+	$.ajax({ 
+    				url: server + 'AdicionarComentarioPQRS?pqrs=' + idSolicitudPQRS + "&comentario=" + comentariosAd, 
+    				dataType: 'json', 
+    				async: false, 
+    				success: function(data){ 
+						var resultado = data;
+						if(resultado[0].resultado == 'OK')
+						{
+							$.alert('Se ha insertado exitosamente el comentario.' );
+							controlador = true;
+						}else
+						{
+							$.alert('Se tuvo un ERROR al insertar el comentario' );
+						}
+					} 
+		});
+	if(controlador == true)
+	{
+		$('#comentarios').val('');
+		idSolicitudPQRS = 0;
+		$('#adicionarObservacion').modal('hide');
+		consultarPQRS();
+	}
+	
+}
+
+
+function limpiarConsultaPQRS()
+{
+	    $('#idSolicitudPQRS').val('');
+        $('#fecha').val('');
+        $('#tipoSolicitud').val('');
+        $('#telefono').val('');
+        $('#nombres').val('');
+        $('#direccion').val('');
+        $('#municipio').val('');
+        $("#tienda").val('');
+        $("#origen").val('');
+        $('#comentariosVista').val('');
 }

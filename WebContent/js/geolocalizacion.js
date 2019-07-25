@@ -1223,6 +1223,16 @@ function ubicarTienda(latitud, longitud , mapa) {
           {lat:6.1590835,lng:-75.6011196}
      ];
 
+     //La ide en este es tener el punto de cada tienda en su longitud y latitud
+     var coorManrique = new google.maps.LatLng(6.27016,-75.554695);
+     var coorBello = new google.maps.LatLng(6.313582,-75.559738);
+     var coorAmerica = new google.maps.LatLng(6.248635,-75.604294);
+     var coorColores = new google.maps.LatLng(6.264574,-75.59654);
+     var coorItagui = new google.maps.LatLng(6.165916,-75.621144);
+     var coorPoblado = new google.maps.LatLng(6.206544,-75.560035);
+     var coorLaMota = new google.maps.LatLng(6.210901,-75.595363);
+     var coorEnvigado = new google.maps.LatLng(6.1670374,-75.5852606);
+
 
      var coordenada = new google.maps.LatLng(latitud, longitud);
      //validamos poblado
@@ -1235,10 +1245,13 @@ function ubicarTienda(latitud, longitud , mapa) {
             fillOpacity: 0.35
         });
      
+     var distTienda = 0;
 
      if(google.maps.geometry.poly.containsLocation(coordenada, poligono1) == true) {
           $.alert('POSIBLEMENTE ESTA DENTRO DE COBERTURA TIENDA <h2>MANRIQUE</h2>');
-          return;
+          //En ese punto tomaríamos la distancia entre el punto del pedido y la tienda
+          distTienda = getDistance(coordenada, coorManrique);
+          return(distTienda);
      }
      
      var poligono2 = new google.maps.Polygon({paths: americacor,
@@ -1252,7 +1265,8 @@ function ubicarTienda(latitud, longitud , mapa) {
 
      if(google.maps.geometry.poly.containsLocation(coordenada, poligono2) == true) {
          $.alert("POSIBLEMENTE ESTA DENTRO DE COBERTURA TIENDA <h2>AMERICA</h2>");
-          return;
+         distTienda = getDistance(coordenada, coorAmerica);
+          return(distTienda);
      }
 
      var poligono3 = new google.maps.Polygon({paths: itaguicor,
@@ -1266,7 +1280,8 @@ function ubicarTienda(latitud, longitud , mapa) {
 
      if(google.maps.geometry.poly.containsLocation(coordenada, poligono3) == true) {
          $.alert("POSIBLEMENTE ESTA DENTRO DE COBERTURA TIENDA <h2>ITAGUI</h2>");
-          return;
+         distTienda = getDistance(coordenada, coorItagui);
+          return(distTienda);
      }
 
      var poligono4 = new google.maps.Polygon({paths: la80cor,
@@ -1280,7 +1295,8 @@ function ubicarTienda(latitud, longitud , mapa) {
 
      if(google.maps.geometry.poly.containsLocation(coordenada, poligono4) == true) {
          $.alert("POSIBLEMENTE ESTA DENTRO DE COBERTURA TIENDA <h2>LA 80</h2>");
-          return;
+         distTienda = getDistance(coordenada, coorColores);
+          return(distTienda);
      }
 
      var poligono5 = new google.maps.Polygon({paths: bellocor,
@@ -1294,7 +1310,8 @@ function ubicarTienda(latitud, longitud , mapa) {
 
      if(google.maps.geometry.poly.containsLocation(coordenada, poligono5) == true) {
          $.alert("POSIBLEMENTE ESTA DENTRO DE COBERTURA TIENDA <h2>BELLO</h2>");
-          return;
+         distTienda = getDistance(coordenada, coorBello);
+          return(distTienda);
      }
 
      var poligono6 = new google.maps.Polygon({paths: lamotacor,
@@ -1308,7 +1325,8 @@ function ubicarTienda(latitud, longitud , mapa) {
 
      if(google.maps.geometry.poly.containsLocation(coordenada, poligono6) == true) {
          $.alert("POSIBLEMENTE ESTA DENTRO DE COBERTURA TIENDA <h2>LA MOTA</h2>");
-          return;
+         distTienda = getDistance(coordenada, coorMota);
+          return(distTienda);
      }
 
      var poligono7 = new google.maps.Polygon({paths: pobladocor,
@@ -1322,7 +1340,8 @@ function ubicarTienda(latitud, longitud , mapa) {
 
      if(google.maps.geometry.poly.containsLocation(coordenada, poligono7) == true) {
          $.alert("POSIBLEMENTE ESTA DENTRO DE COBERTURA TIENDA <h2>POBLADO</h2>");
-          return;
+         distTienda = getDistance(coordenada, coorPoblado);
+          return(distTienda);
      }
 
      //PARA LA NUEVA TIENDA DE ENVIGADO
@@ -1337,7 +1356,8 @@ function ubicarTienda(latitud, longitud , mapa) {
 
      if(google.maps.geometry.poly.containsLocation(coordenada, poligono8) == true) {
          $.alert("POSIBLEMENTE ESTA DENTRO DE COBERTURA TIENDA <h2>ENVIGADO</h2>");
-          return;
+         distTienda = getDistance(coordenada, coorEnvigado);
+          return(distTienda);
      }
 
      $.alert("APARENTEMENTE NO ESTA DENTRO DE LA ZONA DE REPARTO DE NINGÚN PUNTO DE VENTA");
@@ -1357,4 +1377,23 @@ function ubicarTienda(latitud, longitud , mapa) {
      $.getJSON(server + 'InsertarDirFueraZona?direccion=' + direccionEncode + "&municipio=" + municipio + "&idcliente=" + idCliente + "&latitud=" + latitud + "&longitud=" + longitud + "&telefono=" + tel + "&nombre=" + nombr + "&apellido=" + apelli , function(data1){
                
           });
+     return(0);
 }
+
+
+//Pegamos la función que nos ayuda en el cálculo de distancias
+
+function rad(x) {
+ return x * Math.PI / 180;
+};
+ 
+function getDistance(p1, p2) {
+ //  http://es.wikipedia.org/wiki/F{1f0778fe2e852b61c79949ce7b4bb677680b76fea251b03768a071033ace27eb}C3{1f0778fe2e852b61c79949ce7b4bb677680b76fea251b03768a071033ace27eb}B3rmula_del_Haversine
+ var R = 6378137; //radio de la tierra en metros
+ var dLat = rad(p2.lat() - p1.lat());
+ var dLong = rad(p2.lng() - p1.lng());
+ var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(rad(p1.lat())) * Math.cos(rad(p2.lat())) * Math.sin(dLong / 2) * Math.sin(dLong / 2);
+ var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+ var d = R * c;
+ return d;
+};

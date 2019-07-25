@@ -41,6 +41,8 @@ public class InsertarMarcacionPedido extends HttpServlet {
 		String observacion = request.getParameter("observacion");
 		int idPedido = 0;
 		int idMarcacion = 0;
+		double descuento = 0;
+		String motivo = "";
 		try{
 			idPedido = Integer.parseInt(request.getParameter("idpedido"));
 		}catch(Exception e)
@@ -53,8 +55,15 @@ public class InsertarMarcacionPedido extends HttpServlet {
 		{
 			idMarcacion = 0;
 		}
+		try{
+			descuento = Double.parseDouble(request.getParameter("descuento"));
+		}catch(Exception e)
+		{
+			descuento = 0;
+		}
+		motivo = request.getParameter("motivo");
 		PedidoCtrl pedCtrl = new PedidoCtrl();
-		MarcacionPedido marPed = new MarcacionPedido(idPedido, idMarcacion, observacion);
+		MarcacionPedido marPed = new MarcacionPedido(idPedido, idMarcacion, observacion, descuento, motivo);
 		String respuesta = pedCtrl.InsertarMarcacionPedido(marPed);
 		PrintWriter out = response.getWriter();
 		out.write(respuesta);

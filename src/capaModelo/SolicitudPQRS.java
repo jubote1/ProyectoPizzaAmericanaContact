@@ -19,6 +19,23 @@ public class SolicitudPQRS {
 	private String zona;
 	private int idmunicipio;
 	private String comentario;
+	private int idOrigen;
+	private String origen;
+	
+	
+	
+	public String getOrigen() {
+		return origen;
+	}
+	public void setOrigen(String origen) {
+		this.origen = origen;
+	}
+	public int getIdOrigen() {
+		return idOrigen;
+	}
+	public void setIdOrigen(int idOrigen) {
+		this.idOrigen = idOrigen;
+	}
 	public int getIdsolicitud() {
 		return idsolicitud;
 	}
@@ -93,7 +110,7 @@ public class SolicitudPQRS {
 	}
 	public SolicitudPQRS(int idsolicitud, String fechaSolicitud, String tipoSolicitud, int idcliente, int idtienda,
 			String nombres, String apellidos, String telefono, String direccion, String zona, int idmunicipio,
-			String comentario) {
+			String comentario, int idOrigen) {
 		super();
 		this.idsolicitud = idsolicitud;
 		this.fechaSolicitud = fechaSolicitud;
@@ -107,6 +124,7 @@ public class SolicitudPQRS {
 		this.zona = zona;
 		this.idmunicipio = idmunicipio;
 		this.comentario = comentario;
+		this.idOrigen = idOrigen;
 	}
 	
 	

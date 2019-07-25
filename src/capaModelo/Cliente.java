@@ -17,6 +17,7 @@ public class Cliente {
 	private int idMunicipio;
 	private float latitud;
 	private float lontitud;
+	private double distanciaTienda;
 	private String zonaDireccion;
 	private String observacion;
 	private String tienda;
@@ -68,7 +69,7 @@ public class Cliente {
 	
 
 	public Cliente(int idcliente, String telefono, String nombres, String apellidos, String nombreCompania, String direccion, String Municipio, float latitud,
-			float lontitud, String zonaDireccion, String observacion, String tienda, int idtienda, int memcode, int idnomenclatura, String numNomenclatura, String numNomenclatura2, String num3, String nomenclatura) {
+			float lontitud, double distanciaTienda, String zonaDireccion, String observacion, String tienda, int idtienda, int memcode, int idnomenclatura, String numNomenclatura, String numNomenclatura2, String num3, String nomenclatura) {
 		super();
 		this.idcliente = idcliente;
 		this.telefono = telefono;
@@ -79,6 +80,7 @@ public class Cliente {
 		this.Municipio = Municipio;
 		this.latitud = latitud;
 		this.lontitud = lontitud;
+		this.distanciaTienda = distanciaTienda;
 		this.zonaDireccion = zonaDireccion;
 		this.observacion = observacion;
 		this.tienda = tienda;
@@ -93,7 +95,7 @@ public class Cliente {
 
 	
 	public Cliente(int idcliente, String telefono, String nombres, String apellidos, String nombreCompania,
-			String direccion, String municipio, int idMunicipio, float latitud, float lontitud, String zonaDireccion,
+			String direccion, String municipio, int idMunicipio, float latitud, float lontitud, double distanciaTienda, String zonaDireccion,
 			String observacion, String tienda, int idtienda, int memcode, int idnomenclatura, String numNomenclatura, String numNomenclatura2, String num3, String nomenclatura) {
 		super();
 		this.idcliente = idcliente;
@@ -106,6 +108,7 @@ public class Cliente {
 		this.idMunicipio = idMunicipio;
 		this.latitud = latitud;
 		this.lontitud = lontitud;
+		this.distanciaTienda = distanciaTienda;
 		this.zonaDireccion = zonaDireccion;
 		this.observacion = observacion;
 		this.tienda = tienda;
@@ -120,6 +123,14 @@ public class Cliente {
 
 	
 	
+	public double getDistanciaTienda() {
+		return distanciaTienda;
+	}
+
+	public void setDistanciaTienda(double distanciaTienda) {
+		this.distanciaTienda = distanciaTienda;
+	}
+
 	public int getMemcode() {
 		return memcode;
 	}

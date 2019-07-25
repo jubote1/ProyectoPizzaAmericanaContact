@@ -41,7 +41,15 @@ public class TiendaDAO {
 				String url = rs.getString("url");
 				int pos = rs.getInt("pos");
 				String hosbd = rs.getString("hosbd");
-				Tienda tien = new Tienda(idTienda, nombre, dsn, url, pos, hosbd);
+				String alertarPedidos = rs.getString("alertarpedidos");
+				if (alertarPedidos.equals(new String ("1")))
+				{
+					alertarPedidos = "S";
+				}else
+				{
+					alertarPedidos = "N";
+				}
+				Tienda tien = new Tienda(idTienda, nombre, dsn, url, pos, hosbd, alertarPedidos);
 				tiendas.add(tien);
 			}
 			rs.close();
@@ -176,11 +184,11 @@ public class TiendaDAO {
 		Logger logger = Logger.getLogger("log_file");
 		ConexionBaseDatos con = new ConexionBaseDatos();
 		Connection con1 = con.obtenerConexionBDPrincipal();
-		Tienda Pro = new Tienda(0,"","", "",0, "");
+		Tienda Pro = new Tienda(0,"","", "",0, "", "");
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select idtienda,nombre,dsn,url,pos from  tienda  where idtienda = " + idtienda; 
+			String consulta = "select idtienda,nombre,dsn,url,pos, hosbd, alertarpedidos from  tienda  where idtienda = " + idtienda; 
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idtien = 0;
@@ -189,6 +197,7 @@ public class TiendaDAO {
 			String url = "";
 			int pos = 0;
 			String hosbd = "";
+			String alertarPedidos = "";
 			while(rs.next()){
 				idtien = rs.getInt("idtienda");
 				nombre = rs.getString("nombre");
@@ -196,9 +205,17 @@ public class TiendaDAO {
 				url = rs.getString("url");
 				pos = rs.getInt("pos");
 				hosbd = rs.getString("hosbd");
+				alertarPedidos = rs.getString("alertarpedidos");
+				if (alertarPedidos.equals(new String ("1")))
+				{
+					alertarPedidos = "S";
+				}else
+				{
+					alertarPedidos = "N";
+				}
 				break;
 			}
-			Pro = new Tienda(idtien,nombre,dsn,url,pos,hosbd);
+			Pro = new Tienda(idtien,nombre,dsn,url,pos,hosbd,alertarPedidos);
 			stm.close();
 			con1.close();
 		}
@@ -229,7 +246,15 @@ public class TiendaDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String update = "update tienda set nombre = '" + Pro.getNombreTienda() + "', dsn = '" + Pro.getDsnTienda() + "'  where idtienda = " + Pro.getIdTienda(); 
+			int alertarPedidos = 0;
+			if(Pro.getAlertarPedidos().equals(new String("S")))
+			{
+				alertarPedidos = 1;
+			}else
+			{
+				alertarPedidos = 0;
+			}
+			String update = "update tienda set nombre = '" + Pro.getNombreTienda() + "', dsn = '" + Pro.getDsnTienda() + "' , alertarpedidos = " + alertarPedidos + "  where idtienda = " + Pro.getIdTienda(); 
 			logger.info(update);
 			stm.executeUpdate(update);
 			resultado = "exitoso";

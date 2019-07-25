@@ -48,7 +48,7 @@ public class SolicitudPQRSDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String insert = "insert into solicitudPQRS (fechasolicitud,tiposolicitud,idcliente, idtienda, nombres, apellidos, telefono, direccion, zona, idmunicipio, comentario) values ('" + fechaSolicitudFinal + "', '" + solicitud.getTipoSolicitud() + "', " + solicitud.getIdcliente() + " , " + solicitud.getIdtienda() + " , '"+ solicitud.getNombres() + "' , '"+ solicitud.getApellidos() + "' , '" + solicitud.getTelefono() + "' , '" + solicitud.getDireccion() + "' , '" + solicitud.getZona() + "' , " + solicitud.getIdmunicipio() + " , '" + solicitud.getComentario() + "')" ; 
+			String insert = "insert into solicitudPQRS (fechasolicitud,tiposolicitud,idcliente, idtienda, nombres, apellidos, telefono, direccion, zona, idmunicipio, comentario, idorigen) values ('" + fechaSolicitudFinal + "', '" + solicitud.getTipoSolicitud() + "', " + solicitud.getIdcliente() + " , " + solicitud.getIdtienda() + " , '"+ solicitud.getNombres() + "' , '"+ solicitud.getApellidos() + "' , '" + solicitud.getTelefono() + "' , '" + solicitud.getDireccion() + "' , '" + solicitud.getZona() + "' , " + solicitud.getIdmunicipio() + " , '" + solicitud.getComentario() + "' , " + solicitud.getIdOrigen() + ")" ; 
 			logger.info(insert);
 			stm.executeUpdate(insert);
 			ResultSet rs = stm.getGeneratedKeys();
@@ -72,6 +72,36 @@ public class SolicitudPQRSDAO {
 		return(idSolicitudPQRSIns);
 	}
 	
+	public static boolean adicionarComentarioPQRS(int idSolicitudPQRS, String comentario)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		boolean respuesta = false;
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		Date fechaTemporal = new Date();
+		comentario = " ///" + fechaTemporal.toString() + " "	+ comentario;
+		try
+		{
+			Statement stm = con1.createStatement();
+			String update = "update solicitudPQRS set comentario = concat( comentario , ' " + comentario + "') where idsolicitudPQRS = " + idSolicitudPQRS;
+			logger.info(update);
+			stm.executeUpdate(update);
+			stm.close();
+			con1.close();
+			respuesta = true;
+		}
+		catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+			return(respuesta);
+		}
+		return(respuesta);
+	}
 	
 	public static ArrayList<SolicitudPQRS> ConsultaIntegradaSolicitudesPQRS(String fechainicial, String fechafinal, String tienda)
 	{
@@ -84,10 +114,10 @@ public class SolicitudPQRSDAO {
 		{
 			if (tienda.equals("TODAS"))
 			{
-				consulta = "select idsolicitudPQRS, fechasolicitud, tiposolicitud,nombres,apellidos, direccion , telefono,comentario from solicitudPQRS where fechasolicitud >=  '" + fechaini +"' and fechasolicitud <= '"+ fechafin +"'" ;
+				consulta = "select idsolicitudPQRS, fechasolicitud, tiposolicitud,nombres,apellidos, direccion , telefono,comentario, a.idorigen, b.nombre_origen, a.idmunicipio, a.idtienda  from solicitudPQRS a, origen_pqrs b where a.idorigen = b.idorigen and fechasolicitud >=  '" + fechaini +"' and fechasolicitud <= '"+ fechafin +"'" ;
 			}else
 			{
-				consulta = "select idsolicitudPQRS, fechasolicitud, tiposolicitud,nombres,apellidos, direccion , telefono,comentario from solicitudPQRS where fechasolicitud >=  '" + fechaini +"' and fechasolicitud <= '"+ fechafin +"' and idtienda = " + tienda;
+				consulta = "select idsolicitudPQRS, fechasolicitud, tiposolicitud,nombres,apellidos, direccion , telefono,comentario, a.idorigen, b.nombre_origen, a.idmunicipio, a.idtienda  from solicitudPQRS a, origen_pqrs b where a.idorigen = b.idorigen and fechasolicitud >=  '" + fechaini +"' and fechasolicitud <= '"+ fechafin +"' and idtienda = " + tienda;
 			}
 		}
 		logger.info(consulta);
@@ -105,6 +135,10 @@ public class SolicitudPQRSDAO {
 			String direccion = "";
 			String telefono = "";
 			String comentario = "";
+			int idOrigen = 0;
+			String origen = "";
+			int idMunicipio = 0;
+			int idTienda = 0;
 			while(rs.next())
 			{
 				idsolicitudpqrs = rs.getInt("idsolicitudPQRS");
@@ -115,9 +149,16 @@ public class SolicitudPQRSDAO {
 				direccion = rs.getString("direccion");
 				telefono = rs.getString("telefono");
 				comentario = rs.getString("comentario");
+				idOrigen = rs.getInt("idorigen");
+				origen = rs.getString("nombre_origen");
+				idMunicipio = rs.getInt("idmunicipio");
+				idTienda = rs.getInt("idtienda");
 				SolicitudPQRS cadaSolicitud = new SolicitudPQRS(idsolicitudpqrs, fechasolicitud, tiposolicitud, 0, 0,
 						nombres, apellidos, telefono, direccion, "", 0,
-						comentario);
+						comentario, idOrigen);
+				cadaSolicitud.setOrigen(origen);
+				cadaSolicitud.setIdmunicipio(idMunicipio);
+				cadaSolicitud.setIdtienda(idTienda);
 				consultaSolicitudes.add(cadaSolicitud);
 			}
 			rs.close();
@@ -135,6 +176,48 @@ public class SolicitudPQRSDAO {
 			
 		}
 		return(consultaSolicitudes);
+	}
+	
+	
+	/**
+	 * Método que se encarga de validar si una PQRS existe o no, retornando esto como un valor booleano
+	 * @param PQRS
+	 * @param idCliente
+	 * @return
+	 */
+	public static boolean validarPQRS(int PQRS, int idCliente)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		String consulta = "select * from solicitudPQRS where idCliente = " + idCliente + " and idsolicitudPQRS = " + PQRS;
+		logger.info(consulta);
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		boolean respuesta = false;
+		try
+		{
+			Statement stm = con1.createStatement();
+			ResultSet rs = stm.executeQuery(consulta);
+			
+			while(rs.next())
+			{
+				respuesta = true;
+				break;
+			}
+			rs.close();
+			stm.close();
+			con1.close();
+
+		}catch(Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+			
+		}
+		return(respuesta);
 	}
 
 }

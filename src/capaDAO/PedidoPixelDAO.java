@@ -360,7 +360,7 @@ public class PedidoPixelDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select a.idcliente, b.nombre nombreTienda, a.idtienda, a.nombre, a.apellido, a.nombrecompania, a.direccion, a.zona, a.observacion, a.telefono, c.nombre nombremunicipio, a.latitud, a.longitud, a.memcode, a.idnomenclatura, a.num_nomencla1, a.num_nomencla2, a.num3, d.nomenclatura from cliente a JOIN tienda b ON a.idtienda = b.idtienda JOIN municipio c ON a.idmunicipio = c.idmunicipio left join nomenclatura_direccion d on a.idnomenclatura = d.idnomenclatura  where a.idcliente = " + id +"";
+			String consulta = "select a.idcliente, b.nombre nombreTienda, a.idtienda, a.nombre, a.apellido, a.nombrecompania, a.direccion, a.zona, a.observacion, a.telefono, c.nombre nombremunicipio, a.latitud, a.longitud, a.distancia_tienda, a.memcode, a.idnomenclatura, a.num_nomencla1, a.num_nomencla2, a.num3, d.nomenclatura from cliente a JOIN tienda b ON a.idtienda = b.idtienda JOIN municipio c ON a.idmunicipio = c.idmunicipio left join nomenclatura_direccion d on a.idnomenclatura = d.idnomenclatura  where a.idcliente = " + id +"";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idcliente;
@@ -375,6 +375,7 @@ public class PedidoPixelDAO {
 			String municipio;
 			float latitud;
 			float longitud;
+			double distanciaTienda;
 			int idTienda;
 			int memcode;
 			int idnomenclatura;
@@ -395,6 +396,7 @@ public class PedidoPixelDAO {
 				municipio = rs.getString("nombremunicipio");
 				latitud = rs.getFloat("latitud");
 				longitud = rs.getFloat("longitud");
+				distanciaTienda = rs.getDouble("distancia_tienda");
 				idTienda = rs.getInt("idtienda");
 				memcode = rs.getInt("memcode");
 				idnomenclatura = rs.getInt("idnomenclatura");
@@ -402,7 +404,7 @@ public class PedidoPixelDAO {
 				numNomenclatura2 = rs.getString("num_nomencla2");
 				num3 = rs.getString("num3");
 				nomenclatura = rs.getString("nomenclatura");
-				clienteConsultado = new Cliente( idcliente, telefono, nombreCliente, apellido, nombreCompania, direccion,municipio,latitud, longitud, zona, observacion, nombreTienda, idTienda,memcode,idnomenclatura, numNomenclatura1, numNomenclatura2, num3, nomenclatura);
+				clienteConsultado = new Cliente( idcliente, telefono, nombreCliente, apellido, nombreCompania, direccion,municipio,latitud, longitud, distanciaTienda, zona, observacion, nombreTienda, idTienda,memcode,idnomenclatura, numNomenclatura1, numNomenclatura2, num3, nomenclatura);
 				
 			}
 		}catch (Exception e){

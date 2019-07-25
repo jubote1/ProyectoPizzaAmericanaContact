@@ -46,8 +46,11 @@ public class FinalizarPedido extends HttpServlet {
 		double valorformapago;
 		double valortotal;
 		double tiempopedido;
+		double descuento = 0;
 		String validaDir;
+		String motivoDescuento = "";
 		validaDir = request.getParameter("validadir");
+		motivoDescuento = request.getParameter("motivodescuento");
 		try
 		{
 			idformapago = Integer.parseInt(request.getParameter("idformapago"));
@@ -85,8 +88,14 @@ public class FinalizarPedido extends HttpServlet {
 		{
 			tiempopedido = 0;
 		}
+		try{
+			descuento = Double.parseDouble(request.getParameter("descuento"));
+		}catch(Exception e)
+		{
+			descuento = 0;
+		}
 		PedidoCtrl PedidoCtrl = new PedidoCtrl();
-        String respuesta = PedidoCtrl.FinalizarPedido(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado, tiempopedido, validaDir);
+        String respuesta = PedidoCtrl.FinalizarPedido(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado, tiempopedido, validaDir, descuento, motivoDescuento);
         PrintWriter out = response.getWriter();
 		out.write(respuesta);
 	}

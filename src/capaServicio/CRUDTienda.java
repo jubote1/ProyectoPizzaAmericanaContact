@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import capaControlador.ParametrosCtrl;
+import capaControlador.TiendaCtrl;
 
 /**
  * Servlet implementation class CRUDTienda
@@ -39,7 +40,7 @@ public class CRUDTienda extends HttpServlet {
 		HttpSession sesion = request.getSession();
 		response.addHeader("Access-Control-Allow-Origin", "*");
 		String idoperacion = request.getParameter("idoperacion");
-		ParametrosCtrl ParametrosCtrl = new ParametrosCtrl();
+		TiendaCtrl tiendaCtrl = new TiendaCtrl();
 		int operacion;
 		String respuesta="";
 		System.out.println("operacion " + idoperacion) ;
@@ -53,27 +54,28 @@ public class CRUDTienda extends HttpServlet {
 		{
 			String nombre = request.getParameter("nombre");
 			String dsn = request.getParameter("dsn");
-			respuesta = ParametrosCtrl.insertarTienda(nombre, dsn);
+			respuesta = tiendaCtrl.insertarTienda(nombre, dsn);
 		}else if (operacion ==2)
 		{
 			int idtienda= Integer.parseInt(request.getParameter("idtienda"));
 			String nombre = request.getParameter("nombre");
 			String dsn = request.getParameter("dsn");
-			respuesta = ParametrosCtrl.editarTienda(idtienda, nombre, dsn);
+			String alertarPedidos = request.getParameter("alertarpedidos");
+			respuesta = tiendaCtrl.editarTienda(idtienda, nombre, dsn, alertarPedidos);
 		}else if (operacion ==3 )
 		{
 			int idtienda = Integer.parseInt(request.getParameter("idtienda"));
-			respuesta = ParametrosCtrl.eliminarTienda(idtienda);
+			respuesta = tiendaCtrl.eliminarTienda(idtienda);
 		}else if (operacion == 4)
 		{
 			int idtiecon = Integer.parseInt(request.getParameter("idtienda"));
-			respuesta = ParametrosCtrl.retornarTienda(idtiecon);
+			respuesta = tiendaCtrl.retornarTienda(idtiecon);
 		}else if(operacion == 5)
 		{
-			respuesta = ParametrosCtrl.retornarTiendas();
+			respuesta = tiendaCtrl.retornarTiendas();
 		}else if(operacion == 6)
 		{
-			respuesta = ParametrosCtrl.retornarTiendas();
+			respuesta = tiendaCtrl.retornarTiendas();
 		}
 		//System.out.println(respuesta);
 		PrintWriter out = response.getWriter();

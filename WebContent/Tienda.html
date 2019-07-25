@@ -4,6 +4,7 @@
 		<title>Maestro Tiendas</title>
 		<meta charset="utf-8" />
 		  <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+		  <link href="css/all.min.css" rel="stylesheet" type="text/css" />
 		  <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.min.css">
 		  <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script> 
 		  <script type="text/javascript" src="js/bootstrap.min.js"></script>
@@ -71,11 +72,11 @@
 		      <form>
 		      <div class="modal-body">
 		       		<div class="form-group">
-					    <label for="nombreEspecialidad">Nombre Tienda</label>
+					    <label for="nombreTienda">Nombre Tienda</label>
 					    <input type="text" class="form-control" id="nombre" placeholder="Nombre Tienda">
 					  </div>
 					  <div class="form-group">
-					    <label for="abreviaturaEspecialidad">DSN</label>
+					    <label for="dsn">DSN</label>
 					    <input type="text" class="form-control" id="dsn" placeholder="DSN">
 					  </div>
 		      </div>
@@ -109,6 +110,11 @@
         <div class="col-xs-5">
             <input type="text" class="form-control" name="nombreedit" />
         </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-3 control-label">
+        	<input type="checkbox" id="alertarpedidos" value="sialertapedidos" checked> Alertar Pedidos </label>
     </div>
 
     <div class="form-group">

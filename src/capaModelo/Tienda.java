@@ -14,9 +14,17 @@ public class Tienda {
 	private String url;
 	private int pos;
 	private String hosbd;
+	private String alertarPedidos;
 	
 	
 	
+	
+	public String getAlertarPedidos() {
+		return alertarPedidos;
+	}
+	public void setAlertarPedidos(String alertarPedidos) {
+		this.alertarPedidos = alertarPedidos;
+	}
 	public String getHosbd() {
 		return hosbd;
 	}
@@ -55,7 +63,7 @@ public class Tienda {
 	}
 	
 	
-	public Tienda(int idTienda, String nombreTienda, String dsnTienda, String url, int pos, String hosbd) {
+	public Tienda(int idTienda, String nombreTienda, String dsnTienda, String url, int pos, String hosbd, String alertarPedidos) {
 		super();
 		this.idTienda = idTienda;
 		this.nombreTienda = nombreTienda;
@@ -63,6 +71,7 @@ public class Tienda {
 		this.url = url;
 		this.pos = pos;
 		this.hosbd = hosbd;
+		this.alertarPedidos = alertarPedidos;
 	}
 	
 	public Tienda()

@@ -14,6 +14,7 @@ import capaModelo.ExcepcionPrecio;
 import capaModelo.FormaPago;
 import capaModelo.HomologaGaseosaIncluida;
 import capaModelo.InsertarPedidoPixel;
+import capaModelo.MarcacionPedido;
 import capaModelo.Producto;
 import capaModelo.SaborLiquido;
 import capaModelo.Tienda;
@@ -40,7 +41,7 @@ public class PedidoDAO {
 	 * Método que se encarga de obtener todas especialidades de Pizza definidos en el sistema.
 	 * @return Se retorna un ArrayList con todas las especialidades definidas en la base de datos.
 	 */
-	public static ArrayList<Especialidad> obtenerEspecialidad()
+	public static ArrayList<Especialidad> obtenerEspecialidad(int idExcepcion)
 	{
 		Logger logger = Logger.getLogger("log_file");
 		ArrayList<Especialidad> especialidades = new ArrayList();
@@ -49,7 +50,14 @@ public class PedidoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select e.idespecialidad, e.nombre, e.abreviatura from especialidad e order by nombre asc";
+			String consulta = "";
+			if(idExcepcion == 0)
+			{
+				consulta = "select e.idespecialidad, e.nombre, e.abreviatura from especialidad e order by nombre asc";
+			}else
+			{
+				consulta = "select e.idespecialidad, e.nombre, e.abreviatura from especialidad e, controla_especialidades c where e.idespecialidad = c.idespecialidad and c.idexcepcion = " + idExcepcion +" order by nombre asc";
+			}
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idespecialidad;
@@ -820,7 +828,7 @@ public class PedidoDAO {
 	}
 	
 	
-	public static InsertarPedidoPixel finalizarPedidoPOSPM(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado, double tiempopedido)
+	public static InsertarPedidoPixel finalizarPedidoPOSPM(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado, double tiempopedido, double descuento)
 	{
 		Logger logger = Logger.getLogger("log_file");
 		ConexionBaseDatos con = new ConexionBaseDatos();
@@ -836,7 +844,7 @@ public class PedidoDAO {
 				valorTotal = rs.getDouble(1);
 				break;
 			}
-			String update = "update pedido set total_bruto =" + valorTotal* 0.92 + " , impuesto = " + valorTotal * 0.08 + " , total_neto =" + valorTotal + " , idestadopedido = 2, tiempopedido = " + tiempopedido +  " where idpedido = " + idpedido;
+			String update = "update pedido set total_bruto =" + (valorTotal / 1.08) + " , impuesto = " + (valorTotal- (valorTotal / 1.08)) + " , total_neto =" + valorTotal + " , idestadopedido = 2, tiempopedido = " + tiempopedido + " , descuento = " + descuento +  " where idpedido = " + idpedido;
 			logger.info(update);
 			stm.executeUpdate(update);
 			String insertformapago = "insert pedido_forma_pago (idpedido, idforma_pago, valortotal, valorformapago) values (" + idpedido + " , " + idformapago + " , " + valortotal + " , " + valorformapago + ")";
@@ -1189,7 +1197,7 @@ public class PedidoDAO {
 				formapago = rs.getString("formapago");
 				idformapago = rs.getInt("idforma_pago");
 				tiempopedido = rs.getDouble("tiempopedido");
-				Tienda tiendapedido = new Tienda(idtienda, nombreTienda, "", url, 0, "");
+				Tienda tiendapedido = new Tienda(idtienda, nombreTienda, "", url, 0, "", "");
 				Pedido cadaPedido = new Pedido(idpedido,  nombreTienda,totalBruto, impuesto, totalNeto,
 						estadoPedido, fechaPedido, nombreCliente, idcliente, enviadopixel,numposheader, tiendapedido, stringpixel, fechainsercion, usuariopedido, direccion, telefono, formapago, idformapago, tiempopedido);
 				consultaPedidos.add(cadaPedido);
@@ -1702,7 +1710,7 @@ public class PedidoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select a.idpedido_forma_pago, a.idforma_pago,valortotal, a.valorformapago, b.nombre from pedido_forma_pago a, forma_pago b where a.idforma_pago = b.idforma_pago and a.idpedido = " + idPedido;
+			String consulta = "select a.idpedido_forma_pago, a.idforma_pago,valortotal, a.valorformapago, b.nombre, c.descuento from pedido_forma_pago a, forma_pago b, pedido c where a.idforma_pago = b.idforma_pago and a.idpedido = " + idPedido + " and a.idpedido = c.idpedido ";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idpedidoformapago;
@@ -1710,13 +1718,16 @@ public class PedidoDAO {
 			double valortotal;
 			double valorformapago;
 			String nombre;
+			double descuento;
 			while(rs.next()){
 				idpedidoformapago = rs.getInt("idpedido_forma_pago");
 				idformapago = rs.getInt("idforma_pago");
 				valortotal = rs.getDouble("valortotal");
 				valorformapago = rs.getDouble("valorformapago");
 				nombre = rs.getString("nombre");
-			formaPago = new FormaPago(idformapago,nombre,"",valortotal, valorformapago);
+				descuento = rs.getDouble("descuento");
+				formaPago = new FormaPago(idformapago,nombre,"",valortotal, valorformapago);
+				formaPago.setDescuento(descuento);
 			}
 			rs.close();
 			stm.close();
@@ -1731,6 +1742,54 @@ public class PedidoDAO {
 			}
 		}
 		return(formaPago);
+	}
+	
+	/**
+	 * Método que recupera las marcaciones de un pedido en un ArrayList.
+	 * @param idPedido
+	 * @return
+	 */
+	public static ArrayList<MarcacionPedido> obtenerMarcacionesPedido(int idPedido)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		ArrayList<MarcacionPedido> marcacionesPedido = new ArrayList();
+		try
+		{
+			Statement stm = con1.createStatement();
+			String consulta = "select b.nombre_marcacion, a.idmarcacion, a.observacion, a.descuento, a.motivo from marcacion_pedido a, marcacion b where a.idmarcacion = b.idmarcacion and a.idpedido = " + idPedido;
+			logger.info(consulta);
+			ResultSet rs = stm.executeQuery(consulta);
+			String nombreMarcacion;
+			String observacion;
+			int idMarcacion;
+			double descuento;
+			String motivo;
+			MarcacionPedido marcacionPedido;
+			while(rs.next()){
+				nombreMarcacion = rs.getString("nombre_marcacion");
+				idMarcacion = rs.getInt("idmarcacion");
+				observacion = rs.getString("observacion");
+				descuento = rs.getDouble("descuento");
+				motivo = rs.getString("motivo");
+				marcacionPedido = new MarcacionPedido(idPedido, idMarcacion, observacion, descuento, motivo);
+				marcacionPedido.setNombreMarcacion(nombreMarcacion);
+				marcacionesPedido.add(marcacionPedido);
+			}
+			rs.close();
+			stm.close();
+			con1.close();
+		}catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+		}
+		return(marcacionesPedido);
 	}
 	
 	/**
@@ -1957,7 +2016,7 @@ public class PedidoDAO {
 				formapago = rs.getString("formapago");
 				idformapago = rs.getInt("idforma_pago");
 				tiempopedido = rs.getDouble("tiempopedido");
-				Tienda tiendapedido = new Tienda(idtienda, nombreTienda, "", url,0, "");
+				Tienda tiendapedido = new Tienda(idtienda, nombreTienda, "", url,0, "", "");
 				Pedido cadaPedido = new Pedido(idpedido,  nombreTienda,totalBruto, impuesto, totalNeto,
 						estadoPedido, fechaPedido, nombreCliente, idcliente, enviadopixel,numposheader, tiendapedido, stringpixel, fechainsercion, usuariopedido, direccion, telefono, formapago, idformapago, tiempopedido);
 				consultaPedidos.add(cadaPedido);
@@ -2064,5 +2123,141 @@ public class PedidoDAO {
 		return(consultaDirs);
 	}
 	
+	
+	/**
+	 * Método que se encargará de consultar los pedidos pendientes dada una fecha determinada, con el fin de alertar posteriormente en correo electrónico
+	 * @param fechaPed
+	 * @return
+	 */
+	public static ArrayList<Pedido> ConsultarPedidosPendientes(String fechaPed)
+	{
+		ArrayList <Pedido> consultaPedidos = new ArrayList();
+		int idtienda = 0;
+		String consulta = "";
+		consulta = "select a.idpedido, b.nombre, a.total_bruto, a.impuesto, a.total_neto, concat (c.nombre , '-' , c.apellido) nombrecliente, c.direccion, c.telefono, d.descripcion, a.fechapedido, c.idcliente, a.enviadopixel, a.numposheader, b.idtienda, b.url, a.stringpixel, a.fechainsercion, a.usuariopedido, e.nombre formapago, e.idforma_pago, a.tiempopedido from pedido a, tienda b, cliente c, estado_pedido d, forma_pago e, pedido_forma_pago f where a.idtienda = b.idtienda and a.idcliente = c.idcliente and a.idestadopedido = d.idestadopedido and e.idforma_pago = f.idforma_pago and f.idpedido = a.idpedido and a.fechapedido = '" + fechaPed + "' and a.idestadopedido = 2 and a.enviadopixel = 0 AND TIMESTAMPDIFF(MINUTE, a.fechainsercion, NOW()) > 5 and b.alertarpedidos = 1";
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		//Llamamos metodo de conexión asumiendo que corremos en el servidor de aplicaciones de manera local
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		try
+		{
+			Statement stm = con1.createStatement();
+			ResultSet rs = stm.executeQuery(consulta);
+			int idpedido;
+			String nombreTienda;
+			double totalBruto;
+			double impuesto;
+			double totalNeto;
+			String nombreCliente;
+			String estadoPedido;
+			String fechaPedido;
+			int idcliente;
+			int enviadopixel;
+			int numposheader;
+			String url;
+			String stringpixel;
+			String fechainsercion;
+			String usuariopedido;
+			String telefono;
+			String direccion;
+			String formapago;
+			int idformapago;
+			double tiempopedido;
+			while(rs.next())
+			{
+				idpedido = rs.getInt("idpedido");
+				nombreTienda = rs.getString("nombre");
+				totalBruto = rs.getDouble("total_bruto");
+				impuesto = rs.getDouble("impuesto");
+				totalNeto = rs.getDouble("total_neto");
+				nombreCliente = rs.getString("nombrecliente");
+				estadoPedido = rs.getString("descripcion");
+				fechaPedido = rs.getString("fechapedido");
+				idcliente = rs.getInt("idcliente");
+				enviadopixel = rs.getInt("enviadopixel");
+				numposheader = rs.getInt("numposheader");
+				stringpixel = rs.getString("stringpixel");
+				fechainsercion = rs.getString("fechainsercion");
+				usuariopedido = rs.getString("usuariopedido");
+				direccion = rs.getString("direccion");
+				telefono = rs.getString("telefono");
+				url = rs.getString("url");
+				formapago = rs.getString("formapago");
+				idformapago = rs.getInt("idforma_pago");
+				tiempopedido = rs.getDouble("tiempopedido");
+				Pedido cadaPedido = new Pedido(idpedido,  nombreTienda,totalBruto, impuesto, totalNeto,
+						estadoPedido, fechaPedido, nombreCliente, idcliente, enviadopixel,numposheader, null, stringpixel, fechainsercion, usuariopedido, direccion, telefono, formapago, idformapago, tiempopedido);
+				consultaPedidos.add(cadaPedido);
+			}
+			rs.close();
+			stm.close();
+			con1.close();
+
+		}catch(Exception e){
+			System.out.println(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+			
+		}
+		return(consultaPedidos);
+	}
+	
+	public static boolean seDebeReportar(int idpedido ,int maxAlertas)
+	{
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		boolean seDebeReportar = false;
+		boolean existeRegistro = false;
+		int vecesReportado = 0;
+		try
+		{
+			Statement stm = con1.createStatement();
+			Statement stm1 = con1.createStatement();
+			// Actualizamos la tabla pedido con el numero pedido pixel y le ponemos estado al pedido = 1, indicando que ya fue enviado a la tienda.
+			String select = "select veces_reportado from pedidos_pendiente where idpedido =" + idpedido;
+			ResultSet rs = stm.executeQuery(select);
+			while(rs.next())
+			{
+				vecesReportado = rs.getInt("veces_reportado");
+				if(vecesReportado == maxAlertas)
+				{
+					seDebeReportar = false;
+				}
+				else
+				{
+					seDebeReportar = true;
+					vecesReportado++;
+					String update = "update pedidos_pendiente set veces_reportado = " + vecesReportado + " where idpedido = " + idpedido;
+					System.out.println("update " + update);
+					stm1.executeUpdate(update);
+				}
+				existeRegistro = true;
+			}
+			if(!existeRegistro)
+			{
+				seDebeReportar = true;
+				vecesReportado = 1;
+				String insert = "insert into pedidos_pendiente (idpedido, veces_reportado) values(" + idpedido + "," + vecesReportado + ")";
+				System.out.println("insert " + insert);
+				stm1.executeUpdate(insert);
+			}
+			stm.close();
+			con1.close();
+		}
+		catch (Exception e){
+			System.out.println(e.getMessage());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+			return(false);
+		}
+		return(seDebeReportar);
+	}
 	
 }

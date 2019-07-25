@@ -28,7 +28,7 @@ public class MarcacionPedidoDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String insert = "insert into marcacion_pedido (idpedido,idmarcacion,observacion) values ( " + mar.getIdPedido() + " , " + mar.getIdMarcacion() + " , '" + mar.getObservacion() +  "' )"; 
+			String insert = "insert into marcacion_pedido (idpedido,idmarcacion,observacion,descuento, motivo) values ( " + mar.getIdPedido() + " , " + mar.getIdMarcacion() + " , '" + mar.getObservacion() + "' , " + mar.getDescuento() + " , '" + mar.getMotivo() + "')"; 
 			logger.info(insert);
 			stm.executeUpdate(insert);
 			ResultSet rs = stm.getGeneratedKeys();

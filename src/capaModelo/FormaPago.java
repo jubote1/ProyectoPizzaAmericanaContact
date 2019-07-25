@@ -13,10 +13,18 @@ public class FormaPago {
 	private String tipoforma;
 	private double valortotal;
 	private double valorformapago;
+	private double descuento;
 	
 	
 	
 	
+	
+	public double getDescuento() {
+		return descuento;
+	}
+	public void setDescuento(double descuento) {
+		this.descuento = descuento;
+	}
 	public double getValortotal() {
 		return valortotal;
 	}

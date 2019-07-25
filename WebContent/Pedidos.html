@@ -4,14 +4,15 @@
 		<title>Tomar Pedidos</title>
 		<meta charset="utf-8" />
 		  <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-		  <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />	
-		  <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
+		  <link href="css/all.min.css" rel="stylesheet" type="text/css" />
+		  <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
+		  <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.min.css">
 		  <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script> 
 		  <script type="text/javascript" src="js/bootstrap.min.js"></script>
-		  <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.js"></script>
-		  <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.5.3/js/bootstrapValidator.min.js'></script>
-   		  <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.5.3/js/language/es_ES.min.js'></script>
-		  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.1.0/jquery-confirm.min.css">	
+		  <script type="text/javascript" charset="utf8" src="js/jquery.dataTables.js"></script>
+		  <script src='js/bootstrapValidator.min.js'></script>
+   		  <script src='js/language/es_ES.min.js'></script>
+		  <link rel="stylesheet" href="css/jquery-confirm.min.css">	
 	</head>
 	<body>
 
@@ -61,15 +62,43 @@
 				
 					<table class="table table-bordered">
 						<tbody>
-								
-								<tr>
-										<td class="active">Fecha Pedido</td>
-										<td><input type="text" id="fechapedido" name="fechapedido" class="form-control" placeholder="Fecha Pedido"></td>
-								</tr>
+								<div class="row">
+								<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+									<tr>
+											<td class="active">Fecha Pedido</td>
+											<td><input type="text" id="fechapedido" name="fechapedido" class="form-control" placeholder="Fecha Pedido"></td>
+									</tr>
+								</div>
+								</div>
 								<tr>
 										<td class="active">Teléfono</td>
 										<td id="encTelefono"><input type="text" id="telefono" name="telefono" class="form-control" placeholder="Telefono" onchange="validarTelefono();" maxlength="10"></td>
 								</tr>
+						</tbody>
+					</table>
+					<table id="grid-clientes" class="table table-condensed table-hover table-striped" cellspacing="0" width="100%">
+									        <thead>
+									            <tr>
+									                <th data-column-id="idCliente">idCliente</th>
+									                <th data-column-id="tienda">Tienda</th>
+									                <th data-column-id="nombre">Nombres</th>
+									                <th data-column-id="apellido">Apellidos</th>
+									                <th data-column-id="nombrecompania">Nom-Compañia</th>
+									                <th data-column-id="direccion">Dirección</th>
+									                <th data-column-id="zona">Zona</th>
+									                <th data-column-id="observacion">Observacion</th>
+									                <th data-column-id="telefono">Telefono</th>
+									                <th data-column-id="memcode">Memcode</th>
+									                <th data-column-id="latitud">latitud</th>
+									                <th data-column-id="longitud">longitud</th>
+									            </tr>
+									        </thead>
+									      	<tbody>
+									      			
+									      	</tbody>
+					</table>
+					<table class="table table-bordered">
+						<tbody>
 								<tr>
 										<td class="active">Nombres</td>
 										<td id="encNombres"><input type="text" id="nombres" name="nombres" class="form-control" placeholder="Nombres" maxlength="20"></td>
@@ -122,9 +151,9 @@
 												<select id="selectMunicipio" class="form-control" onchange="descripcionDireccion()"></select>
 											</div>
 											<div class="col-md-2">
-												<input type="button" class="btn btn-default btn-sm" id="buscar" value="Buscar" onclick="buscarMapaDigitado1()"/>
+												<button type="button" class="btn btn-secondary btn-sm" id="buscar"  onclick="buscarMapaDigitado1()">Buscar</button>
 											</div>
-											<div class="col-md-6 col-md-offset-0 col-lg-6 col-lg-offset-0"> 
+											<div class="col-md-6 col-md-offset-0 col-lg-6 col-lg-offset-0">  
 												<input type="text" id="descDireccion" name="descDireccion" class="form-control" placeholder="Descripción Dirección" maxlength="10">
 											</div>
 										</div>
@@ -149,10 +178,10 @@
 							
 						</tbody>
 					</table>
-
-					<input type="button" class="btn btn-danger btn-sm" id="limpiar" name="limpiar" value="Limpiar Selección Cliente" onclick="limpiarSeleccionCliente()"/>
-					<input type="button" class="btn btn-primary btn-sm" id="ultimospedidos" name="ultimospedidos" value="Últimos Pedidos" onclick="consultarUltimosPedidos()"/>
-					<input type="button" class="btn btn-warning btn-sm" id="transferircliente" name="transferircliente" value="Transferir Cliente" onclick="mostrarTransferirCliente()"/>
+					
+					<button type="button" class="btn btn-danger btn-sm" id="limpiar" name="limpiar" onclick="limpiarSeleccionCliente()"><i class="fas fa-eraser fa-2x"></i> Limpiar Selección Cliente</button>
+					<button type="button" class="btn btn-primary btn-sm" id="ultimospedidos" name="ultimospedidos" onclick="consultarUltimosPedidos()"><i class="fas fa-pizza-slice fa-2x"></i> Últimos Pedidos</button>
+					<button type="button" class="btn btn-warning btn-sm" id="transferircliente" name="transferircliente" onclick="mostrarTransferirCliente()"><i class="fas fa-exchange-alt fa-2x"></i> Transferir Cliente</button>
 
 					<table id="grid-clientes" class="table table-condensed table-hover table-striped" cellspacing="0" width="100%">
 									        <thead>
@@ -169,6 +198,7 @@
 									                <th data-column-id="memcode">Memcode</th>
 									                <th data-column-id="latitud">latitud</th>
 									                <th data-column-id="longitud">longitud</th>
+									                <th data-column-id="distanciatienda">Distancia</th>
 									            </tr>
 									        </thead>
 									      	<tbody>
@@ -250,10 +280,10 @@
 								</tr>
 								<tr>
 									<td>
-										<input type="button" class="btn btn-success btn-md" value="PRODUCTO CON" onclick="ProductoCon()">
+										<button type="button" class="btn btn-success btn-md" onclick="ProductoCon()"><i class="fas fa-thumbs-up fa-2x"></i> PRODUCTO CON</button>
 									</td>
 									<td>
-										<input type="button" class="btn btn-warning btn-md" value="PRODUCTO SIN" onclick="ProductoSin()">
+										<button type="button" class="btn btn-warning btn-md" onclick="ProductoSin()"><i class="fas fa-thumbs-down fa-2x"></i> PRODUCTO SIN</button>
 									</td>
 								</tr>
 							</tbody>
@@ -268,11 +298,11 @@
 
 					<!-- ESTO ES PARA LA ADICIÓN -->
 						<div class="modal fade" id="addAdicion" tabindex="-1" role="dialog" aria-labelledby="addLabel">
-							 <div class="modal-dialog modal-lg" role="document">
+							 <div class="modal-dialog modal-xl" role="document">
 							    <div class="modal-content">
 							      <div class="modal-header">
+							      	<h4 class="modal-title" id="addLabel">Seleccionar Adiciones</h4>
 							        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-							        <h4 class="modal-title" id="addLabel">Seleccionar Adiciones</h4>
 							      </div>
 							      <form id='pintarAdiciones'>
 								  </form>
@@ -283,11 +313,11 @@
 
 					<!-- ESTO ES MODAL PARA TRANSFERIR CLIENTE -->
 						<div class="modal fade" id="transCliente" tabindex="-1" role="dialog" aria-labelledby="addLabel">
-							 <div class="modal-dialog modal-lg" role="document">
+							 <div class="modal-dialog modal-xl" role="document">
 							    <div class="modal-content">
 							      <div class="modal-header">
+							      	<h4 class="modal-title" id="addLabel">Seleccionar Tienda a Trasladar el Cliente</h4>
 							        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-							        <h4 class="modal-title" id="addLabel">Seleccionar Tienda a Trasladar el Cliente</h4>
 							      </div>
 							      <form id='transClienteTienda'>
 							      	<td class="active">Tienda a Trasladar Cliente</td>
@@ -301,11 +331,11 @@
 
 					<!-- ESTO ES PARA LA GASEOSA -->
 						<div class="modal fade" id="addGaseosa" tabindex="-1" role="dialog" aria-labelledby="addLabel">
-							 <div class="modal-dialog modal-lg" role="document">
+							 <div class="modal-dialog modal-xl" role="document">
 							    <div class="modal-content">
 							      <div class="modal-header">
+							      	<h4 class="modal-title" id="addLabel">Seleccionar Gaseosa</h4>
 							        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-							        <h4 class="modal-title" id="addLabel">Seleccionar Gaseosa</h4>
 							      </div>
 							      <form id='pintarGaseosa'>
 								  </form>
@@ -316,11 +346,11 @@
 
 					<!-- ESTO ES PARA ADICIONALES -->
 						<div class="modal fade" id="addAdicionales" tabindex="-1" role="dialog" aria-labelledby="addLabel">
-							 <div class="modal-dialog modal-lg" role="document">
+							 <div class="modal-dialog modal-xl" role="document">
 							    <div class="modal-content">
 							      <div class="modal-header">
+							      	<h4 class="modal-title" id="addLabel">Seleccionar Adicionales</h4>
 							        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-							        <h4 class="modal-title" id="addLabel">Seleccionar Adicionales</h4>
 							      </div>
 							      <form id='pintarAdicionales'>
 								  </form>
@@ -334,11 +364,11 @@
 					
 								
 									<div class="modal fade" id="conProducto" tabindex="-1" role="dialog" aria-labelledby="addLabel">
-										 <div class="modal-dialog modal-lg" role="document">
+										 <div class="modal-dialog modal-xl" role="document">
 										    <div class="modal-content">
 										      <div class="modal-header">
+										      	<h4 class="modal-title" id="addLabel">Producto CON</h4>
 										        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-										        <h4 class="modal-title" id="addLabel">Producto CON</h4>
 										      </div>
 										      <form id='pintarCon'>
 											  </form>
@@ -348,14 +378,14 @@
 							<!-- ESTO ES PARA LA CONINGREDIENTE -->
 
 							<!-- ESTO ES PARA LA SININGREDIENTE -->
-							
+									
 								
 									<div class="modal fade" id="sinProducto" tabindex="-1" role="dialog" aria-labelledby="addLabel">
-										 <div class="modal-dialog modal-lg" role="document">
+										 <div class="modal-dialog modal-xl" role="document">
 										    <div class="modal-content">
 										      <div class="modal-header">
+										      	<h4 class="modal-title" id="addLabel">Producto SIN</h4>
 										        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-										        <h4 class="modal-title" id="addLabel">Producto SIN</h4>
 										      </div>
 										      <form id='pintarSin'>
 											  </form>
@@ -367,11 +397,11 @@
 							
 								
 									<div class="modal fade" id="ultimosPedidosCliente" tabindex="-1" role="dialog" aria-labelledby="addLabel">
-										 <div class="modal-dialog modal-lg" role="document">
+										 <div class="modal-dialog modal-xl" role="document">
 										    <div class="modal-content">
 										      <div class="modal-header">
+										      	<h4 class="modal-title" id="addLabel">ÚLTIMOS PEDIDIOS</h4>
 										        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-										        <h4 class="modal-title" id="addLabel">ÚLTIMOS PEDIDIOS</h4>
 										      </div>
 										      		<form id='pintarUltimosPedidosCliente'>
 										      						
@@ -536,7 +566,7 @@
 						<!-- <canvas id="pintarpedido" width="200" height="200"> -->
            				<!-- </canvas> -->
 						<div>
-						<input type="button" class="btn btn-primary btn-lg" value="Agregar al Pedido" onclick="agregarProducto()">
+							<button type="button" class="btn btn-primary btn-lg" onclick="agregarProducto()"><i class="fas fa-cart-plus fa-3x"></i> Agregar al Pedido</button>	
 						</div>
 						<br>
 							<table class='table table-bordered'>
@@ -578,6 +608,8 @@
 								      	</tbody>
 								</table>
 						</div>
+						<form  id='frmMarcaciones'>
+						</form>
 						<table class='table table-bordered'>
 								<tbody>
 									<tr>
@@ -606,16 +638,14 @@
 									</tr>
 								</tbody>
 							</table>
-							<form  id='frmMarcaciones'>
-							</form>
 							<table class='table'>
 								<tbody>
 									<tr>
 										<td>
-											<input align='right' type="button" class="btn btn-danger btn-lg" value="Reiniciar Pedido" onclick="ReiniciarPedido()">
+											<button  align='right' type="button" class="btn btn-danger btn-lg" onclick="ReiniciarPedido()"><i class="fas fa-trash-restore fa-3x"></i> Reiniciar Pedido</button>
 										</td>
 										<td>
-											<input align='left' type="button" class="btn btn-primary btn-lg" value="Confimar Pedido" onclick="ConfirmarPedido()">
+											<button  align='left' type="button" class="btn btn-primary btn-lg" onclick="ConfirmarPedido()"><i class="fas fa-check fa-3x"></i> Confimar Pedido</button>
 										</td>
 									</tr>
 								</tbody>
@@ -624,7 +654,7 @@
 	</body>
 	<script src="js/pedidos.js" type="text/javascript"></script>
 	<script src="js/geolocalizacion.js" type="text/javascript"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.1.0/jquery-confirm.min.js"></script>
+	<script src="js/jquery-confirm.min.js"></script>
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRtUQ2WV0L2gMnb9DKiFn1PTHJQLH3suA&callback=initMap&libraries=geometry">
     </script>
     <script src="js/jquery-ui.min.js"></script>

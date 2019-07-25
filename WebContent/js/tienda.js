@@ -21,7 +21,7 @@ $(document).ready(function() {
             {
                 "mData": "accion",
                 className: "center",
-                defaultContent: '<input type="button" class="btn btn-default btn-xs" onclick="eliminarTienda()" value="Eliminar"></button> <input type="button" class="btn btn-default btn-xs" onclick="EditarTienda()" value="Editar"></button>'
+                defaultContent: '<button type="button" class="btn btn-default btn-xs" onclick="eliminarTienda()">Eliminar</button> <button type="button" class="btn btn-default btn-xs" onclick="EditarTienda()">Editar</button>'
             }
         ]
     	} );
@@ -165,7 +165,7 @@ function pintarTiendas()
 					"idtienda": data1[i].idtienda, 
 					"dsn": data1[i].dsn,
 					"nombre": data1[i].nombre, 
-					"accion":'<input type="button" class="btn btn-default btn-xs" onclick="eliminarTienda(' +data1[i].idtienda+ ')" value="Eliminar"></button> <input type="button" onclick="editarTienda('+data1[i].idtienda +')" class="btn btn-default btn-xs editButton" ' + 'data-id="' + data1[i].idtienda + '" value="Edición"></button>'
+					"accion":'<button type="button" class="btn btn-default btn-xs" onclick="eliminarTienda(' +data1[i].idtienda+ ')"><i class="fas fa-eraser fa-2x"></i></button> <button type="button" onclick="editarTienda('+data1[i].idtienda +')" class="btn btn-default btn-xs editButton" ' + 'data-id="' + data1[i].idtienda + '">Edición</button>'
 				}).draw();
 				//table.row.add(data1[i]).draw();
 			}
@@ -188,7 +188,13 @@ function editarTienda(idtienda)
 				                .find('[name="idtiendaedit"]').val(respuesta.idtienda).end()
 				                .find('[name="nombreedit"]').val(respuesta.nombre).end()
 				                .find('[name="dsnedit"]').val(respuesta.dsn).end()
-				                
+				                if(respuesta.alertarpedidos == 'S')
+				                {
+				                	$('#alertarpedidos').prop('checked', true);
+				                }else
+				                {
+				                	$('#alertarpedidos').prop('checked', false);
+				                }
 
 				            // Show the dialog
 				            bootbox
@@ -223,9 +229,18 @@ function confirmarEditarTienda()
                 var idtienda =  $('input:text[name=idtiendaedit]').val();
                 var nombre = $('input:text[name=nombreedit]').val();
                 var dsn = $('input:text[name=dsnedit]').val();
+                var alertarPedidos = "";
+                if($('#alertarpedidos').is(':checked'))
+                {
+                	alertarPedidos = "S";
+                }
+                else
+                {
+                	alertarPedidos = "N";
+                }
             // The url and method might be different in your application
             $.ajax({ 
-    				url: server + 'CRUDTienda?idoperacion=2&idtienda='+ idtienda+'&nombre=' + nombre + "&dsn=" + dsn, 
+    				url: server + 'CRUDTienda?idoperacion=2&idtienda='+ idtienda+'&nombre=' + nombre + "&dsn=" + dsn+ "&alertarpedidos=" + alertarPedidos, 
     				dataType: 'json', 
     				async: false, 
     				success: function(data){

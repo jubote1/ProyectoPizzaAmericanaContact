@@ -86,7 +86,7 @@ function guardarOferta()
 {
 	
     
-	var nombreoferta = $('#nombre').val();
+	var nombreoferta = encodeURIComponent($('#nombre').val());
 	var idexcepcion = $('#selectExcepcion').val();
 
 	$.getJSON(server + 'CRUDOferta?idoperacion=1&idexcepcion=' + idexcepcion + "&nombreoferta=" + nombreoferta, function(data){

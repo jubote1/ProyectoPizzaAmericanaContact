@@ -10,10 +10,16 @@ public class OfertaCliente {
 	private String ingresoOferta;
 	private String usoOferta;
 	private String observacion;
+	private int PQRS;
 	
 	
 	
-	
+	public int getPQRS() {
+		return PQRS;
+	}
+	public void setPQRS(int pQRS) {
+		PQRS = pQRS;
+	}
 	public String getObservacion() {
 		return observacion;
 	}
@@ -62,15 +68,8 @@ public class OfertaCliente {
 	public void setUtilizada(String utilizada) {
 		this.utilizada = utilizada;
 	}
-	public OfertaCliente(int idOfertaCliente, int idOferta, int idCliente, String utilizada, String observacion) {
-		super();
-		this.idOfertaCliente = idOfertaCliente;
-		this.idOferta = idOferta;
-		this.idCliente = idCliente;
-		this.utilizada = utilizada;
-		this.observacion = observacion;
-	}
-	public OfertaCliente(int idOfertaCliente, int idOferta, int idCliente, String utilizada, String ingresoOferta,
+
+	public OfertaCliente(int idOfertaCliente, int idOferta, int idCliente, String utilizada, int pqrs, String ingresoOferta,
 			String usoOferta, String observacion) {
 		super();
 		this.idOfertaCliente = idOfertaCliente;
@@ -80,7 +79,7 @@ public class OfertaCliente {
 		this.ingresoOferta = ingresoOferta;
 		this.usoOferta = usoOferta;
 		this.observacion = observacion;
-		
+		this.PQRS = pqrs;
 	}
 	
 	

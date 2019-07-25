@@ -34,9 +34,9 @@ import capaModelo.ProductoIncluido;
 public class PedidoCtrl {
 
 	
-	public String obtenerEspecialidades(){
+	public String obtenerEspecialidades(int idExcepcion){
 		JSONArray listJSON = new JSONArray();
-		ArrayList<Especialidad> especialidades = PedidoDAO.obtenerEspecialidad();
+		ArrayList<Especialidad> especialidades = PedidoDAO.obtenerEspecialidad(idExcepcion);
 		for (Especialidad espe : especialidades) {
 			JSONObject cadaViajeJSON = new JSONObject();
 			cadaViajeJSON.put("idespecialidad", espe.getIdespecialidad());
@@ -284,6 +284,7 @@ public class PedidoCtrl {
 			cadaExcepcionJSON.put("viernes", exc.getViernes());
 			cadaExcepcionJSON.put("sabado", exc.getSabado());
 			cadaExcepcionJSON.put("domingo", exc.getDomingo());
+			cadaExcepcionJSON.put("controlaespecialidades", exc.getControlaEspecialidades());
 			listJSON.add(cadaExcepcionJSON);
 		}
 		
@@ -358,7 +359,7 @@ public class PedidoCtrl {
 	 * @return Se retorna un string en formato JSON con todos los valores que se pasarán al servicio tienda para la creación del pedido en la 
 	 * tienda.
 	 */
-	public String FinalizarPedido(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado, double tiempopedido, String validaDir)
+	public String FinalizarPedido(int idpedido, int idformapago, double valorformapago, double valortotal, int idcliente, int insertado, double tiempopedido, String validaDir, double descuento, String motivoDescuento)
 	{
 		Tienda tienda = PedidoDAO.obtenerTiendaPedido(idpedido);
 		String tiendaPixel = tienda.getUrl();
@@ -371,13 +372,15 @@ public class PedidoCtrl {
 			pedidoPixel = PedidoDAO.finalizarPedido(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado, tiempopedido);
 		}else if (pos == 1)
 		{
-			pedidoPixel = PedidoDAO.finalizarPedidoPOSPM(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado, tiempopedido);
+			pedidoPixel = PedidoDAO.finalizarPedidoPOSPM(idpedido, idformapago, valorformapago, valortotal, idcliente, insertado, tiempopedido, descuento);
 		}
 		JSONArray listJSON = new JSONArray();
 		JSONArray listJSONCliente = new JSONArray();
 		JSONObject respuesta = new JSONObject();
 		respuesta.put("idpedido", idpedido);
 		respuesta.put("valortotal", valortotal);
+		respuesta.put("descuento", descuento);
+		respuesta.put("motivodescuento", motivoDescuento);
 		respuesta.put("insertado", "true");
 		respuesta.put("url", tiendaPixel);
 		respuesta.put("dsntienda", pedidoPixel.getDsnTienda());
@@ -594,7 +597,27 @@ public class PedidoCtrl {
 		Respuesta.put("valortotal", formapago.getValortotal());
 		Respuesta.put("valorformapago", formapago.getValorformapago());
 		Respuesta.put("nombre", formapago.getNombre());
+		Respuesta.put("descuento", formapago.getDescuento());
 		listJSON.add(Respuesta);
+		return(listJSON.toJSONString());
+	}
+	
+	public String obtenerMarcacionesPedido(int idpedido)
+	{
+		ArrayList<MarcacionPedido> marcacionesPedido = PedidoDAO.obtenerMarcacionesPedido(idpedido);
+		JSONArray listJSON = new JSONArray();
+		JSONObject Respuesta = new JSONObject();
+		for(MarcacionPedido cadaMarcacion: marcacionesPedido)
+		{
+			Respuesta.put("idpedido", cadaMarcacion.getIdPedido());
+			Respuesta.put("idmarcacion", cadaMarcacion.getIdMarcacion() );
+			Respuesta.put("nombremarcacion", cadaMarcacion.getNombreMarcacion() );
+			Respuesta.put("observacion", cadaMarcacion.getObservacion());
+			Respuesta.put("descuento", cadaMarcacion.getDescuento());
+			Respuesta.put("motivo", cadaMarcacion.getMotivo() );
+			listJSON.add(Respuesta);
+		}
+		
 		return(listJSON.toJSONString());
 	}
 	
@@ -884,6 +907,13 @@ public class PedidoCtrl {
 			listJSON.add(ResultadoJSON);
 		}
 		return listJSON.toJSONString();
+		
+	}
+	
+	public ArrayList<Pedido> ConsultarPedidosPendientes(String fechaPed)
+	{
+		ArrayList<Pedido> pedidosPendientes = PedidoDAO.ConsultarPedidosPendientes(fechaPed);
+		return(pedidosPendientes);
 		
 	}
 }

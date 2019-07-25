@@ -77,6 +77,7 @@ public class InsertarClienteEncabezadoPedido extends HttpServlet {
         String num3 = request.getParameter("num3");
         float latitud;
         float longitud;
+        double distanciaTienda;
         int idCliente;
         int memcode;
         try{
@@ -90,6 +91,13 @@ public class InsertarClienteEncabezadoPedido extends HttpServlet {
         }catch(Exception e)
         {
         	longitud = 0;
+        }
+        try{
+        	
+        	distanciaTienda = Double.parseDouble(request.getParameter("distanciatienda"));
+        }catch(Exception e)
+        {
+        	distanciaTienda = 0;
         }
         try{
         	memcode = Integer.parseInt(request.getParameter("memcode"));
@@ -110,7 +118,7 @@ public class InsertarClienteEncabezadoPedido extends HttpServlet {
         	idnomenclatura = 0;
         }
         ClienteCtrl ClienCtrl = new ClienteCtrl();
-        int idcliente = ClienCtrl.InsertarClientePedidoEncabezado(idCliente,telefono, nombres, apellidos, nombreCompania,  direccion, municipio, latitud, longitud, zona, observacion, tienda, memcode, idnomenclatura, numNomenclatura, numNomenclatura2, num3);
+        int idcliente = ClienCtrl.InsertarClientePedidoEncabezado(idCliente,telefono, nombres, apellidos, nombreCompania,  direccion, municipio, latitud, longitud, distanciaTienda, zona, observacion, tienda, memcode, idnomenclatura, numNomenclatura, numNomenclatura2, num3);
         String respuesta = "";
         PedidoCtrl PedidoCtrl = new PedidoCtrl();
 	    respuesta = PedidoCtrl.InsertarEncabezadoPedido(tienda,idcliente,fechaPedido, user);

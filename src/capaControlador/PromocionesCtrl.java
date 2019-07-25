@@ -37,6 +37,7 @@ public class PromocionesCtrl {
 			cadaOfertaJSON.put("ingresooferta", ofer.getIngresoOferta());
 			cadaOfertaJSON.put("usooferta", ofer.getUsoOferta());
 			cadaOfertaJSON.put("observacion", ofer.getObservacion());
+			cadaOfertaJSON.put("pqrs", ofer.getPQRS());
 			listJSON.add(cadaOfertaJSON);
 		}
 		return(listJSON.toJSONString());
@@ -57,6 +58,7 @@ public class PromocionesCtrl {
 			cadaOfertaJSON.put("ingresooferta", ofer.getIngresoOferta());
 			cadaOfertaJSON.put("usooferta", ofer.getUsoOferta());
 			cadaOfertaJSON.put("observacion", ofer.getObservacion());
+			cadaOfertaJSON.put("pqrs", ofer.getPQRS());
 			listJSON.add(cadaOfertaJSON);
 		}
 		return(listJSON.toJSONString());
@@ -96,6 +98,7 @@ public class PromocionesCtrl {
 		ResultadoJSON.put("ingresooferta", oferCliente.getIngresoOferta());
 		ResultadoJSON.put("usooferta", oferCliente.getUsoOferta());
 		ResultadoJSON.put("observacion", oferCliente.getObservacion());
+		ResultadoJSON.put("pqrs", oferCliente.getPQRS());
 		listJSON.add(ResultadoJSON);
 		return(listJSON.toJSONString());
 	}
@@ -108,6 +111,18 @@ public class PromocionesCtrl {
 		ResultadoJSON.put("resultado", "exitoso");
 		listJSON.add(ResultadoJSON);
 		return listJSON.toJSONString();
+	}
+	
+	public ArrayList<OfertaCliente> obtenerOfertasNuevasSemana(String fechaSuperior, String fechaInferior)
+	{
+		ArrayList<OfertaCliente> ofertasNuevasSemana =  OfertaClienteDAO.obtenerOfertasNuevasSemana(fechaSuperior, fechaInferior);
+		return(ofertasNuevasSemana);
+	}
+	
+	public ArrayList<OfertaCliente> obtenerOfertasRedimidasSemana(String fechaSuperior, String fechaInferior)
+	{
+		ArrayList<OfertaCliente> ofertasRedSemana =  OfertaClienteDAO.obtenerOfertasRedimidasSemana(fechaSuperior, fechaInferior);
+		return(ofertasRedSemana );
 	}
 	
 	//ENTIDAD OFERTA

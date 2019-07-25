@@ -43,6 +43,7 @@ public class ClienteCtrl {
 			cadaViajeJSON.put("municipio", cliente.getMunicipio());
 			cadaViajeJSON.put("longitud", cliente.getLontitud());
 			cadaViajeJSON.put("latitud", cliente.getLatitud());
+			cadaViajeJSON.put("distanciatienda", cliente.getDistanciaTienda());
 			cadaViajeJSON.put("memcode", cliente.getMemcode());
 			cadaViajeJSON.put("idnomenclatura", cliente.getIdnomenclatura());
 			cadaViajeJSON.put("numnomenclatura1", cliente.getNumNomenclatura());
@@ -83,6 +84,7 @@ public class ClienteCtrl {
 			cadaViajeJSON.put("municipio", cliente.getMunicipio());
 			cadaViajeJSON.put("longitud", cliente.getLontitud());
 			cadaViajeJSON.put("latitud", cliente.getLatitud());
+			cadaViajeJSON.put("distanciatienda", cliente.getDistanciaTienda());
 			cadaViajeJSON.put("memcode", cliente.getMemcode());
 			cadaViajeJSON.put("idnomenclatura", cliente.getIdnomenclatura());
 			cadaViajeJSON.put("numnomenclatura1", cliente.getNumNomenclatura());
@@ -151,6 +153,7 @@ public String obtenerClienteporID(int id)
 	Respuesta.put("nombremunicipio", clienteConsultado.getMunicipio());
 	Respuesta.put("latitud", clienteConsultado.getLatitud());
 	Respuesta.put("longitud", clienteConsultado.getLontitud());
+	Respuesta.put("distanciatienda", clienteConsultado.getDistanciaTienda());
 	Respuesta.put("idtienda", clienteConsultado.getIdtienda());
 	listJSON.add(Respuesta);
 	return(listJSON.toJSONString());
@@ -241,7 +244,7 @@ public String InsertarClientePedido(String telefono, String nombres, String dire
  * @param memcode
  * @return Retorna el idcliente ingresado o actualizado según los datos recibidos como parámetro.
  */
-public int InsertarClientePedidoEncabezado(int idCliente,String telefono, String nombres, String apellidos, String nombreCompania, String direccion, String municipio, float latitud, float longitud, String zona,  String observacion, String tienda, int memcode, int idnomenclatura, String numNomenclatura, String numNomenclatura2, String num3 )
+public int InsertarClientePedidoEncabezado(int idCliente,String telefono, String nombres, String apellidos, String nombreCompania, String direccion, String municipio, float latitud, float longitud, double distanciaTienda, String zona,  String observacion, String tienda, int memcode, int idnomenclatura, String numNomenclatura, String numNomenclatura2, String num3 )
 {
 	//Validar si el cliente ya existe en la base de datos
 	//Llamamos el mï¿½todo ya existente para saber si el cliente con el telï¿½fono ya existe
@@ -249,7 +252,7 @@ public int InsertarClientePedidoEncabezado(int idCliente,String telefono, String
 	int idTienda = TiendaDAO.obteneridTienda(tienda);
 	int idMunicipio = MunicipioDAO.obteneridMunicipio(municipio);
 	// Se crea el objeto cliente con todas las características enviadas
-	Cliente clienteRevisar = new Cliente(idCliente, telefono, nombres, apellidos, nombreCompania, direccion,municipio, idMunicipio, latitud, longitud, zona,  observacion,  tienda, idTienda, memcode, idnomenclatura, numNomenclatura, numNomenclatura2, num3, "");
+	Cliente clienteRevisar = new Cliente(idCliente, telefono, nombres, apellidos, nombreCompania, direccion,municipio, idMunicipio, latitud, longitud, distanciaTienda,  zona,  observacion,  tienda, idTienda, memcode, idnomenclatura, numNomenclatura, numNomenclatura2, num3, "");
 	// Se inician las variables para la iniciación de la creación o la actualización
 	int idRespuestaCreacion = 0;
 	int idRespuestaActualizacion = 0;
@@ -279,7 +282,7 @@ public int InsertarClientePedidoEncabezado(int idCliente,String telefono, String
 }
 
 
-public String InsertarClientePedidoEncabezadoJSON(int idCliente,String telefono, String nombres, String apellidos, String nombreCompania, String direccion, String municipio, float latitud, float longitud, String zona,  String observacion, String tienda, int memcode, int idnomenclatura, String numNomenclatura, String numNomenclatura2, String num3 )
+public String InsertarClientePedidoEncabezadoJSON(int idCliente,String telefono, String nombres, String apellidos, String nombreCompania, String direccion, String municipio, float latitud, float longitud, double distanciaTienda, String zona,  String observacion, String tienda, int memcode, int idnomenclatura, String numNomenclatura, String numNomenclatura2, String num3 )
 {
 	//Validar si el cliente ya existe en la base de datos
 	//Llamamos el mï¿½todo ya existente para saber si el cliente con el telï¿½fono ya existe
@@ -287,7 +290,7 @@ public String InsertarClientePedidoEncabezadoJSON(int idCliente,String telefono,
 	int idTienda = TiendaDAO.obteneridTienda(tienda);
 	int idMunicipio = MunicipioDAO.obteneridMunicipio(municipio);
 	// Se crea el objeto cliente con todas las características enviadas
-	Cliente clienteRevisar = new Cliente(idCliente, telefono, nombres, apellidos, nombreCompania, direccion,municipio, idMunicipio, latitud, longitud, zona,  observacion,  tienda, idTienda, memcode, idnomenclatura, numNomenclatura, numNomenclatura2, num3, "");
+	Cliente clienteRevisar = new Cliente(idCliente, telefono, nombres, apellidos, nombreCompania, direccion,municipio, idMunicipio, latitud, longitud, distanciaTienda, zona,  observacion,  tienda, idTienda, memcode, idnomenclatura, numNomenclatura, numNomenclatura2, num3, "");
 	// Se inician las variables para la iniciación de la creación o la actualización
 	int idRespuestaCreacion = 0;
 	int idRespuestaActualizacion = 0;

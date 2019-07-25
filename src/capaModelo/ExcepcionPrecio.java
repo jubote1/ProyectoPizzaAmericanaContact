@@ -27,10 +27,19 @@ public class ExcepcionPrecio {
 	private String viernes;
 	private String sabado;
 	private String domingo;
+	private String controlaEspecialidades;
 	
 	
 	
 	
+	public String getControlaEspecialidades() {
+		return controlaEspecialidades;
+	}
+
+	public void setControlaEspecialidades(String controlaEspecialidades) {
+		this.controlaEspecialidades = controlaEspecialidades;
+	}
+
 	public String getLunes() {
 		return lunes;
 	}
@@ -262,7 +271,7 @@ public class ExcepcionPrecio {
 		this.descripcion = descripcion;
 	}
 	public ExcepcionPrecio(int idExcepcion, int idProducto, double precio, String descripcion, String controlaCantidadIngredientes, int cantidadIngredientes,String incluyeliquido,
-			int idtipoliquido, String partiradiciones , String horaInicial, String horaFinal, String lunes, String martes, String miercoles, String jueves, String viernes, String sabado, String domingo ) {
+			int idtipoliquido, String partiradiciones , String horaInicial, String horaFinal, String lunes, String martes, String miercoles, String jueves, String viernes, String sabado, String domingo, String controlaEspecialidades ) {
 		super();
 		this.idExcepcion = idExcepcion;
 		this.idProducto = idProducto;
@@ -280,6 +289,7 @@ public class ExcepcionPrecio {
 		this.viernes = viernes;
 		this.sabado = sabado;
 		this.domingo = domingo;
+		this.controlaEspecialidades = controlaEspecialidades;
 	}
 	
 	

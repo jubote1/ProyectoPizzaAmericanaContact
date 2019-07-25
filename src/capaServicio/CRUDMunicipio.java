@@ -53,21 +53,21 @@ public class CRUDMunicipio extends HttpServlet {
 				{
 					String nombre = request.getParameter("nombre");
 					String dsn = request.getParameter("dsn");
-					respuesta = ParametrosCtrl.insertarTienda(nombre, dsn);
+					
 				}else if (operacion ==2)
 				{
 					int idtienda= Integer.parseInt(request.getParameter("idtienda"));
 					String nombre = request.getParameter("nombre");
 					String dsn = request.getParameter("dsn");
-					respuesta = ParametrosCtrl.editarTienda(idtienda, nombre, dsn);
+					
 				}else if (operacion ==3 )
 				{
 					int idtienda = Integer.parseInt(request.getParameter("idtienda"));
-					respuesta = ParametrosCtrl.eliminarTienda(idtienda);
+					
 				}else if (operacion == 4)
 				{
 					int idtiecon = Integer.parseInt(request.getParameter("idtienda"));
-					respuesta = ParametrosCtrl.retornarTienda(idtiecon);
+					
 				}else if(operacion == 5)
 				{
 					respuesta = ParametrosCtrl.retornarMunicipios();

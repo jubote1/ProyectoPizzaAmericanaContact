@@ -34,6 +34,7 @@ public class ExcepcionPrecioDAO {
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			String lunes, martes, miercoles, jueves, viernes, sabado, domingo;
+			String controlaEspecialidades;
 			while(rs.next()){
 				int idExcepcion = rs.getInt("idexcepcion");
 				int idProducto = rs.getInt("idproducto");
@@ -53,7 +54,9 @@ public class ExcepcionPrecioDAO {
 				viernes = rs.getString("viernes");
 				sabado = rs.getString("sabado");
 				domingo = rs.getString("domingo");
-				ExcepcionPrecio excepcion = new ExcepcionPrecio(idExcepcion, idProducto, precio, descripcion,controlaCantidadIngredientes,cantidadIngredientes,"",0,partiradiciones,horaInicial, horaFinal,lunes,martes,miercoles,jueves,viernes, sabado, domingo);
+				controlaEspecialidades = rs.getString("controla_especialidades");
+				System.out.println("controlaEspecialidades " + controlaEspecialidades);
+				ExcepcionPrecio excepcion = new ExcepcionPrecio(idExcepcion, idProducto, precio, descripcion,controlaCantidadIngredientes,cantidadIngredientes,"",0,partiradiciones,horaInicial, horaFinal,lunes,martes,miercoles,jueves,viernes, sabado, domingo, controlaEspecialidades);
 				excepciones.add(excepcion);
 			}
 			rs.close();

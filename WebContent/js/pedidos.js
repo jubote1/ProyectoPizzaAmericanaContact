@@ -27,18 +27,28 @@ var marcardorProductoSin = 0;
 var canvas;
 var ctx;
 var totalpedido = 0;
+//Tendremos una variable total general 
+var totalpedidogeneral = 0;
 var radioEsp1Ant= 0;
 var radioEsp1 = 0;
 var radioEsp2Ant= 0;
 var radioEsp2 = 0;
 var contadorItem = 1;
 var controlaCantidadIngredientes = "N";
+var controlarEspecialidades = "N";
+var idExcepcionSeleccionada = 0;
 var cantidadIngredientes = 0;
 var excepcionSeleccionada = null;
 var gaseosaHomologadaTienda;
 var productoGaseosaHomologadaTienda;
 var formas;
 var idOfertaCliente;
+var administrador = "N";
+//Manejaremos una variable global para saber el valor de los descuentos
+var descuentoPedido = 0;
+var motivoDescuento = "";
+//Variable donde será almacaneda la distancia del cliente a la tienda en caso de que se pueda calcular
+var distanciaTienda = 0;
 
 // A continuación  la ejecucion luego de cargada la pagina
 $(document).ready(function() {
@@ -74,6 +84,15 @@ $("#fechapedido").change(function(){
 	// En resumen se invocan todos servicios que se encargan de llenar la data del formulario.
 	//getTodosProductos();
 	
+    //Vamos a validar si es un admnistrador o no quien se está logueando
+    if(respuesta == 'OKA')
+    {
+        administrador = 'S';
+    }else if(respuesta == 'OK')
+    {
+        administrador = 'N';
+    }
+
 	getListaTiendas();
 	//Obtenemos las homologaciones para los liquidos
 	getHomologacionGaseosaTienda();
@@ -115,6 +134,7 @@ $("#fechapedido").change(function(){
             { "mData": "telefono" },
             { "mData": "latitud" , "visible": false },
             { "mData": "longitud" , "visible": false },
+            { "mData": "distanciatienda"  , "visible": false },
             { "mData": "memcode"  , "visible": false }
         ]
     	} );
@@ -335,6 +355,48 @@ $("#fechapedido").change(function(){
         	}
         }
 
+        //Vamos a revisar la distancia entre dos puntos si la tiene el cliente
+        distanciaTienda = datos.distanciatienda;
+        var coordenadaCliente = new google.maps.LatLng(datos.latitud, datos.longitud);
+        //Validamos si la distancia a la tienda almacenada es cero, en cuyo caso se recalcula
+        if(distanciaTienda == 0)
+        {
+            //Definimos las coordenadas de cada tienda
+            var coorManrique = new google.maps.LatLng(6.27016,-75.554695);
+            var coorBello = new google.maps.LatLng(6.313582,-75.559738);
+            var coorAmerica = new google.maps.LatLng(6.248635,-75.604294);
+            var coorColores = new google.maps.LatLng(6.264574,-75.59654);
+            var coorItagui = new google.maps.LatLng(6.165916,-75.621144);
+            var coorPoblado = new google.maps.LatLng(6.206544,-75.560035);
+            var coorLaMota = new google.maps.LatLng(6.210901,-75.595363);
+            var coorEnvigado = new google.maps.LatLng(6.1670374,-75.5852606);
+            if(datos.tienda == "Manrique")
+            {
+                distanciaTienda = getDistance(coordenadaCliente, coorManrique);
+            }else if(datos.tienda == "America")
+            {coordenadaCliente
+                distanciaTienda = getDistance(coordenadaCliente, coorAmerica);
+            }else if(datos.tienda == "Itagui")
+            {
+                distanciaTienda = getDistance(coordenadaCliente, coorItagui);
+            }else if(datos.tienda == "Bello")
+            {
+                distanciaTienda = getDistance(coordenadaCliente, coorBello);
+            }else if(datos.tienda == "Colores")
+            {
+                distanciaTienda = getDistance(coordenadaCliente, coorColores);
+            }else if(datos.tienda == "La Mota")
+            {
+                distanciaTienda = getDistance(coordenadaCliente, coorLaMota);
+            }else if(datos.tienda == "Poblado")
+            {
+                distanciaTienda = getDistance(coordenadaCliente, coorPoblado);
+            }else if(datos.tienda == "Envigado")
+            {
+                distanciaTienda = getDistance(coordenadaCliente, coorEnvigado);
+            }
+        }
+
         //En este punto luego de buscar la direccion del cliente, buscaremos si este tiene pedidos
         $('#ultimospedidos').attr('disabled', false);
         $('#transferircliente').attr('disabled', false);
@@ -356,7 +418,7 @@ $("#fechapedido").change(function(){
     	}
         getProductosTienda(idtien);
         //Traemos las gaseosas homologadas y disponibles para la tienda
-        obtenerHomologacionProductoGaseosa(idtiend);
+        obtenerHomologacionProductoGaseosa(idtien);
     });
 
     //Se define acción al momento de seleccionar la excepción de precio para validar que maneje o no hora de promoción
@@ -777,7 +839,7 @@ function duplicarDetallePedido(iddetallepedido)
 							    		// Para controlar la adición del botón de duplicacion, contralamos que no sea ni adicion, ni modificadores y adicionalmente que no sea un producto incluido con el valor en el campo de observacion.
 							    		if((cadaDetalle.tipo != "ADICION") && (cadaDetalle.tipo != "MODIFICADOR CON") && (cadaDetalle.tipo != "MODIFICADOR SIN") && (cadaDetalle.observacion.substring(0,18) != 'Producto Incluido-' ))
 							    		{
-							    			accion2 = '<input type="button" class="btn btn-default btn-xs" onclick="duplicarDetallePedido(' + cadaDetalle.iddetallepedido + ')" value="Duplicar"></button>';
+							    			accion2 = '<button type="button" class="btn btn-warning btn-xs" onclick="duplicarDetallePedido(' + cadaDetalle.iddetallepedido + ')"><i class="fas fa-copy fa-2x"></i></button>';
 							    			adicion = cadaDetalle.adicion;
 							    		}else
 							    		{
@@ -797,7 +859,7 @@ function duplicarDetallePedido(iddetallepedido)
 								        "adicion": adicion,
 								        "valorunitario": cadaDetalle.valorunitario,
 								        "valortotal": cadaDetalle.valortotal,
-								        "accion":'<input type="button" class="btn btn-default btn-xs" onclick="eliminarDetallePedido(' + cadaDetalle.iddetallepedido + ')" value="Eliminar"></button>',
+								        "accion":'<button type="button" class="btn btn-danger btn-xs" onclick="eliminarDetallePedido(' + cadaDetalle.iddetallepedido + ')"><i class="fas fa-trash-alt fa-2x"></i></button>',
 								        "accion2": accion2
 								    	}).draw();
 							    	}
@@ -923,25 +985,76 @@ function getListaMunicipios(){
 //Método que invoca el servicio para obtener lista de municipios parametrizados en el sistema
 function getMarcaciones(){
 
-	$.getJSON(server + 'ObtenerMarcaciones', function(data){
-		marcaciones = data;
-		var str = '<h2>Marcaciones Pedido</h2>';
-        str += '<table class="table table-bordered">';
-		str += '<tbody>';
-		for(var i = 0; i < data.length;i++){
-			var cadaMarcacion  = marcaciones[i];
-			str +='<tr> ';
-			str +='<td> ';
-			str += '<label><input type="checkbox" aria-label="..."' + '  value="'+ cadaMarcacion.nombremarcacion + '" id=checkMarca"' + cadaMarcacion.idmarcacion + '" name= "checkMarca' + cadaMarcacion.idmarcacion  +'">'  + cadaMarcacion.nombremarcacion +'</label>';
-			str += '</td>';
-			str +='<td> ';
-			str += '<label><input type="text" ' + '" id="txtObsMarcacion' + cadaMarcacion.idmarcacion + '" name= "txtObsMarcacion' + cadaMarcacion.idmarcacion +'" maxlength="50">'  +'</label>';
-			str += '</td>';
-			str += '</tr>';
-		}
-		$('#frmMarcaciones').html(str);
-	});
+    //En este punto vamos a validar si se es o no administrador con el fin de pintar o no este bloqueo
+    if(administrador == 'S')
+    {
+        $.getJSON(server + 'ObtenerMarcaciones', function(data){
+            marcaciones = data;
+            var str = '<h2>Marcaciones Pedido</h2>';
+            str += '<table class="table table-bordered">';
+            str += '<tbody>';
+            for(var i = 0; i < data.length;i++){
+                var cadaMarcacion  = marcaciones[i];
+                str +='<tr> ';
+                str +='<td> ';
+                str += '<label><input type="checkbox" aria-label="..."' + '  value="'+ cadaMarcacion.nombremarcacion + '" id=checkMarca"' + cadaMarcacion.idmarcacion + '" name= "checkMarca' + cadaMarcacion.idmarcacion  +'">'  + cadaMarcacion.nombremarcacion +'</label>';
+                str += '</td>';
+                str +='<td> ';
+                str += '<label><input type="text" ' + '" id="txtObsMarcacion' + cadaMarcacion.idmarcacion + '" name= "txtObsMarcacion' + cadaMarcacion.idmarcacion +'" maxlength="50">'  +'</label>';
+                str += '</td>';
+                //Agregaremos dos columnas con el fin tener el descuento
+                str +='<td> ';
+                str += '<label>Descuento<input type="text" ' + '" id="txtDescuento' + cadaMarcacion.idmarcacion + '" onchange="validarDescuento(this.value);" name= "txtDescuento' + cadaMarcacion.idmarcacion +'" maxlength="50">'  +'</label>';
+                str += '</td>';
+                str +='<td> ';
+                str += '<select id="selectMotivo' + cadaMarcacion.idmarcacion +  '" onchange="validarMotivoDescuento(this);"  class="form-control">';
+                str += '<option value="vacio" id ="0"></option><option value="Descuento propio de Domicilios" id ="1">Descuento propio de Domicilios</option><option value="Descuento de Franquicias" id ="2">Descuento de Franquicias</option>';
+                str += '</select>';
+                str += '</td>';
+                str += '</tr>';
+            }
+            $('#frmMarcaciones').html(str);
+        });
+    }
+}
 
+
+function validarDescuento( descuentoIng)
+{
+    if (!/^([0-9])*$/.test( descuentoIng))
+    {
+        $.alert("El valor Descuento  " + descuentoIng + " no es un número, se asumirá un valor de cero");
+        return;
+    }
+    //Realizamos validación que el total del descuento no sobrepase el total del pedido
+    if (descuentoIng > totalpedidogeneral)
+    {
+        $.alert("El valor del descuento  " + descuentoIng + " no puede sobrepasar el total del pedido " + totalpedidogeneral);
+        return;
+    }
+    descuentoPedido = descuentoIng;
+    //Realizamos recalculo del totalPedido
+    //Debemos de recorrer todos los descuentos
+    var descTemp = 0;
+    totalpedido = totalpedidogeneral;
+    for(var i = 0; i < marcaciones.length;i++)
+    {
+        var cadaMarcacion = marcaciones[i];
+        descTemp = $('#txtDescuento'+cadaMarcacion.idmarcacion).val();
+        totalpedido = totalpedido - descTemp;
+    }
+
+    $('#totalpedido').val(totalpedido);
+    if ($("input:radio[name=requiereDevuelta]:checked").val() == "completo")
+    {
+        $("#valorpago").val(totalpedido);
+    }
+    $("#valordevolver").val($("#valorpago").val() - $("#totalpedido").val() );
+}
+
+function validarMotivoDescuento( motivoDesc)
+{
+    motivoDescuento = $('option:selected', motivoDesc).val();
 }
 
 function procesarMarcaciones(idPedMarcado){
@@ -951,9 +1064,19 @@ function procesarMarcaciones(idPedMarcado){
 		if($('input:checkbox[name=checkMarca'+cadaMarcacion.idmarcacion+']').is(':checked'))
 		{
 			var observacion = "";
+            var descuento = 0;
+            var motivo = "";
 			observacion = $("#txtObsMarcacion"+cadaMarcacion.idmarcacion).val();
-			$.getJSON(server + 'InsertarMarcacionPedido?idpedido='+idPedMarcado+"&idmarcacion=" + cadaMarcacion.idmarcacion + "&observacion=" + observacion, function(data){
+            descuento = $("#txtDescuento"+cadaMarcacion.idmarcacion).val();
+            if (descuento == '' || descuento == null)
+            {
+                descuento = 0;
+            }
+            motivo = $("#selectMotivo"+cadaMarcacion.idmarcacion).val();
+			$.getJSON(server + 'InsertarMarcacionPedido?idpedido='+idPedMarcado+"&idmarcacion=" + cadaMarcacion.idmarcacion + "&observacion=" + observacion + "&descuento=" + descuento + "&motivo=" + motivo, function(data){
 				$("#txtObsMarcacion"+cadaMarcacion.idmarcacion).val('');
+                $("#txtDescuento"+cadaMarcacion.idmarcacion).val('');
+                $("#selectMotivo"+cadaMarcacion.idmarcacion).val("vacio");
 				$('input:checkbox[name=checkMarca'+cadaMarcacion.idmarcacion+']').attr('checked',false);
 			});
 		}
@@ -995,6 +1118,8 @@ function getExcepcionesPrecios(){
 	var idSelExcepcion;
 	var selCodigoProducto;
 	controlaCantidadIngredientes = "N";
+    controlarEspecialidades= "N";
+    idExcepcionSeleccionada = 0;
 	cantidadIngredientes = 0;
 	excepcionSeleccionada;
 	// Se realiza el control de cuando se cambia el valor de la excepción, se valida que el producto seleccionado, corresponda con la excepción
@@ -1022,6 +1147,8 @@ function getExcepcionesPrecios(){
 		{
 			excepcionSeleccionada = null;
 			controlaCantidadIngredientes = 'N';
+            controlarEspecialidades= 'N'
+            idExcepcionSeleccionada = 0;
 			cantidadIngredientes = 0;
 			return;
 		}
@@ -1045,10 +1172,13 @@ function getExcepcionesPrecios(){
 				{
 					excepcionSeleccionada = cadaExcepcion;
 					controlaCantidadIngredientes = excepcionSeleccionada.controlacantidadingredientes;
+                    controlarEspecialidades = excepcionSeleccionada.controlaespecialidades;
+                    idExcepcionSeleccionada = excepcionSeleccionada.idexcepcion;
 					cantidadIngredientes = excepcionSeleccionada.cantidadingredientes;
 					break;
 				}
 			}
+
 
 			if (selCodigoProducto != idSelExcepcion)
 			{
@@ -1174,7 +1304,15 @@ function getExcepcionesPrecios(){
 
 //Método para obtener y pintar las especilaidades cuando se elige en la forma de mitad y mitad
 function getEspecilidadesMitad(){
-	$.getJSON(server + 'GetEspecialidades', function(data){
+    var obtEspecialidades = "";
+    if(controlarEspecialidades == 'S')
+    {
+        obtEspecialidades = server + 'GetEspecialidades?idexcepcion=' + idExcepcionSeleccionada;
+    }else
+    {
+        obtEspecialidades = server + 'GetEspecialidades';
+    }
+	$.getJSON(obtEspecialidades, function(data){
 		especialidades = data;
 		var str = '';
 		str += '<table class="table table-bordered">';
@@ -1200,8 +1338,15 @@ function getEspecilidadesMitad(){
 
 // Método que se encarga de pintar las especialidad cuando se elige que la pizza será de un solo sabor.
 function getEspecilidadesEntera(){
-
-	$.getJSON(server + 'GetEspecialidades', function(data){
+    var obtEspecialidades = "";
+    if(controlarEspecialidades == 'S')
+    {
+        obtEspecialidades = server + 'GetEspecialidades?idexcepcion=' + idExcepcionSeleccionada;
+    }else
+    {
+        obtEspecialidades = server + 'GetEspecialidades';
+    }
+	$.getJSON(obtEspecialidades , function(data){
 		especialidades = data;
 		var str = '';
 		var indfila = 1;
@@ -1841,6 +1986,7 @@ function agregarGaseosa()
 				valorunitario = cadaProdu.preciogeneral;
 				valortotal= cadaProdu.preciogeneral * cantidad;
 				totalpedido = totalpedido + valortotal; 
+                totalpedidogeneral = totalpedidogeneral + valortotal; 
 				otroProd = cadaProdu.idproducto+'-'+cadaProdu.nombre;
 				adicion = '';
 				adiciones = '';
@@ -1997,6 +2143,7 @@ function AgregarAdicionales()
 				valorunitario = cadaProdu.preciogeneral;
 				valortotal= cadaProdu.preciogeneral * cantidad;
 				totalpedido = totalpedido + valortotal; 
+                totalpedidogeneral = totalpedidogeneral + valortotal; 
 				otroProd = cadaProdu.idproducto+'-'+cadaProdu.nombre;
 				adicion = '';
 				adiciones = '';
@@ -2032,7 +2179,7 @@ function adicionarDetalleProducto(codprod,especialidad1,cantidad,especialidad2,v
 			{
 				if(indDup == 'S')
 				{
-					accion2 = '<input type="button" class="btn btn-default btn-xs" onclick="duplicarDetallePedido(' + idDetallePedido + ')" value="Duplicar"></button>';
+					accion2 = '<button type="button" class="btn btn-warning btn-xs" onclick="duplicarDetallePedido(' + idDetallePedido + ')"><i class="fas fa-copy fa-2x"></i></button>';
 				}else{
 					accion2 = '';
 				}
@@ -2049,7 +2196,7 @@ function adicionarDetalleProducto(codprod,especialidad1,cantidad,especialidad2,v
 					"adicion": '--',
 					"valorunitario": valorunitario,
 					"valortotal": valortotal,
-					"accion":'<input type="button" class="btn btn-default btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')" value="Eliminar"></button>',
+					"accion":'<button type="button" class="btn btn-danger btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')""><i class="fas fa-trash-alt fa-2x"></i></button>',
 					"accion2": accion2
 				} ).draw();
 				if (indAvanz == 'S')
@@ -2112,19 +2259,19 @@ function getAdicionProductos()
 					{
 						str +='<tr> ';
 						str +='<td onclick="cambiaColorCelda(this);"> ';
-						str += '<div class="col-md-7"> ';
+						str += '<div class="col-md-3"> ';
 						str += '<label><input type="checkbox"' + '  value="'+ cadaAdicion.idproducto + '-' + cadaAdicion.nombre +'" name="' +'mit1' + cadaAdicion.idproducto + '" onclick="revisarMarcacion(this)">' + cadaAdicion.nombre +'</label>';
 						str += '</div>'
-						str += '<div class="col-md-3"> ';
+						str += '<div class="col-md-1"> ';
 						str += '<select name="'+ 'c1' + cadaAdicion.idproducto +'" class="form-control">';
 						str += '<option selected value="0.5" id ="medio">0.5</option> <option value="1" id ="entero">1.0</option> </select>'
 						str += '</div>'
 						str += '</td>';
 						str +='<td onclick="cambiaColorCelda(this);"> ';
-						str += '<div class="col-md-7"> ';
+						str += '<div class="col-md-3"> ';
 						str += '<label><input type="checkbox"' + '  value="'+ cadaAdicion.idproducto + '-' + cadaAdicion.nombre +'" name="' +'mit2' + cadaAdicion.idproducto + '" onclick="revisarMarcacion(this)">' + cadaAdicion.nombre +'</label>';
 						str += '</div>'
-						str += '<div class="col-md-3"> ';
+						str += '<div class="col-md-1"> ';
 						str += '<select name="'+ 'c2' + cadaAdicion.idproducto +'" class="form-control">';
 						str += '<option selected value="0.5" id ="medio">0.5</option> <option value="1" id ="entero">1.0</option> </select>';
 						str += '</div>'
@@ -2321,6 +2468,10 @@ function ReiniciarPedido()
 															    	}
 															    	$('input:radio[name=adicion]')[1].checked = true;
 															    	totalpedido = 0;
+                                                                    totalpedidogeneral = 0;
+                                                                    descuentoPedido = 0;
+                                                                    motivoDescuento = "";
+                                                                    distanciaTienda = 0;
 															    	$("#totalpedido").val('0');
 																	$("#valorpago").val('0');
 																	$("#valordevolver").val('0');
@@ -2329,6 +2480,12 @@ function ReiniciarPedido()
 																	marcardorProductoSin = 0;
 																	marcadorAdicionales = 0;
 																	marcadorGaseosas = 0;
+                                                                    //En reiniciar pedido debemos de limpiar estas variables
+                                                                    controlaCantidadIngredientes = "N";
+                                                                    controlarEspecialidades = "N";
+                                                                    idExcepcionSeleccionada = 0;
+                                                                    cantidadIngredientes = 0;
+                                                                    excepcionSeleccionada = null;
 																	//Volvemos a habilitar el select de tienda
 																	$('#selectTiendas').attr('disabled', false);
 																	$('#limpiar').attr('disabled', false);
@@ -2378,12 +2535,15 @@ function ReiniciarPedido()
 function ConfirmarPedido()
 {
 	//Antes de finalizar el pedido validamos que si estén correctas las marcaciones
-	var validaMarcaciones = validarMarcaciones();
-	if(validaMarcaciones == false)
-	{
-		$.alert('Una o unas de las marcaciones de pedido no tienen observación.');
-		return;
-	}
+    if(administrador == 'S')
+    {
+        var validaMarcaciones = validarMarcaciones();
+        if(validaMarcaciones == false)
+        {
+            $.alert('Una o unas de las marcaciones de pedido no tienen observación.');
+            return;
+        }
+    }
 	if(idPedido == 0 )
 	{
 		$.alert("Para confirmar el pedido debe tener por lo menos un item agregado");
@@ -2421,8 +2581,9 @@ function ConfirmarPedido()
 				'Con la siguiente información: <br>' +
 				'CLIENTE: ' + $('#nombres').val() + ' ' + $('#apellidos').val() + '<br>' +
 				'DIRECCION ' +  dir + '<br>' +
-				'TOTAL PEDIDO ' + $("#totalpedido").val() + '<br>' +
-				'CAMBIO ' + $("#valorpago").val() + '<br>' +
+				'TOTAL PEDIDO ' + ($("#totalpedido").val()) + '<br>' +
+                'DESCUENTO DEL PEDIDO: ' + (descuentoPedido) + '<br>' +
+				'CAMBIO ' + ($("#valorpago").val() - $("#totalpedido").val() ) + '<br>' +
 				'TIENDA DEL PEDIDO ' +  '<h1>' + $("#selectTiendas").val().toUpperCase() + '</h1> <br>' +
 				'<h5> Tiempo Aproximado Pedido :  ' + tiempopedido  + ' Minutos </h5>',
 				'type': 'dark',
@@ -2455,7 +2616,7 @@ function ConfirmarPedido()
 							var numNomenclatura2 = encodeURIComponent($("#numNomen2").val());
 							var num3 = encodeURIComponent($("#num3").val());
 							$.ajax({ 
-					    				url: server + 'ActualizarCliente?telefono=' + telefono.value + "&nombres=" + nombresEncode + "&apellidos=" + apellidosEncode + "&nombreCompania=" + nombreCompaniaEncode +  "&direccion="  + direccionEncode  + "&tienda=" + tempTienda +  "&zona=" + zonaEncode + "&observacion=" + observacionDirEncode + "&municipio=" + tempMunicipio + "&longitud=" + longitud + "&latitud=" + latitud + "&memcode=" + memcode + "&idcliente=" + idCliente + "&idnomenclatura=" + nomenclatura + "&numnomenclatura1=" + numNomenclatura1 + "&numnomenclatura2=" + numNomenclatura2 +  "&num3=" + num3, 
+					    				url: server + 'ActualizarCliente?telefono=' + telefono.value + "&nombres=" + nombresEncode + "&apellidos=" + apellidosEncode + "&nombreCompania=" + nombreCompaniaEncode +  "&direccion="  + direccionEncode  + "&tienda=" + tempTienda +  "&zona=" + zonaEncode + "&observacion=" + observacionDirEncode + "&municipio=" + tempMunicipio + "&longitud=" + longitud + "&latitud=" + latitud + "&distanciatienda=" + distanciaTienda + "&memcode=" + memcode + "&idcliente=" + idCliente + "&idnomenclatura=" + nomenclatura + "&numnomenclatura1=" + numNomenclatura1 + "&numnomenclatura2=" + numNomenclatura2 +  "&num3=" + num3, 
 					    				dataType: 'json', 
 					    				async: false, 
 					    				success: function(data){ 
@@ -2467,13 +2628,17 @@ function ConfirmarPedido()
 							var idformapago =  $("#selectformapago").val();
 							var valorformapago =  $("#valorpago").val();
 							$.ajax({ 
-		    				url: server + 'FinalizarPedido?idpedido=' + idPedido + "&idformapago=" + idformapago + "&valortotal=" + totalpedido + "&valorformapago=" + valorformapago + "&idcliente=" + idCliente + "&insertado=" + insertado + "&tiempopedido=" + tiempopedido +"&validadir=" + validaDir, 
+		    				url: server + 'FinalizarPedido?idpedido=' + idPedido + "&idformapago=" + idformapago + "&valortotal=" + totalpedido + "&valorformapago=" + valorformapago + "&idcliente=" + idCliente + "&insertado=" + insertado + "&tiempopedido=" + tiempopedido +"&validadir=" + validaDir + "&descuento=" + descuentoPedido + "&motivodescuento=" + motivoDescuento, 
 		    				dataType: 'json', 
 		    				async: false, 
-		    				success: function(data){ 
+		    				success: function(data){
 		    						//En este punto realizamos la inserción de los marcadores
-		    						procesarMarcaciones(idPedido);
-									resultado = data[0];
+                                    //Incluimos validación de procesar marcaciones solo si se es administrador, sino no aplicaría
+                                    if(administrador == 'S')
+                                    {
+                                        procesarMarcaciones(idPedido);
+                                    }
+		    						resultado = data[0];
 									var resJSON = JSON.stringify(resultado);
 									var urlTienda = resultado.url;
 									//Mandamos todos los párametros para la inserción de la tienda
@@ -2558,6 +2723,10 @@ function ConfirmarPedido()
 							    	}
 							    	$('input:radio[name=adicion]')[1].checked = true;
 							    	totalpedido = 0;
+                                    totalpedidogeneral = 0;
+                                    descuentoPedido = 0;
+                                    motivoDescuento = "";
+                                    distanciaTienda = 0;
 							    	$("#totalpedido").val('0');
 									$("#valorpago").val('0');
 									$("#valordevolver").val('0');
@@ -2910,7 +3079,7 @@ function agregarEncabezadoPedido()
 		var numNomenclatura2 = encodeURIComponent($("#numNomen2").val());
 		var num3 = encodeURIComponent($("#num3").val());
 		$.ajax({ 
-    				url: server + 'InsertarClienteEncabezadoPedido?telefono=' + telefono.value + "&nombres=" + nombresEncode + "&apellidos=" + apellidosEncode + "&nombreCompania=" + nombreCompaniaEncode +  "&direccion="  + direccionEncode  + "&tienda=" + tempTienda +  "&zona=" + zonaEncode + "&observacion=" + observacionDirEncode + "&municipio=" + tempMunicipio + "&longitud=" + longitud + "&latitud=" + latitud + "&memcode=" + memcode + "&idcliente=" + idCliente + "&fechapedido=" + fechapedido + "&idnomenclatura=" + nomenclatura + "&numnomenclatura1=" + numNomenclatura1 + "&numnomenclatura2=" + numNomenclatura2 +  "&num3=" + num3, 
+    				url: server + 'InsertarClienteEncabezadoPedido?telefono=' + telefono.value + "&nombres=" + nombresEncode + "&apellidos=" + apellidosEncode + "&nombreCompania=" + nombreCompaniaEncode +  "&direccion="  + direccionEncode  + "&tienda=" + tempTienda +  "&zona=" + zonaEncode + "&observacion=" + observacionDirEncode + "&municipio=" + tempMunicipio + "&longitud=" + longitud + "&latitud=" + latitud + "&distanciatienda=" + distanciaTienda + "&memcode=" + memcode + "&idcliente=" + idCliente + "&fechapedido=" + fechapedido + "&idnomenclatura=" + nomenclatura + "&numnomenclatura1=" + numNomenclatura1 + "&numnomenclatura2=" + numNomenclatura2 +  "&num3=" + num3, 
     				dataType: 'json', 
     				async: false, 
     				success: function(data){ 
@@ -3037,6 +3206,7 @@ function agregarProducto()
 						valorunitario = cadaProdu.preciogeneral;
 						valortotal= cadaProdu.preciogeneral * cantidad;
 						totalpedido = totalpedido + valortotal; 
+                        totalpedidogeneral = totalpedidogeneral + valortotal; 
 						otroProd = cadaProdu.idproducto+'-'+cadaProdu.nombre;
 						adicion = cadaProdu.idproducto + '-' + cadaProdu.nombre;
 						adiciones = adiciones + cadaProdu.idproducto + '-' + cadaProdu.nombre + "-MIT1" + '/';
@@ -3070,7 +3240,7 @@ function agregarProducto()
 						        "adicion": '--',
 						        "valorunitario": valorunitario,
 						        "valortotal": valortotal,
-						        "accion":'<input type="button" class="btn btn-default btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')" value="Eliminar"></button>',
+						        "accion":'<button type="button" class="btn btn-danger btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')"><i class="fas fa-trash-alt fa-2x"></i></button>',
 						        "accion2":''
 						    } ).draw();
 						    var adi = new adicionDetallePedido(0,idDetallePedido,$("input:radio[name=mitad1]:checked").val(),cantidad, 0,0);
@@ -3096,7 +3266,8 @@ function agregarProducto()
 						liquido = '--';
 						valorunitario = cadaProdu.preciogeneral;
 						valortotal= cadaProdu.preciogeneral * cantidad;
-						totalpedido = totalpedido + valortotal; 
+						totalpedido = totalpedido + valortotal;
+                        totalpedidogeneral = totalpedidogeneral + valortotal; 
 						otroProd = cadaProdu.idproducto+'-'+cadaProdu.nombre;
 						adicion = cadaProdu.idproducto + '-' + cadaProdu.nombre;
 						adiciones = adiciones + cadaProdu.idproducto + '-' + cadaProdu.nombre + "-MIT2" + '/';
@@ -3129,7 +3300,7 @@ function agregarProducto()
 						        "adicion": '--',
 						        "valorunitario": valorunitario,
 						        "valortotal": valortotal,
-						        "accion":'<input type="button" class="btn btn-default btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')" value="Eliminar"></button>',
+						        "accion":'<button type="button" class="btn btn-danger btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')" value="Eliminar"><i class="fas fa-trash-alt fa-2x"></i></button>',
 						        "accion2":'' 
 						    } ).draw();
 						    var adi = new adicionDetallePedido(0,idDetallePedido, 0,0,$("input:radio[name=mitad2]:checked").val(),cantidad);
@@ -3156,7 +3327,8 @@ function agregarProducto()
 						liquido = '--';
 						valorunitario = cadaProdu.preciogeneral;
 						valortotal= cadaProdu.preciogeneral * cantidad;
-						totalpedido  = totalpedido + valortotal; 
+						totalpedido  = totalpedido + valortotal;
+                        totalpedidogeneral = totalpedidogeneral + valortotal; 
 						otroProd = cadaProdu.idproducto+'-'+cadaProdu.nombre;
 						adicion = cadaProdu.idproducto + '-' + cadaProdu.nombre;
 						adiciones = adiciones + cadaProdu.idproducto + '-' + cadaProdu.nombre + "-MIT1" + '/';
@@ -3189,7 +3361,7 @@ function agregarProducto()
 						        "adicion": '--',
 						        "valorunitario": valorunitario,
 						        "valortotal": valortotal,
-						        "accion":'<input type="button" class="btn btn-default btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')" value="Eliminar"></button>',
+						        "accion":'<button type="button" class="btn btn-danger btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')"><i class="fas fa-trash-alt fa-2x"></i></button>',
 						        "accion2":'' 
 						    } ).draw();
 							if(cantidad == 1)
@@ -3251,7 +3423,8 @@ function agregarProducto()
 						liquido = '--';
 						valorunitario = cadaProdu.preciogeneral;
 						valortotal= cadaProdu.preciogeneral * cantidad;
-						totalpedido = totalpedido + valortotal; 
+						totalpedido = totalpedido + valortotal;
+                        totalpedidogeneral = totalpedidogeneral + valortotal; 
 						otroProd = cadaProdu.nombre;
 						$.ajax({ 
 	    				url: server + 'InsertarDetallePedido?idproducto=' + codprod + "&idpedido=" + idPedido +"&especialidad1=" + especialidad1 + "&cantidad=" + cantidad +"&especialidad2=" + especialidad2 + "&valorunitario=" + valorunitario + "&valortotal=" + valortotal + "&adicion=" + adicion + "&observacion=" + observacion + "&idsabortipoliquido=" + idsabortipoliquido + "&idexcepcion=" + excepcionPrecio, 
@@ -3280,7 +3453,7 @@ function agregarProducto()
 						        "adicion": '--',
 						        "valorunitario": valorunitario,
 						        "valortotal": valortotal,
-						        "accion":'<input type="button" class="btn btn-default btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')" value="Eliminar"></button>',
+						        "accion":'<button type="button" class="btn btn-danger btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')"><i class="fas fa-trash-alt fa-2x"></i></button>',
 						        "accion2":''
 						    } ).draw();
 						    
@@ -3311,7 +3484,8 @@ function agregarProducto()
 						liquido = '--';
 						valorunitario = cadaProdu.preciogeneral;
 						valortotal= cadaProdu.preciogeneral * cantidad;
-						totalpedido = totalpedido + valortotal; 
+						totalpedido = totalpedido + valortotal;
+                        totalpedidogeneral = totalpedidogeneral + valortotal; 
 						otroProd = cadaProdu.nombre;
 						$.ajax({ 
 	    				url: server + 'InsertarDetallePedido?idproducto=' + codprod + "&idpedido=" + idPedido +"&especialidad1=" + especialidad1 + "&cantidad=" + cantidad +"&especialidad2=" + especialidad2 + "&valorunitario=" + valorunitario + "&valortotal=" + valortotal + "&adicion=" + adicion + "&observacion=" + observacion + "&idsabortipoliquido=" + idsabortipoliquido + "&idexcepcion=" + excepcionPrecio, 
@@ -3339,7 +3513,7 @@ function agregarProducto()
 						        "adicion": '--',
 						        "valorunitario": valorunitario,
 						        "valortotal": valortotal,
-						        "accion":'<input type="button" class="btn btn-default btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')" value="Eliminar"></button>' ,
+						        "accion":'<button type="button" class="btn btn-danger btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')"><i class="fas fa-trash-alt fa-2x"></i></button>' ,
 						        "accion2":''
 						    } ).draw();
 						    
@@ -3372,7 +3546,8 @@ function agregarProducto()
 						liquido = '--';
 						valorunitario = cadaProdu.preciogeneral;
 						valortotal= cadaProdu.preciogeneral * cantidad;
-						totalpedido = totalpedido + valortotal; 
+						totalpedido = totalpedido + valortotal;
+                        totalpedidogeneral = totalpedidogeneral + valortotal; 
 						otroProd = cadaProdu.nombre;
 						$.ajax({ 
 	    				url: server + 'InsertarDetallePedido?idproducto=' + codprod + "&idpedido=" + idPedido +"&especialidad1=" + especialidad1 + "&cantidad=" + cantidad +"&especialidad2=" + especialidad2 + "&valorunitario=" + valorunitario + "&valortotal=" + valortotal + "&adicion=" + adicion + "&observacion=" + observacion + "&idsabortipoliquido=" + idsabortipoliquido + "&idexcepcion=" + excepcionPrecio, 
@@ -3401,7 +3576,7 @@ function agregarProducto()
 						        "adicion": '--',
 						        "valorunitario": valorunitario,
 						        "valortotal": valortotal,
-						        "accion":'<input type="button" class="btn btn-default btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')" value="Eliminar"></button>' ,
+						        "accion":'<button type="button" class="btn btn-danger btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')"><i class="fas fa-trash-alt fa-2x"></i></button>' ,
 						        "accion2":''
 						    } ).draw();
 						    
@@ -3507,6 +3682,7 @@ function agregarProducto()
 		}
 		//En este punto sacamos el valor total con el fin de no sumarlo dos veces
 		totalpedido  = totalpedido + valortotal;
+        totalpedidogeneral = totalpedidogeneral + valortotal; 
 	}else{
 			
 			pizza = tamanoPizza.toLowerCase();
@@ -3550,6 +3726,7 @@ function agregarProducto()
 			}
 			//En este punto sacamos el valor total con el fin de no sumarlo dos veces
 			totalpedido  = totalpedido + valortotal;
+            totalpedidogeneral = totalpedidogeneral + valortotal; 
 			otroProd = '--';
 			if ($("input:radio[name=formapizza]:checked").val() == 'mitad'){
 				especialidad1 =  $("input:radio[name=mitad1]:checked").val();
@@ -3560,19 +3737,23 @@ function agregarProducto()
 				else
 				{	
 					var precioAdicional = 0;
-					$.ajax({ 
-			    		url: server + 'ObtenerExcepcionEspecialidad?idproducto=' + codprod + "&idespecialidad=" + especialidad1 , 
-			    		dataType: 'json', 
-			    		async: false, 
-			    		success: function(data){ 
-			    			var temporal;
-							temporal = data[0];
-							precioAdicional = temporal.precio*0.5;
-						}
-					});
+                    if(controlarEspecialidades == 'N')
+                    {
+    					$.ajax({ 
+    			    		url: server + 'ObtenerExcepcionEspecialidad?idproducto=' + codprod + "&idespecialidad=" + especialidad1 , 
+    			    		dataType: 'json', 
+    			    		async: false, 
+    			    		success: function(data){ 
+    			    			var temporal;
+    							temporal = data[0];
+    							precioAdicional = temporal.precio*0.5;
+    						}
+    					});
+                    }
 					valorunitario = valorunitario + precioAdicional;
 					valortotal = valortotal + precioAdicional*cantidad;
-					totalpedido = totalpedido + precioAdicional; 
+					totalpedido = totalpedido + precioAdicional;
+                    totalpedidogeneral = totalpedidogeneral + precioAdicional;
 					especial1 =  $("input:radio[name=mitad1]:checked").attr('id') + " " + ingredienteConMitad1 + " " + ingredienteSinMitad1;
 				}
 				
@@ -3584,19 +3765,23 @@ function agregarProducto()
 				else
 				{
 					var precioAdicional = 0;
-					$.ajax({ 
-			    		url: server + 'ObtenerExcepcionEspecialidad?idproducto=' + codprod + "&idespecialidad=" + especialidad2 , 
-			    		dataType: 'json', 
-			    		async: false, 
-			    		success: function(data){ 
-			    			var temporal;
-							temporal = data[0];
-							precioAdicional = temporal.precio*0.5;
-						}
-					});
+                    if(controlarEspecialidades == 'N')
+                    {
+    					$.ajax({ 
+    			    		url: server + 'ObtenerExcepcionEspecialidad?idproducto=' + codprod + "&idespecialidad=" + especialidad2 , 
+    			    		dataType: 'json', 
+    			    		async: false, 
+    			    		success: function(data){ 
+    			    			var temporal;
+    							temporal = data[0];
+    							precioAdicional = temporal.precio*0.5;
+    						}
+    					});
+                    }
 					valorunitario = valorunitario + precioAdicional;
 					valortotal = valortotal + precioAdicional*cantidad;
 					totalpedido = totalpedido + precioAdicional; 
+                    totalpedidogeneral = totalpedidogeneral+ precioAdicional; 
 					especial2 = $("input:radio[name=mitad2]:checked").attr('id')+ " " + ingredienteConMitad2 + " " + ingredienteSinMitad2;
 				}
 				
@@ -3610,19 +3795,23 @@ function agregarProducto()
 					else
 					{	
 						var precioAdicional = 0;
-						$.ajax({ 
-				    		url: server + 'ObtenerExcepcionEspecialidad?idproducto=' + codprod + "&idespecialidad=" + especialidad1 , 
-				    		dataType: 'json', 
-				    		async: false, 
-				    		success: function(data){ 
-				    			var temporal;
-								temporal = data[0];
-								precioAdicional = temporal.precio;
-							}
-						});
+                        if(controlarEspecialidades == 'N')
+                        {
+    						$.ajax({ 
+    				    		url: server + 'ObtenerExcepcionEspecialidad?idproducto=' + codprod + "&idespecialidad=" + especialidad1 , 
+    				    		dataType: 'json', 
+    				    		async: false, 
+    				    		success: function(data){ 
+    				    			var temporal;
+    								temporal = data[0];
+    								precioAdicional = temporal.precio;
+    							}
+    						});
+                        }
 						valorunitario = valorunitario + precioAdicional;
 						valortotal = valortotal + precioAdicional*cantidad;
 						totalpedido = totalpedido + precioAdicional; 
+                        totalpedidogeneral = totalpedidogeneral + precioAdicional;
 						especial1 = $("input:radio[name=mitad1]:checked").attr('id') + " " + ingredienteConMitad1 + " " + ingredienteSinMitad1;
 						especialidad2 = "--";
 						especial2 = '--';
@@ -3667,8 +3856,8 @@ function agregarProducto()
 	        "adicion": adiciones,
 	        "valorunitario": valorunitario,
 	        "valortotal": valortotal,
-	        "accion":'<input type="button" class="btn btn-default btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')" value="Eliminar"></button>',
-	        "accion2":'<input type="button" class="btn btn-default btn-xs" onclick="duplicarDetallePedido(' + idDetallePedido + ')" value="Duplicar"></button>'
+	        "accion":'<button type="button" class="btn btn-danger btn-xs" onclick="eliminarDetallePedido(' + idDetallePedido + ')"><i class="fas fa-trash-alt fa-2x"></i></button>',
+	        "accion2":'<button type="button" class="btn btn-warning btn-xs" onclick="duplicarDetallePedido(' + idDetallePedido + ')"><i class="fas fa-copy fa-2x"></i></button>'
 	    } ).draw();
 	    //Ya se creó el iddetallepedido del producto grueso
 	    
@@ -3682,7 +3871,8 @@ function agregarProducto()
 	    		// En caso tal de que el producto a agregar tenga un precio diferente a cero debremos agregar este valor al total pedido
 	    		if(prodInc.preciogeneral > 0)
 	    		{
-	    			totalpedido = totalpedido + prodInc.preciogeneral*prodInc.cantidad; 
+	    			totalpedido = totalpedido + prodInc.preciogeneral*prodInc.cantidad;
+                    totalpedidogeneral = totalpedidogeneral + prodInc.preciogeneral*prodInc.cantidad; 
 	    		}
 	    	}
 	    }
@@ -3754,6 +3944,8 @@ function agregarProducto()
 		}
 	    $("#valordevolver").val($("#valorpago").val() - $("#totalpedido").val() );
 	    controlaCantidadIngredientes = "N";
+        controlarEspecialidades = "N";
+        idExcepcionSeleccionada = 0;
 		cantidadIngredientes = 0;
 		excepcionSeleccionada = null;
 
@@ -3927,7 +4119,7 @@ function geocodeResult(results, status) {
         var marker = new google.maps.Marker(markerOptions);
         marker.setMap(map);
         //Luego de la ubicación en el mapa trataremos de ejecutar una función asincrona para ubicar dentro del mapa y ubicar la tienda
-        ubicarTienda(latitud , longitud , map);
+        distanciaTienda = ubicarTienda(latitud , longitud , map);
         
     } else {
         // En caso de no haber resultados o que haya ocurrido un error
@@ -4309,7 +4501,7 @@ function transferirCliente()
     var numNomenclatura2 = encodeURIComponent($("#numNomen2").val());
     var num3 = encodeURIComponent($("#num3").val());
                             $.ajax({ 
-                                url: server + 'ActualizarCliente?telefono=' + telef + "&nombres=" + nombresEncode + "&apellidos=" + apellidosEncode + "&nombreCompania=" + nombreCompaniaEncode +  "&direccion="  + direccionEncode  + "&tienda=" + tempTienda +  "&zona=" + zonaEncode + "&observacion=" + observacionDirEncode + "&municipio=" + tempMunicipio + "&longitud=" + longitud + "&latitud=" + latitud + "&memcode=0" + "&idcliente=0" + "&idnomenclatura=" + nomenclatura + "&numnomenclatura1=" + numNomenclatura1 + "&numnomenclatura2=" + numNomenclatura2 +  "&num3=" + num3, 
+                                url: server + 'ActualizarCliente?telefono=' + telef + "&nombres=" + nombresEncode + "&apellidos=" + apellidosEncode + "&nombreCompania=" + nombreCompaniaEncode +  "&direccion="  + direccionEncode  + "&tienda=" + tempTienda +  "&zona=" + zonaEncode + "&observacion=" + observacionDirEncode + "&municipio=" + tempMunicipio + "&longitud=" + longitud + "&latitud=" + latitud + "&distanciatienda=" + distanciaTienda + "&memcode=0" + "&idcliente=0" + "&idnomenclatura=" + nomenclatura + "&numnomenclatura1=" + numNomenclatura1 + "&numnomenclatura2=" + numNomenclatura2 +  "&num3=" + num3, 
                                 dataType: 'json', 
                                 async: false, 
                                 success: function(data){

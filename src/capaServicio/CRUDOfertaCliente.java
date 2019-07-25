@@ -66,8 +66,14 @@ public class CRUDOfertaCliente extends HttpServlet {
 			}catch(Exception e){
 				idCliente = 0;
 			}
+			int PQRS = 0;
+			try{
+				PQRS = Integer.parseInt(request.getParameter("pqrs"));
+			}catch(Exception e){
+				PQRS = 0;
+			}
 			String observacion = request.getParameter("observacion");
-			OfertaCliente ofer = new OfertaCliente(0,idOferta, idCliente, "", "", "", observacion);
+			OfertaCliente ofer = new OfertaCliente(0,idOferta, idCliente, "", PQRS, "", "", observacion);
 			respuesta = PromoCtrl.insertarOfertaCliente(ofer);
 		}else if (operacion ==2)
 		{

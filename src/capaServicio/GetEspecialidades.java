@@ -41,7 +41,13 @@ public class GetEspecialidades extends HttpServlet {
 			response.addHeader("Access-Control-Allow-Origin", "*");
 			response.setContentType("application/json");
 			PedidoCtrl PedidoCtrl = new PedidoCtrl();
-			String respuesta = PedidoCtrl.obtenerEspecialidades();
+			int idExcepcion = 0;
+			try {
+				idExcepcion = Integer.parseInt(request.getParameter("idexcepcion"));
+			} catch (Exception e) {
+				idExcepcion = 0;
+			}
+			String respuesta = PedidoCtrl.obtenerEspecialidades(idExcepcion);
 			PrintWriter out = response.getWriter();
 			out.write(respuesta);
 			

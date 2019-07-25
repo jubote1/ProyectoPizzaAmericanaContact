@@ -51,6 +51,7 @@ public class ActualizarCliente extends HttpServlet {
         String municipio = request.getParameter("municipio");
         float latitud;
         float longitud;
+        double distanciaTienda;
         int idCliente;
         int memcode;
         int idnomenclatura = 0;
@@ -68,6 +69,13 @@ public class ActualizarCliente extends HttpServlet {
         }catch(Exception e)
         {
         	longitud = 0;
+        }
+        try{
+        	
+        	distanciaTienda = Double.parseDouble(request.getParameter("distanciatienda"));
+        }catch(Exception e)
+        {
+        	distanciaTienda = 0;
         }
         try{
         	memcode = Integer.parseInt(request.getParameter("memcode"));
@@ -88,7 +96,7 @@ public class ActualizarCliente extends HttpServlet {
         	idnomenclatura = 0;
         }
         ClienteCtrl ClienCtrl = new ClienteCtrl();
-        String respuesta  = ClienCtrl.InsertarClientePedidoEncabezadoJSON(idCliente,telefono, nombres, apellidos, nombreCompania,  direccion, municipio, latitud, longitud, zona, observacion, tienda, memcode, idnomenclatura, numNomenclatura, numNomenclatura2, num3);
+        String respuesta  = ClienCtrl.InsertarClientePedidoEncabezadoJSON(idCliente,telefono, nombres, apellidos, nombreCompania,  direccion, municipio, latitud, longitud, distanciaTienda, zona, observacion, tienda, memcode, idnomenclatura, numNomenclatura, numNomenclatura2, num3);
         PrintWriter out = response.getWriter();
         out.write(respuesta);
 	}

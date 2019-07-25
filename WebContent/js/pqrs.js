@@ -42,6 +42,7 @@ $("#fecha").change(function(){
 	// En resumen se invocan todos servicios que se encargan de llenar la data del formulario.
 	getListaTiendas();
 	getListaMunicipios();
+	getListaOrigenes();
 	setInterval('validarVigenciaLogueo()',600000);
 	// Llevamos a cero los campos cálculos de los totales
 	// Se define evento para campo valor a devolver.
@@ -161,6 +162,20 @@ function getListaTiendas(){
 	});
 }
 
+function getListaOrigenes(){
+	$.getJSON(server + 'CRUDOrigenPqrs?idoperacion=5', function(data){
+		var origenes = data;
+		var str = '';
+		for(var i = 0; i < data.length;i++){
+			var cadaOrigen  = data[i];
+			str +='<option value="'+ cadaOrigen.nombreorigen +'" id ="'+ cadaOrigen.idorigen +'">' + cadaOrigen.nombreorigen +'</option>';
+		}
+		$('#selectOrigen').html(str);
+		// Realizamos cambio para que la tienda no esté seleccionada por defecto
+		$("#selectOrigen").val('');
+	});
+}
+
 
 //Método que invoca el servicio para obtener lista de municipios parametrizados en el sistema
 function getListaMunicipios(){
@@ -252,6 +267,7 @@ function ConfirmarPQRS()
 	var tipoSolicitud = $("#selectSolicitud option:selected").val();
 	//idCliente
 	var tempTienda =  $("#selectTiendas option:selected").attr('id');
+	var idOrigen = $("#selectOrigen option:selected").attr('id');
 	var nombresEncode = $("#nombres").val();;
 	var apellidosEncode = $("#apellidos").val();
 	var tel = $("#telefono").val();
@@ -280,7 +296,8 @@ function ConfirmarPQRS()
 	    										 'direccion' : direccionEncode,
 	    										 'zona' : zonaEncode,
 	    										 'idmunicipio' : tempMunicipio,
-	    										 'comentario' : comentarioEncode
+	    										 'comentario' : comentarioEncode,
+	    										 'idorigen' : idOrigen
 	    										}, 
 							    				async: false, 
 							    				success: function(data1){ 
@@ -298,6 +315,7 @@ function ConfirmarPQRS()
 					$('#direccion').val('');
 					$('#zona').val('');
 					$("#selectTiendas").val('');
+					$("#selectOrigen").val('');
 					$("#selectMunicipio").val(1);
 					$("#comentarios").val('');
 					idCliente = 0;
@@ -353,6 +371,13 @@ function ValidacionesDatos()
 	if (tien == '' || tien == null || tien == undefined)
 	{
 		alert ('Debe ingresar la tienda del cliente PQRS');
+		return;
+	}
+	//Validamos la selección del origen de PQRS
+	var origen = $("#selectOrigen option:selected").val();
+	if (origen == '' || origen == null || origen == undefined)
+	{
+		alert ('Debe ingresar el origen de la PQRS');
 		return;
 	}
 	var muni = $("#selectMunicipio option:selected").val();

@@ -139,10 +139,39 @@ $(document).ready(function() {
 	                		var valorDevolver =  data2[0].valorformapago - data2[0].valortotal;
 	                		$('#valordevolver').val(valorDevolver);
 	                		$('#formapago').val(data2[0].nombre);
+	                		$('#descuento').val(data2[0].descuento);
 	                		idformapago = data2[0].idformapago;
 							totalpedido = data2[0].valortotal;
 							valorformapago = data2[0].valorformapago;
 							
+					});
+
+
+        //Obtenemos las marcaciones del Pedido
+        $.getJSON(server + 'ObtenerMarcacionesPedido?idpedido=' + idPedido, function(data2){
+	                		var respuesta = data2;
+	                		var str = '<h1>Marcaciones Pedido</h1>';
+        					str += '<table class="table table-bordered">';
+							str += '<tbody>';
+	                		for(var i = 0; i < respuesta.length;i++)
+							{
+								var cadaMarcacion  = respuesta[i];
+								str +='<tr> ';
+								str +='<td> ';
+								str += '<label>Marcacion<input type="text" aria-label="..."' + '  value="'+ cadaMarcacion.nombremarcacion + '" id="' + cadaMarcacion.idmarcacion + '" disabled></label>';
+								str += '</td>';
+								str +='<td> ';
+								str += '<label>Observacion<input type="text" ' + '" id="txtObsMarcacion' + cadaMarcacion.idmarcacion + '" value="'+ cadaMarcacion.observacion + '" name= "txtObsMarcacion' + cadaMarcacion.idmarcacion +'" maxlength="50" disabled></label>';
+								str += '</td>';
+					            str +='<td> ';
+					            str += '<label>Descuento<input type="text" ' + ' id="txtDescuento' + cadaMarcacion.idmarcacion + '" name= "txtDescuento'  + cadaMarcacion.idmarcacion +'" maxlength="50" value="'+ cadaMarcacion.descuento + '" disabled></label>';
+					            str += '</td>';
+					            str +='<td> ';
+					            str += '<label>Motivo<input type="text" ' + '" id="txtMotivo' + cadaMarcacion.idmarcacion + '" name= "txtMotivo'  + cadaMarcacion.idmarcacion +'" maxlength="50" value="'+ cadaMarcacion.motivo + '"" disabled>'  +'</label>';
+					            str += '</td>';
+								str += '</tr>';
+							}
+							$('#marcacionesPedido').html(str);
 					});
      
 

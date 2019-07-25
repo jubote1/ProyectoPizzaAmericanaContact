@@ -51,6 +51,7 @@ public class InsertarSolicitudPQRS extends HttpServlet {
 				String zona = "";
 				int idmunicipio = 0;
 				String comentario = "";
+				int idOrigen = 0;
 				fechasolicitud = request.getParameter("fechasolicitud");
 				tiposolicitud = request.getParameter("tiposolicitud");
 				nombres = request.getParameter("nombres");
@@ -81,12 +82,19 @@ public class InsertarSolicitudPQRS extends HttpServlet {
 		        {
 		        	idmunicipio = 0;
 		        }
-		       
+		        //Vamos a capturar el origen de la PQRS
+		        try
+		        {
+		        	idOrigen=  Integer.parseInt(request.getParameter("idorigen"));
+		        }catch(Exception e)
+		        {
+		        	idOrigen = 0;
+		        }
 		        //logger.info("Llamado a servicio InsertarSolicitudPQRS con parámetros iddetallepedidopadre: "
 		        //		+ iddetallepedidopadre + " iddetallepedidoadicion:  " + iddetallepedidoadicion + " idespecialidad1: " + idespecialidad1
 		        //		+ " idespecialidad2: " + idespecialidad2 + " cantidad1: " + cantidad1 + " cantidad2: " + cantidad2 );
 		        SolicitudPQRSCtrl solicitudCtrl = new SolicitudPQRSCtrl();
-		        String respuesta = solicitudCtrl.insertarSolicitudPQRS(fechasolicitud, tiposolicitud, idcliente, idtienda, nombres, apellidos, telefono, direccion, zona, idmunicipio, comentario);
+		        String respuesta = solicitudCtrl.insertarSolicitudPQRS(fechasolicitud, tiposolicitud, idcliente, idtienda, nombres, apellidos, telefono, direccion, zona, idmunicipio, comentario, idOrigen);
 		        System.out.println(respuesta);
 		        PrintWriter out = response.getWriter();
 				out.write(respuesta);
