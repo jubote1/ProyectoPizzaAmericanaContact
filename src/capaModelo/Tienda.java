@@ -15,10 +15,18 @@ public class Tienda {
 	private int pos;
 	private String hosbd;
 	private String alertarPedidos;
+	private String manejaZonas;
 	
 	
 	
 	
+	
+	public String getManejaZonas() {
+		return manejaZonas;
+	}
+	public void setManejaZonas(String manejaZonas) {
+		this.manejaZonas = manejaZonas;
+	}
 	public String getAlertarPedidos() {
 		return alertarPedidos;
 	}
@@ -63,7 +71,7 @@ public class Tienda {
 	}
 	
 	
-	public Tienda(int idTienda, String nombreTienda, String dsnTienda, String url, int pos, String hosbd, String alertarPedidos) {
+	public Tienda(int idTienda, String nombreTienda, String dsnTienda, String url, int pos, String hosbd, String alertarPedidos, String manejaZonas) {
 		super();
 		this.idTienda = idTienda;
 		this.nombreTienda = nombreTienda;
@@ -72,6 +80,7 @@ public class Tienda {
 		this.pos = pos;
 		this.hosbd = hosbd;
 		this.alertarPedidos = alertarPedidos;
+		this.manejaZonas = manejaZonas;
 	}
 	
 	public Tienda()

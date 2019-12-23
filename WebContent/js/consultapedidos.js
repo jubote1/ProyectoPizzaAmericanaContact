@@ -472,6 +472,15 @@ function consultarPedido()
 		alert ('La fecha inicial es mayor a la fecha final, favor corregir');
 		return;
 	}
+	//Incluimos validación de cantidad de días de la consulta
+	if(validarDiferenciaFechas(fechaini, fechafin))
+	{
+	}
+	else
+	{
+		alert ('La diferencia entre la fecha Inicial y Final no puede ser mayor a 3 días');
+		return;
+	}
 
 	if (tienda == '' || tienda == null)
 	{
@@ -521,6 +530,24 @@ function validarFechaMenorActual(date1, date2){
         return false;
       else
         return true;
+}
+
+function validarDiferenciaFechas(date1, date2){
+      var fechaini = new Date();
+      var fechafin = new Date();
+      var fecha1 = date1.split("/");
+      var fecha2 = date2.split("/");
+      fechaini.setFullYear(fecha1[2],fecha1[1]-1,fecha1[0]);
+      fechafin.setFullYear(fecha2[2],fecha2[1]-1,fecha2[0]);
+      var diferencia = fechafin - fechaini;
+      var dias = diferencia/(1000*60*60*24);
+      if(dias > 3)
+      {
+      	return(false);
+      }else
+      {
+      	return(true);
+      }
 }
 
 function enviarPedidoTienda(){

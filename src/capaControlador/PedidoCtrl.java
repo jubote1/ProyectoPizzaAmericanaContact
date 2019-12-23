@@ -11,6 +11,7 @@ import capaDAO.EspecialidadDAO;
 import capaDAO.PedidoDAO;
 import capaDAO.ProductoDAO;
 import capaDAO.TiendaDAO;
+import capaDAO.TmpPedidosPoligonoDAO;
 import capaDAO.ExcepcionPrecioDAO;
 import capaDAO.MarcacionPedidoDAO;
 import capaModelo.Especialidad;
@@ -452,6 +453,7 @@ public class PedidoCtrl {
 		clienteJSON.put("idmunicipio", pedidoPixel.getCliente().getIdMunicipio());
 		clienteJSON.put("latitud", pedidoPixel.getCliente().getLatitud());
 		clienteJSON.put("longitud", pedidoPixel.getCliente().getLontitud());
+		clienteJSON.put("distanciatienda", pedidoPixel.getCliente().getDistanciaTienda());
 		listJSONCliente.add(clienteJSON);
 		respuesta.put("cliente", listJSONCliente.toString());
 		listJSON.add(respuesta);
@@ -906,9 +908,26 @@ public class PedidoCtrl {
 			ResultadoJSON.put("fechapedido", dirTemp.getFechaIngreso());
 			listJSON.add(ResultadoJSON);
 		}
+		//Tendremos una tabla temporal para reportes clientes y pedidos dentro de un poligono
+		TmpPedidosPoligonoDAO.limpiarTabla();
 		return listJSON.toJSONString();
 		
 	}
+	
+	public String insertarTmpPedidoPoligono(int idPedido, int idCliente)
+	{
+		int respuesta = TmpPedidosPoligonoDAO.insertarTmpPedidoPoligono(idPedido, idCliente);
+		JSONObject ResultadoJSON  = new JSONObject();
+		if(respuesta > 0)
+		{
+			ResultadoJSON.put("resultado", "OK");
+		}else
+		{
+			ResultadoJSON.put("resultado", "NOK");
+		}
+		return(ResultadoJSON.toJSONString());
+	}
+	
 	
 	public ArrayList<Pedido> ConsultarPedidosPendientes(String fechaPed)
 	{

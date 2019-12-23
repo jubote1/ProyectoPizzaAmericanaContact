@@ -360,7 +360,7 @@ public class PedidoPixelDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select a.idcliente, b.nombre nombreTienda, a.idtienda, a.nombre, a.apellido, a.nombrecompania, a.direccion, a.zona, a.observacion, a.telefono, c.nombre nombremunicipio, a.latitud, a.longitud, a.distancia_tienda, a.memcode, a.idnomenclatura, a.num_nomencla1, a.num_nomencla2, a.num3, d.nomenclatura from cliente a JOIN tienda b ON a.idtienda = b.idtienda JOIN municipio c ON a.idmunicipio = c.idmunicipio left join nomenclatura_direccion d on a.idnomenclatura = d.idnomenclatura  where a.idcliente = " + id +"";
+			String consulta = "select a.idcliente, b.nombre nombreTienda, a.idtienda, a.nombre, a.apellido, a.nombrecompania, a.direccion, a.zona, a.observacion, a.telefono, c.nombre nombremunicipio, a.latitud, a.longitud, a.distancia_tienda, a.memcode, a.idnomenclatura, a.num_nomencla1, a.num_nomencla2, a.num3, d.nomenclatura, a.idmunicipio from cliente a JOIN tienda b ON a.idtienda = b.idtienda JOIN municipio c ON a.idmunicipio = c.idmunicipio left join nomenclatura_direccion d on a.idnomenclatura = d.idnomenclatura  where a.idcliente = " + id +"";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idcliente;
@@ -379,6 +379,7 @@ public class PedidoPixelDAO {
 			int idTienda;
 			int memcode;
 			int idnomenclatura;
+			int idMunicipio;
 			String numNomenclatura1;
 			String numNomenclatura2;
 			String num3;
@@ -394,6 +395,7 @@ public class PedidoPixelDAO {
 				observacion = rs.getString("observacion");
 				telefono = rs.getString("telefono");
 				municipio = rs.getString("nombremunicipio");
+				idMunicipio = rs.getInt("idmunicipio");
 				latitud = rs.getFloat("latitud");
 				longitud = rs.getFloat("longitud");
 				distanciaTienda = rs.getDouble("distancia_tienda");
@@ -405,7 +407,7 @@ public class PedidoPixelDAO {
 				num3 = rs.getString("num3");
 				nomenclatura = rs.getString("nomenclatura");
 				clienteConsultado = new Cliente( idcliente, telefono, nombreCliente, apellido, nombreCompania, direccion,municipio,latitud, longitud, distanciaTienda, zona, observacion, nombreTienda, idTienda,memcode,idnomenclatura, numNomenclatura1, numNomenclatura2, num3, nomenclatura);
-				
+				clienteConsultado.setIdMunicipio(idMunicipio);
 			}
 		}catch (Exception e){
 			logger.error(e.toString());

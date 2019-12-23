@@ -193,12 +193,24 @@ public class OfertaDAO {
 			ResultSet rs = stm.executeQuery(consulta);
 			String nombreOferta = "";
 			int idExcepcion = 0;
+			int diasCaducidad = 0;
+			String tipoCaducidad = "";
 			while(rs.next()){
 				nombreOferta = rs.getString("nombre_oferta");
 				idExcepcion = rs.getInt("idexcepcion");
+				try {
+					diasCaducidad = rs.getInt("dias_caducidad");
+					
+				}catch(Exception e)
+				{
+					diasCaducidad = 0;
+				}
+				tipoCaducidad = rs.getString("tipo_caducidad");
 				break;
 			}
 			ofertaTemp = new Oferta(idOferta, nombreOferta, idExcepcion);
+			ofertaTemp.setDiasCaducidad(diasCaducidad);
+			ofertaTemp.setTipoCaducidad(tipoCaducidad);
 			stm.close();
 			con1.close();
 		}
@@ -249,6 +261,45 @@ public class OfertaDAO {
 		return(resultado);
 	}
 	
-	
+	public static boolean manejaCodigoOferta(int idOferta)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		boolean respuesta = false;
+		try
+		{
+			Statement stm = con1.createStatement();
+			String consulta = "select codigo_promocional from  oferta  where idoferta = " + idOferta; 
+			logger.info(consulta);
+			ResultSet rs = stm.executeQuery(consulta);
+			String codigoPromocional = "";
+			while(rs.next()){
+				codigoPromocional = rs.getString("codigo_promocional");
+				if(codigoPromocional.equals(new String("S")))
+				{
+					respuesta = true;
+				}else
+				{
+					respuesta = false;
+				}
+				break;
+			}
+			stm.close();
+			rs.close();
+			con1.close();
+		}
+		catch (Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+		}
+		return(respuesta);
+	}
+
 
 }

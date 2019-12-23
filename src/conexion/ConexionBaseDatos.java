@@ -62,6 +62,48 @@ public class ConexionBaseDatos {
 		return(con);
 	}
 	
+	public Connection obtenerConexionBDGeolocalizacion(){
+		try {
+			/**
+			 * Se realiza el registro del drive de Mysql
+			 */
+		    Class.forName("com.mysql.jdbc.Driver").newInstance();
+		    
+
+		} catch (Exception e) {
+
+		    System.out.println(e.toString());
+
+		}
+		
+		Connection con = null;
+		//...
+
+		try {
+
+			
+			/**
+			 * Se realiza la creación de la conexión a la base de datos
+			 */
+			//con = DriverManager.getConnection(
+		    //        "jdbc:mysql://192.168.0.25/pizzaamericana?"
+		    //        + "user=root&password=4m32017");
+			
+			con = DriverManager.getConnection(
+		            "jdbc:mysql://localhost/geolocalizacion?"
+		            + "user=root&password=4m32017");
+
+		    // Otros y operaciones sobre la base de datos...
+
+		} catch (SQLException ex) {
+
+		    // Mantener el control sobre el tipo de error
+		    System.out.println("SQLException: " + ex.getMessage());
+
+		}
+		return(con);
+	}
+	
 	/**
 	 * Método que se encarga de tener conexión al sistema principal de temas generales
 	 * @return

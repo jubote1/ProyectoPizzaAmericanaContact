@@ -11,9 +11,37 @@ public class OfertaCliente {
 	private String usoOferta;
 	private String observacion;
 	private int PQRS;
+	private String codigoPromocion;
+	private String usuarioIngreso;
+	private String usuarioUso;
+	private String fechaCaducidad;
 	
-	
-	
+		
+		
+	public String getFechaCaducidad() {
+		return fechaCaducidad;
+	}
+	public void setFechaCaducidad(String fechaCaducidad) {
+		this.fechaCaducidad = fechaCaducidad;
+	}
+	public String getUsuarioIngreso() {
+		return usuarioIngreso;
+	}
+	public void setUsuarioIngreso(String usuarioIngreso) {
+		this.usuarioIngreso = usuarioIngreso;
+	}
+	public String getUsuarioUso() {
+		return usuarioUso;
+	}
+	public void setUsuarioUso(String usuarioUso) {
+		this.usuarioUso = usuarioUso;
+	}
+	public String getCodigoPromocion() {
+		return codigoPromocion;
+	}
+	public void setCodigoPromocion(String codigoPromocion) {
+		this.codigoPromocion = codigoPromocion;
+	}
 	public int getPQRS() {
 		return PQRS;
 	}
@@ -70,7 +98,7 @@ public class OfertaCliente {
 	}
 
 	public OfertaCliente(int idOfertaCliente, int idOferta, int idCliente, String utilizada, int pqrs, String ingresoOferta,
-			String usoOferta, String observacion) {
+			String usoOferta, String observacion, String usuarioIngreso) {
 		super();
 		this.idOfertaCliente = idOfertaCliente;
 		this.idOferta = idOferta;
@@ -80,6 +108,7 @@ public class OfertaCliente {
 		this.usoOferta = usoOferta;
 		this.observacion = observacion;
 		this.PQRS = pqrs;
+		this.usuarioIngreso = usuarioIngreso;
 	}
 	
 	

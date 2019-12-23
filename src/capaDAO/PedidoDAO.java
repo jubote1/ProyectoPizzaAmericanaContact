@@ -1197,7 +1197,7 @@ public class PedidoDAO {
 				formapago = rs.getString("formapago");
 				idformapago = rs.getInt("idforma_pago");
 				tiempopedido = rs.getDouble("tiempopedido");
-				Tienda tiendapedido = new Tienda(idtienda, nombreTienda, "", url, 0, "", "");
+				Tienda tiendapedido = new Tienda(idtienda, nombreTienda, "", url, 0, "", "", "");
 				Pedido cadaPedido = new Pedido(idpedido,  nombreTienda,totalBruto, impuesto, totalNeto,
 						estadoPedido, fechaPedido, nombreCliente, idcliente, enviadopixel,numposheader, tiendapedido, stringpixel, fechainsercion, usuariopedido, direccion, telefono, formapago, idformapago, tiempopedido);
 				consultaPedidos.add(cadaPedido);
@@ -2016,7 +2016,7 @@ public class PedidoDAO {
 				formapago = rs.getString("formapago");
 				idformapago = rs.getInt("idforma_pago");
 				tiempopedido = rs.getDouble("tiempopedido");
-				Tienda tiendapedido = new Tienda(idtienda, nombreTienda, "", url,0, "", "");
+				Tienda tiendapedido = new Tienda(idtienda, nombreTienda, "", url,0, "", "", "");
 				Pedido cadaPedido = new Pedido(idpedido,  nombreTienda,totalBruto, impuesto, totalNeto,
 						estadoPedido, fechaPedido, nombreCliente, idcliente, enviadopixel,numposheader, tiendapedido, stringpixel, fechainsercion, usuariopedido, direccion, telefono, formapago, idformapago, tiempopedido);
 				consultaPedidos.add(cadaPedido);
@@ -2038,6 +2038,58 @@ public class PedidoDAO {
 		return(consultaPedidos);
 	}
 	
+	 	/**
+	 	 * Método que se encargará de obtener el Texto del último pedido de un cliente.
+	 	 * @param idCliente
+	 	 * @return
+	 	 */
+		public static String[] obtenerUltimoPedidoCliente(int idCliente)
+		{
+			Logger logger = Logger.getLogger("log_file");
+			String[] infoPedido = new String[4];
+			String consulta = "";
+			consulta = "select a.idpedido, a.fechapedido, e.nombre formapago, a.tiempopedido from pedido a, forma_pago e, pedido_forma_pago f WHERE e.idforma_pago = f.idforma_pago and f.idpedido = a.idpedido and a.idcliente = "+ idCliente + " order by fechapedido desc LIMIT 1";
+			logger.info(consulta);
+			ConexionBaseDatos con = new ConexionBaseDatos();
+			Connection con1 = con.obtenerConexionBDPrincipal();
+			
+			try
+			{
+				Statement stm = con1.createStatement();
+				ResultSet rs = stm.executeQuery(consulta);
+				String idPedido = "";
+				String fechaPedido = "";
+				String formaPago = "";
+				String tiempoPedido = "";
+				while(rs.next())
+				{
+					idPedido = rs.getString("idpedido");
+					fechaPedido = rs.getString("fechapedido");
+					formaPago = rs.getString("formapago");
+					tiempoPedido = rs.getString("tiempopedido");
+					break;
+				}
+				infoPedido[0] = idPedido;
+				infoPedido[1] = fechaPedido;
+				infoPedido[2] = formaPago;
+				infoPedido[3] = tiempoPedido;
+				rs.close();
+				stm.close();
+				con1.close();
+
+			}catch(Exception e){
+				logger.error(e.toString());
+				try
+				{
+					con1.close();
+				}catch(Exception e1)
+				{
+				}
+				
+			}
+			return(infoPedido);
+		}
+	
 	public static ArrayList<DireccionFueraZona> ConsultarDireccionesPedido(String fechainicial, String fechafinal, String strIdMuni, String idTienda, String horaIni, String horaFin)
 	{
 		Logger logger = Logger.getLogger("log_file");
@@ -2057,8 +2109,21 @@ public class PedidoDAO {
 				consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and a.idtienda = " + idTienda;
 			}else
 			{
-				int idMunicipio = Integer.parseInt(strIdMuni);
-				consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and b.idmunicipio = " + idMunicipio + " and a.idtienda = " + idTienda;
+				int idMunicipio;
+				try
+				{
+					idMunicipio = Integer.parseInt(strIdMuni);
+				}catch(Exception e)
+				{
+					idMunicipio = 0;
+				}
+				if(idMunicipio > 0)
+				{
+					consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and b.idmunicipio = " + idMunicipio + " and a.idtienda = " + idTienda;
+				}else
+				{
+					consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and a.idtienda = " + idTienda;
+				}
 			}
 		}else
 		{
@@ -2067,8 +2132,21 @@ public class PedidoDAO {
 				consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and a.idtienda = " + idTienda + " and fechainsercion >= '" + horaInicial + "' and fechainsercion <= '" + horaFinal +"'";
 			}else
 			{
-				int idMunicipio = Integer.parseInt(strIdMuni);
-				consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and b.idmunicipio = " + idMunicipio + " and a.idtienda = " + idTienda + " and fechainsercion >= '" + horaInicial + "' and fechainsercion <= '" + horaFinal +"'";
+				int idMunicipio;
+				try
+				{
+					idMunicipio = Integer.parseInt(strIdMuni);
+				}catch(Exception e)
+				{
+					idMunicipio = 0;
+				}
+				if(idMunicipio > 0)
+				{
+					consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and b.idmunicipio = " + idMunicipio + " and a.idtienda = " + idTienda + " and fechainsercion >= '" + horaInicial + "' and fechainsercion <= '" + horaFinal +"'";
+				}else
+				{
+					consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and a.idtienda = " + idTienda + " and fechainsercion >= '" + horaInicial + "' and fechainsercion <= '" + horaFinal +"'";
+				}
 			}
 		}
 		

@@ -748,7 +748,6 @@ function llenarSelectOferta()
                         async: false, 
                         success: function(data1)
                             { 
-                                console.log(data1);
                                 var str = '';
                                 for(var i = 0; i < data1.length;i++){
                                     str +='<option value="'+ data1[i].idoferta +'" id ="'+ data1[i].idoferta +'">' + data1[i].nombreoferta + '</option>';
@@ -829,7 +828,7 @@ function usarOferta(idofertacliente)
             
             // The url and method might be different in your application
             $.ajax({ 
-                    url: server + 'CRUDOfertaCliente?idoperacion=2&idofertacliente='+ idofertacliente , 
+                    url: server + 'CRUDOfertaCliente?idoperacion=2&idofertacliente='+ idofertacliente  , 
                     dataType: 'json', 
                     async: false, 
                     success: function(data){
@@ -993,7 +992,7 @@ function validarPQRS(){
     // Validamos el tema de la longitud del pedido
     var valPQRS = $("#PQRSOferta").val();
     var resultado = "";
-    if (valPQRS == '')
+    if (valPQRS.trim() == '')
     {
 
     }else
@@ -1004,24 +1003,31 @@ function validarPQRS(){
           return("ERROR");
         }
     }
+    //Si no hay PQRS es decir es vacía no debería validarse
     
-    $.ajax({ 
-                        url:server + 'ValidarPQRS?pqrs=' + valPQRS + "&idcliente=" + idCliente, 
-                        dataType: 'json', 
-                        async: false, 
-                        success: function(data1){ 
-                            var respuesta = data1[0];
-                            if(respuesta.resultado == 'NOK')
-                            {
-                                $.alert("Por favor validar la PQRS, pues o no existe o no pertenece a este cliente");
-                                resultado = "ERROR";
-                            }
-                            else
-                            {
-                                resultado = "OK";
-                            }
-                        } 
-                        });
+    if (valPQRS.trim() == '')
+    {
+        resultado = 'OK';
+    }else
+    {
+        $.ajax({ 
+                            url:server + 'ValidarPQRS?pqrs=' + valPQRS + "&idcliente=" + idCliente, 
+                            dataType: 'json', 
+                            async: false, 
+                            success: function(data1){ 
+                                var respuesta = data1[0];
+                                if(respuesta.resultado == 'NOK')
+                                {
+                                    $.alert("Por favor validar la PQRS, pues o no existe o no pertenece a este cliente");
+                                    resultado = "ERROR";
+                                }
+                                else
+                                {
+                                    resultado = "OK";
+                                }
+                            } 
+                            });
+    }
     return(resultado);
 
 }

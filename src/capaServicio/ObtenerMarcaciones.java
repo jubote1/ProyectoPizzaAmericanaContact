@@ -36,8 +36,9 @@ public class ObtenerMarcaciones extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.addHeader("Access-Control-Allow-Origin", "*");
 		HttpSession sesion = request.getSession();
+		String adm = request.getParameter("adm");
 		ParametrosCtrl parCtrl = new ParametrosCtrl();
-        String respuesta = parCtrl.obtenerMarcaciones();
+        String respuesta = parCtrl.obtenerMarcaciones(adm);
         System.out.println(respuesta);
         PrintWriter out = response.getWriter();
 		out.write(respuesta);

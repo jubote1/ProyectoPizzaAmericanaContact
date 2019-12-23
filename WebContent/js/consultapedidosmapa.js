@@ -102,7 +102,6 @@ function validarDatosConsulta()
 {
 	var fechaIni = $("#fechainicial").val();
 	var fechaFinal = $("#fechafinal").val();
-	var selMunicipio = $("#selectMunicipio").val();
 	var selTienda = $("#selectTiendas").val();
 	var horaIni = $("#selectHoraInicial").val();
 	var horaFin = $("#selectHoraFinal").val();
@@ -122,11 +121,6 @@ function validarDatosConsulta()
 	else
 	{
 		$.alert('La fecha Final está incorrecta');
-		return;
-	}
-	if((selMunicipio == '') || (selMunicipio == null))
-	{
-		$.alert('Debe seleccionar un municipio para la consulta');
 		return;
 	}
 	if((selTienda == '') || (selTienda == null))

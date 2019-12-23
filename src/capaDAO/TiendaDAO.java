@@ -42,6 +42,7 @@ public class TiendaDAO {
 				int pos = rs.getInt("pos");
 				String hosbd = rs.getString("hosbd");
 				String alertarPedidos = rs.getString("alertarpedidos");
+				String manejaZonas = rs.getString("maneja_zonas");
 				if (alertarPedidos.equals(new String ("1")))
 				{
 					alertarPedidos = "S";
@@ -49,7 +50,7 @@ public class TiendaDAO {
 				{
 					alertarPedidos = "N";
 				}
-				Tienda tien = new Tienda(idTienda, nombre, dsn, url, pos, hosbd, alertarPedidos);
+				Tienda tien = new Tienda(idTienda, nombre, dsn, url, pos, hosbd, alertarPedidos, manejaZonas);
 				tiendas.add(tien);
 			}
 			rs.close();
@@ -184,11 +185,11 @@ public class TiendaDAO {
 		Logger logger = Logger.getLogger("log_file");
 		ConexionBaseDatos con = new ConexionBaseDatos();
 		Connection con1 = con.obtenerConexionBDPrincipal();
-		Tienda Pro = new Tienda(0,"","", "",0, "", "");
+		Tienda Pro = new Tienda(0,"","", "",0, "", "", "");
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select idtienda,nombre,dsn,url,pos, hosbd, alertarpedidos from  tienda  where idtienda = " + idtienda; 
+			String consulta = "select idtienda,nombre,dsn,url,pos, hosbd, alertarpedidos, maneja_zonas from  tienda  where idtienda = " + idtienda; 
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idtien = 0;
@@ -198,6 +199,7 @@ public class TiendaDAO {
 			int pos = 0;
 			String hosbd = "";
 			String alertarPedidos = "";
+			String manejaZonas = "";
 			while(rs.next()){
 				idtien = rs.getInt("idtienda");
 				nombre = rs.getString("nombre");
@@ -206,6 +208,7 @@ public class TiendaDAO {
 				pos = rs.getInt("pos");
 				hosbd = rs.getString("hosbd");
 				alertarPedidos = rs.getString("alertarpedidos");
+				manejaZonas = rs.getString("maneja_zonas");
 				if (alertarPedidos.equals(new String ("1")))
 				{
 					alertarPedidos = "S";
@@ -215,7 +218,7 @@ public class TiendaDAO {
 				}
 				break;
 			}
-			Pro = new Tienda(idtien,nombre,dsn,url,pos,hosbd,alertarPedidos);
+			Pro = new Tienda(idtien,nombre,dsn,url,pos,hosbd,alertarPedidos, manejaZonas);
 			stm.close();
 			con1.close();
 		}

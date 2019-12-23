@@ -5,9 +5,51 @@ private int idOferta;
 private String nombreOferta;
 private int idExcepcion;
 private String nombreExcepcion;
+private String codigoPromocional;
+private double descuentoFijo;
+private String mensaje1;
+private String mensaje2;
+private int diasCaducidad;
+private String tipoCaducidad;
 
 
 
+public int getDiasCaducidad() {
+	return diasCaducidad;
+}
+public void setDiasCaducidad(int diasCaducidad) {
+	this.diasCaducidad = diasCaducidad;
+}
+public String getTipoCaducidad() {
+	return tipoCaducidad;
+}
+public void setTipoCaducidad(String tipoCaducidad) {
+	this.tipoCaducidad = tipoCaducidad;
+}
+public String getCodigoPromocional() {
+	return codigoPromocional;
+}
+public void setCodigoPromocional(String codigoPromocional) {
+	this.codigoPromocional = codigoPromocional;
+}
+public double getDescuentoFijo() {
+	return descuentoFijo;
+}
+public void setDescuentoFijo(double descuentoFijo) {
+	this.descuentoFijo = descuentoFijo;
+}
+public String getMensaje1() {
+	return mensaje1;
+}
+public void setMensaje1(String mensaje1) {
+	this.mensaje1 = mensaje1;
+}
+public String getMensaje2() {
+	return mensaje2;
+}
+public void setMensaje2(String mensaje2) {
+	this.mensaje2 = mensaje2;
+}
 public String getNombreExcepcion() {
 	return nombreExcepcion;
 }

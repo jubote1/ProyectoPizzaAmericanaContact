@@ -14,6 +14,7 @@ import capaControlador.ParametrosCtrl;
 import capaControlador.PromocionesCtrl;
 import capaModelo.Oferta;
 import capaModelo.OfertaCliente;
+import capaModelo.Usuario;
 
 /**
  * Servlet implementation class CRUDExcepcionPrecio
@@ -73,12 +74,18 @@ public class CRUDOfertaCliente extends HttpServlet {
 				PQRS = 0;
 			}
 			String observacion = request.getParameter("observacion");
-			OfertaCliente ofer = new OfertaCliente(0,idOferta, idCliente, "", PQRS, "", "", observacion);
+			//Capturamos la información de la sesion del usuario que está ejecutando la inserción
+			Usuario usuario = (Usuario) sesion.getAttribute("usuario");
+			String usuarioIngreso = usuario.getNombreUsuario();
+			OfertaCliente ofer = new OfertaCliente(0,idOferta, idCliente, "", PQRS, "", "", observacion, usuarioIngreso);
 			respuesta = PromoCtrl.insertarOfertaCliente(ofer);
 		}else if (operacion ==2)
 		{
 			int idOfertaCliente = Integer.parseInt(request.getParameter("idofertacliente"));
-			respuesta = PromoCtrl.actualizarUsoOferta(idOfertaCliente);
+			//Capturamos la información de la sesion del usuario que está ejecutando la inserción
+			Usuario usuario = (Usuario) sesion.getAttribute("usuario");
+			String usuarioUso = usuario.getNombreUsuario();
+			respuesta = PromoCtrl.actualizarUsoOferta(idOfertaCliente, usuarioUso);
 		}else if (operacion ==3 )
 		{
 			int idOfertaClienteEli = Integer.parseInt(request.getParameter("idofertacliente"));

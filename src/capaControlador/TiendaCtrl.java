@@ -22,6 +22,7 @@ public class TiendaCtrl {
 			cadaViajeJSON.put("urltienda", tienda.getUrl());
 			cadaViajeJSON.put("pos", tienda.getPos());
 			cadaViajeJSON.put("alertarpedidos", tienda.getAlertarPedidos());
+			cadaViajeJSON.put("manejazonas", tienda.getManejaZonas());
 			listJSON.add(cadaViajeJSON);
 		}
 		return listJSON.toJSONString();
@@ -46,7 +47,7 @@ public class TiendaCtrl {
 	public String insertarTienda(String nombre, String dsn)
 	{
 		JSONArray listJSON = new JSONArray();
-		Tienda Tie = new Tienda(0,nombre,dsn,"",0, "", "");
+		Tienda Tie = new Tienda(0,nombre,dsn,"",0, "", "", "");
 		int idTieIns = TiendaDAO.insertarTienda(Tie);
 		JSONObject ResultadoJSON = new JSONObject();
 		ResultadoJSON.put("idtienda", idTieIns);
@@ -115,7 +116,7 @@ public class TiendaCtrl {
 	public String editarTienda(int idtienda, String nombre, String dsn, String alertarPedidos)
 	{
 		JSONArray listJSON = new JSONArray();
-		Tienda Tie = new Tienda(idtienda,nombre,dsn,"",0, "", alertarPedidos);
+		Tienda Tie = new Tienda(idtienda,nombre,dsn,"",0, "", alertarPedidos, "");
 		String resultado =TiendaDAO.editarTienda(Tie);
 		JSONObject ResultadoJSON = new JSONObject();
 		ResultadoJSON.put("resultado", resultado);

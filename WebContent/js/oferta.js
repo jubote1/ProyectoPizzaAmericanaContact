@@ -21,7 +21,7 @@ $(document).ready(function() {
             {
                 "mData": "accion",
                 className: "center",
-                defaultContent: '<input type="button" class="btn btn-default btn-xs" onclick="eliminarOferta()" value="Eliminar"></button> <input type="button" class="btn btn-default btn-xs" onclick="EditarOferta()" value="Editar"></button>'
+                defaultContent: '<button type="button" class="btn btn-default btn-xs" onclick="eliminarOferta()">Eliminar</button> <button type="button" class="btn btn-default btn-xs" onclick="EditarOferta()">Editar</button>'
             }
         ]
     	} );
@@ -183,11 +183,32 @@ function pintarOfertas()
 					"nombre": data1[i].nombreoferta,
 					"idexcepcion": data1[i].idexcepcion, 
 					"nombreexcepcion": data1[i].nombreexcepcion, 
-					"accion":'<input type="button" class="btn btn-default btn-xs" onclick="eliminarOferta(' +data1[i].idoferta + ')" value="Eliminar"></button> <input type="button" onclick="editarOferta('+data1[i].idoferta+')" class="btn btn-default btn-xs editButton" ' + 'data-id="' + data1[i].idoferta + '" value="Edición"></button>'
+					"accion":'<button type="button" class="btn btn-default btn-xs" onclick="eliminarOferta(' +data1[i].idoferta + ')">Eliminar</button> <button type="button" onclick="editarOferta('+data1[i].idoferta+')" class="btn btn-default btn-xs editButton" ' + 'data-id="' + data1[i].idoferta + '">Edicion</button>' + '<button type="button" onclick="enviarMensaje('+data1[i].idoferta+')" class="btn btn-default btn-xs editButton" ' + 'data-id="' + data1[i].idoferta + '">Mensaje</button>'
 				}).draw();
 				//table.row.add(data1[i]).draw();
 			}
 		});
+}
+
+
+//Se deberá consumir un servicio para el envío de los mensajes de texto pendientes
+function enviarMensaje(idOferta)
+{
+	// The url and method might be different in your application
+            $.ajax({ 
+    				url: server + 'GetEnviarMensajesOferta?idoferta='+ idOferta , 
+    				dataType: 'json', 
+    				async: false, 
+    				success: function(data){
+    					if(data.respuesta == 'exitoso')
+    					{
+    						$.alert('Los mensajes de Texto se han enviado Correctamente');
+    					}else
+    					{
+    						$.alert('Se tuvieron inconvenientes para el envío de los mensajes de Texto');
+    					}
+    				} 
+			}); 
 }
 
 function editarOferta(idoferta)

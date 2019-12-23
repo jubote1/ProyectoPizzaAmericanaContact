@@ -29,6 +29,7 @@ public class Cliente {
 	private String num3;
 	private String nomenclatura;
 	private int estado;
+	public String zonaTienda;
 	
 	
 	public Cliente(int id, String telefono, String nombres, String direccion, String zonaDireccion, String observacion,
@@ -195,12 +196,6 @@ public class Cliente {
 	public void setNum3(String num3) {
 		this.num3 = num3;
 	}
-
-	public void setMunicipio(String idMunicipio) {
-		this.Municipio = idMunicipio;
-	}
-
-
 
 
 	public float getLatitud() {
@@ -369,6 +364,16 @@ public class Cliente {
 
 	public void setNombreCompania(String nombreCompania) {
 		this.nombreCompania = nombreCompania;
+	}
+
+	
+	
+	public String getZonaTienda() {
+		return zonaTienda;
+	}
+
+	public void setZonaTienda(String zonaTienda) {
+		this.zonaTienda = zonaTienda;
 	}
 
 	public Cliente() {

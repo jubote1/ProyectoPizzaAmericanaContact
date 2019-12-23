@@ -44,7 +44,6 @@ public class GetNomenclaturasDireccion extends HttpServlet {
 			String respuesta = PedidoCtrl.obtenerNomenclaturaDireccion();
 			PrintWriter out = response.getWriter();
 			out.write(respuesta);
-			
 		}catch(Exception e){
 			System.out.println(e.getMessage());
 		}

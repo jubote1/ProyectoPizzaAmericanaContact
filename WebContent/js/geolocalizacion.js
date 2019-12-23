@@ -755,68 +755,22 @@ function ubicarTienda(latitud, longitud , mapa) {
           {lat: 6.249769,lng: -75.56859},
           {lat: 6.251073,lng: -75.568075},
           {lat: 6.252409,lng: -75.567731},
-          {lat: 6.252944,lng: -75.569406},
+          {lat: 6.2530187,lng: -75.5692558},
+          {lat: 6.2533765,lng: -75.570149},
           {lat: 6.253777,lng: -75.570994},
           {lat: 6.254356,lng: -75.571211},
-          {lat: 6.257058,lng: -75.576119},
-          {lat: 6.2611,lng: -75.573782},
-          {lat: 6.265108,lng: -75.572317},
-          {lat: 6.266408,lng: -75.571958},
-          {lat: 6.277345,lng: -75.569555},
-          {lat: 6.278914,lng: -75.56917},
-          {lat: 6.28042,lng: -75.569215},
-          {lat: 6.28082,lng: -75.570286},
-          {lat: 6.281071,lng: -75.571786},
-          {lat: 6.281788,lng: -75.571892},
-          {lat: 6.282153,lng: -75.572171},
-          {lat: 6.283126,lng: -75.571933},
-          {lat: 6.285425,lng: -75.570917},
-          {lat: 6.287108,lng: -75.570323},
-          {lat: 6.287938,lng: -75.57033},
-          {lat: 6.288057,lng: -75.571097},
-          {lat: 6.288378,lng: -75.572148},
-          {lat: 6.288979,lng: -75.573841},
-          {lat: 6.290095,lng: -75.57725},
-          {lat: 6.292359,lng: -75.584207},
-          {lat: 6.292486,lng: -75.585936},
-          {lat: 6.293145,lng: -75.586562},
-          {lat: 6.292057,lng: -75.587787},
-          {lat: 6.292271,lng: -75.588203},
-          {lat: 6.292719,lng: -75.5882},
-          {lat: 6.293078,lng: -75.587764},
-          {lat: 6.293748,lng: -75.588554},
-          {lat: 6.29223,lng: -75.589642},
-          {lat: 6.291332,lng: -75.589431},
-          {lat: 6.290932,lng: -75.590048},
-          {lat: 6.290909,lng: -75.590799},
-          {lat: 6.290043,lng: -75.59182},
-          {lat: 6.290339,lng: -75.592262},
-          {lat: 6.29155,lng: -75.592892},
-          {lat: 6.289209,lng: -75.594393},
-          {lat: 6.287295,lng: -75.595851},
-          {lat: 6.290062,lng: -75.598548},
-          {lat: 6.290454,lng: -75.599997},
-          {lat: 6.28826,lng: -75.602373},
-          {lat: 6.285514,lng: -75.601138},
-          {lat: 6.284501,lng: -75.602181},
-          {lat: 6.286143,lng: -75.604155},
-          {lat: 6.285337,lng: -75.606136},
-          {lat: 6.287958,lng: -75.607624},
-          {lat: 6.287465,lng: -75.609756},
-          {lat: 6.285931,lng: -75.610309},
-          {lat: 6.283906,lng: -75.609385},
-          {lat: 6.282093,lng: -75.607902},
-          {lat: 6.280176,lng: -75.606907},
-          {lat: 6.279499,lng: -75.606118},
-          {lat: 6.27742,lng: -75.606601},
-          {lat: 6.276993,lng: -75.603903},
-          {lat: 6.278209,lng: -75.603908},
-          {lat: 6.278507,lng: -75.601725},
-          {lat: 6.279318,lng: -75.600805},
-          {lat: 6.280214,lng: -75.600786},
-          {lat: 6.279894,lng: -75.59864},
-          {lat: 6.277302,lng: -75.597739},
-          {lat: 6.273247,lng: -75.597766},
+          {lat: 6.2571521,lng: -75.5761699},
+          {lat: 6.256578,lng: -75.576494},
+          {lat: 6.258293,lng: -75.577394},
+          {lat: 6.259762,lng: -75.58264},
+          {lat: 6.260677,lng: -75.583475},
+          {lat: 6.261912,lng: -75.584032},
+          {lat: 6.265514,lng: -75.587201},
+          {lat: 6.267187,lng: -75.589751},
+          {lat: 6.269202,lng: -75.591808},
+          {lat: 6.273031,lng: -75.594799},
+          {lat: 6.273424,lng: -75.596911},
+          {lat: 6.274734,lng: -75.59885},
           {lat: 6.271954,lng: -75.59852},
           {lat: 6.272499,lng: -75.599923},
           {lat: 6.27345,lng: -75.600496},
@@ -891,6 +845,79 @@ function ubicarTienda(latitud, longitud , mapa) {
           {lat: 6.250297,lng: -75.57869},
           {lat: 6.24868,lng: -75.57423},
           {lat: 6.247149,lng: -75.569791}
+     ];
+
+     var pilaricacor = [
+          {lat: 6.256578,lng: -75.576494},
+          {lat: 6.2611,lng: -75.573782},
+          {lat: 6.265108,lng: -75.572317},
+          {lat: 6.266408,lng: -75.571958},
+          {lat: 6.277345,lng: -75.569555},
+          {lat: 6.278914,lng: -75.56917},
+          {lat: 6.28042,lng: -75.569215},
+          {lat: 6.28082,lng: -75.570286},
+          {lat: 6.281071,lng: -75.571786},
+          {lat: 6.281788,lng: -75.571892},
+          {lat: 6.282153,lng: -75.572171},
+          {lat: 6.283126,lng: -75.571933},
+          {lat: 6.285425,lng: -75.570917},
+          {lat: 6.287108,lng: -75.570323},
+          {lat: 6.287938,lng: -75.57033},
+          {lat: 6.288057,lng: -75.571097},
+          {lat: 6.288378,lng: -75.572148},
+          {lat: 6.288979,lng: -75.573841},
+          {lat: 6.290095,lng: -75.57725},
+          {lat: 6.292359,lng: -75.584207},
+          {lat: 6.292486,lng: -75.585936},
+          {lat: 6.293145,lng: -75.586562},
+          {lat: 6.292057,lng: -75.587787},
+          {lat: 6.292271,lng: -75.588203},
+          {lat: 6.292719,lng: -75.5882},
+          {lat: 6.293078,lng: -75.587764},
+          {lat: 6.293748,lng: -75.588554},
+          {lat: 6.29223,lng: -75.589642},
+          {lat: 6.291332,lng: -75.589431},
+          {lat: 6.290932,lng: -75.590048},
+          {lat: 6.290909,lng: -75.590799},
+          {lat: 6.290043,lng: -75.59182},
+          {lat: 6.290339,lng: -75.592262},
+          {lat: 6.29155,lng: -75.592892},
+          {lat: 6.289209,lng: -75.594393},
+          {lat: 6.287295,lng: -75.595851},
+          {lat: 6.290062,lng: -75.598548},
+          {lat: 6.290454,lng: -75.599997},
+          {lat: 6.28826,lng: -75.602373},
+          {lat: 6.285514,lng: -75.601138},
+          {lat: 6.284501,lng: -75.602181},
+          {lat: 6.286143,lng: -75.604155},
+          {lat: 6.285337,lng: -75.606136},
+          {lat: 6.287958,lng: -75.607624},
+          {lat: 6.287465,lng: -75.609756},
+          {lat: 6.285931,lng: -75.610309},
+          {lat: 6.283906,lng: -75.609385},
+          {lat: 6.282093,lng: -75.607902},
+          {lat: 6.280176,lng: -75.606907},
+          {lat: 6.279499,lng: -75.606118},
+          {lat: 6.27742,lng: -75.606601},
+          {lat: 6.276993,lng: -75.603903},
+          {lat: 6.278209,lng: -75.603908},
+          {lat: 6.278507,lng: -75.601725},
+          {lat: 6.279318,lng: -75.600805},
+          {lat: 6.280214,lng: -75.600786},
+          {lat: 6.279894,lng: -75.59864},
+          {lat: 6.277035,lng: -75.598554},
+          {lat: 6.274734,lng: -75.59885},
+          {lat: 6.273424,lng: -75.596911},
+          {lat: 6.273031,lng: -75.594799},
+          {lat: 6.271968,lng: -75.593859},
+          {lat: 6.269202,lng: -75.591808},
+          {lat: 6.267187,lng: -75.589751},
+          {lat: 6.265514,lng: -75.587201},
+          {lat: 6.261912,lng: -75.584032},
+          {lat: 6.260677,lng: -75.583475},
+          {lat: 6.259762,lng: -75.58264},
+          {lat: 6.258293,lng: -75.577394},
+          {lat: 6.256578,lng: -75.576494}
      ];
 
      var bellocor = [
@@ -1230,6 +1257,7 @@ function ubicarTienda(latitud, longitud , mapa) {
      var coorColores = new google.maps.LatLng(6.264574,-75.59654);
      var coorItagui = new google.maps.LatLng(6.165916,-75.621144);
      var coorPoblado = new google.maps.LatLng(6.206544,-75.560035);
+     var coorPilarica = new google.maps.LatLng(6.272744,-75.585397);
      var coorLaMota = new google.maps.LatLng(6.210901,-75.595363);
      var coorEnvigado = new google.maps.LatLng(6.1670374,-75.5852606);
 
@@ -1325,7 +1353,7 @@ function ubicarTienda(latitud, longitud , mapa) {
 
      if(google.maps.geometry.poly.containsLocation(coordenada, poligono6) == true) {
          $.alert("POSIBLEMENTE ESTA DENTRO DE COBERTURA TIENDA <h2>LA MOTA</h2>");
-         distTienda = getDistance(coordenada, coorMota);
+         distTienda = getDistance(coordenada, coorLaMota);
           return(distTienda);
      }
 
@@ -1357,6 +1385,22 @@ function ubicarTienda(latitud, longitud , mapa) {
      if(google.maps.geometry.poly.containsLocation(coordenada, poligono8) == true) {
          $.alert("POSIBLEMENTE ESTA DENTRO DE COBERTURA TIENDA <h2>ENVIGADO</h2>");
          distTienda = getDistance(coordenada, coorEnvigado);
+          return(distTienda);
+     }
+
+     //PARA LA TIENDA DE PILARICA
+     var poligono9 = new google.maps.Polygon({paths: pilaricacor,
+            strokeColor: "#FF0000",
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: "#FF0000",
+            fillOpacity: 0.35
+        });
+     
+
+     if(google.maps.geometry.poly.containsLocation(coordenada, poligono9) == true) {
+         $.alert("POSIBLEMENTE ESTA DENTRO DE COBERTURA TIENDA <h2>PILARICA</h2>");
+         distTienda = getDistance(coordenada, coorPilarica);
           return(distTienda);
      }
 

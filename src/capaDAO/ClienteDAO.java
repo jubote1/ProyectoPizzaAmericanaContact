@@ -30,7 +30,7 @@ public class ClienteDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select a.idcliente, b.nombre nombreTienda, a.idtienda, a.nombre, a.apellido, a.nombrecompania, a.direccion, a.zona, a.observacion, a.telefono, c.nombre nombremunicipio, a.latitud, a.longitud, a.distancia_tienda, a.memcode, a.idnomenclatura, a.num_nomencla1, a.num_nomencla2, a.num3, d.nomenclatura from cliente a,tienda b, municipio c, nomenclatura_direccion d where a.idnomenclatura = d.idnomenclatura and a.idtienda = b.idtienda and a.idmunicipio = c.idmunicipio and a.telefono = '" + tel +"' and activo = 1";
+			String consulta = "select a.idcliente, b.nombre nombreTienda, a.idtienda, a.nombre, a.apellido, a.nombrecompania, a.direccion, a.zona, a.observacion, a.telefono, c.nombre nombremunicipio, a.latitud, a.longitud, a.distancia_tienda, a.memcode, a.idnomenclatura, a.num_nomencla1, a.num_nomencla2, a.num3, d.nomenclatura, a.zona_tienda from cliente a,tienda b, municipio c, nomenclatura_direccion d where a.idnomenclatura = d.idnomenclatura and a.idtienda = b.idtienda and a.idmunicipio = c.idmunicipio and a.telefono = '" + tel +"' and activo = 1";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idcliente;
@@ -53,6 +53,7 @@ public class ClienteDAO {
 			String numNomenclatura2;
 			String num3;
 			String nomenclatura;
+			String zonaTienda;
 			while(rs.next()){
 				idcliente = rs.getInt("idcliente");
 				nombreTienda = rs.getString("nombreTienda");
@@ -74,7 +75,9 @@ public class ClienteDAO {
 				numNomenclatura2 = rs.getString("num_nomencla2");
 				num3 = rs.getString("num3");
 				nomenclatura = rs.getString("nomenclatura");
+				zonaTienda = rs.getString("zona_tienda");
 				Cliente clien = new Cliente( idcliente, telefono, nombreCliente,apellido, nombreCompania, direccion,municipio,latitud, longitud, distanciaTienda, zona, observacion, nombreTienda, idTienda, memcode,idnomenclatura, numNomenclatura1, numNomenclatura2, num3, nomenclatura);
+				clien.setZonaTienda(zonaTienda);
 				clientes.add(clien);
 			}
 			rs.close();
@@ -228,7 +231,7 @@ public class ClienteDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select a.idcliente, b.nombre nombreTienda, a.idtienda, a.nombre, a.apellido, a.nombrecompania, a.direccion, a.zona, a.observacion, a.telefono, c.nombre nombremunicipio, c.idmunicipio, a.latitud, a.longitud, a.memcode, a.idnomenclatura, a.num_nomencla1, a.num_nomencla2, a.num3, d.nomenclatura from cliente a JOIN tienda b ON a.idtienda = b.idtienda JOIN municipio c ON a.idmunicipio = c.idmunicipio left join nomenclatura_direccion d on a.idnomenclatura = d.idnomenclatura  where a.idcliente = " + id +"";
+			String consulta = "select a.idcliente, b.nombre nombreTienda, a.idtienda, a.nombre, a.apellido, a.nombrecompania, a.direccion, a.zona, a.observacion, a.telefono, c.nombre nombremunicipio, c.idmunicipio, a.latitud, a.longitud, a.memcode, a.idnomenclatura, a.num_nomencla1, a.num_nomencla2, a.num3, d.nomenclatura, a.distancia_tienda from cliente a JOIN tienda b ON a.idtienda = b.idtienda JOIN municipio c ON a.idmunicipio = c.idmunicipio left join nomenclatura_direccion d on a.idnomenclatura = d.idnomenclatura  where a.idcliente = " + id +"";
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idcliente;
@@ -251,6 +254,7 @@ public class ClienteDAO {
 			String numNomenclatura2;
 			String num3;
 			String nomenclatura;
+			double distanciaTienda;
 			while(rs.next()){
 				idcliente = rs.getInt("idcliente");
 				nombreTienda = rs.getString("nombreTienda");
@@ -272,8 +276,9 @@ public class ClienteDAO {
 				numNomenclatura2 = rs.getString("num_nomencla2");
 				num3 = rs.getString("num3");
 				nomenclatura = rs.getString("nomenclatura");
-				clienteConsultado = new Cliente( idcliente, telefono, nombreCliente, apellido, nombreCompania, direccion,municipio, idMunicipio,latitud, longitud, zona, observacion, nombreTienda, idTienda,memcode,idnomenclatura, numNomenclatura1, numNomenclatura2, num3, nomenclatura);
-				
+				distanciaTienda = rs.getDouble("distancia_tienda");
+				clienteConsultado = new Cliente( idcliente, telefono, nombreCliente, apellido, nombreCompania, direccion,municipio, latitud, longitud, distanciaTienda, zona, observacion, nombreTienda, idTienda,memcode,idnomenclatura, numNomenclatura1, numNomenclatura2, num3, nomenclatura);
+				clienteConsultado.setIdMunicipio(idMunicipio);
 			}
 			rs.close();
 			stm.close();

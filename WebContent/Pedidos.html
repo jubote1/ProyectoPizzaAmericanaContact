@@ -9,6 +9,7 @@
 		  <link rel="stylesheet" type="text/css" href="css/jquery.dataTables.min.css">
 		  <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script> 
 		  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+		  <script type="text/javascript" src="js/push.min.js"></script> 
 		  <script type="text/javascript" charset="utf8" src="js/jquery.dataTables.js"></script>
 		  <script src='js/bootstrapValidator.min.js'></script>
    		  <script src='js/language/es_ES.min.js'></script>
@@ -182,6 +183,7 @@
 					<button type="button" class="btn btn-danger btn-sm" id="limpiar" name="limpiar" onclick="limpiarSeleccionCliente()"><i class="fas fa-eraser fa-2x"></i> Limpiar Selección Cliente</button>
 					<button type="button" class="btn btn-primary btn-sm" id="ultimospedidos" name="ultimospedidos" onclick="consultarUltimosPedidos()"><i class="fas fa-pizza-slice fa-2x"></i> Últimos Pedidos</button>
 					<button type="button" class="btn btn-warning btn-sm" id="transferircliente" name="transferircliente" onclick="mostrarTransferirCliente()"><i class="fas fa-exchange-alt fa-2x"></i> Transferir Cliente</button>
+					<button type="button" class="btn btn-primary btn-sm" id="notificaciones" name="notificaciones" onclick="mostrarNotificaciones()"><i class="fas fa-pizza-slice fa-2x"></i>Notificaciones</button>
 
 					<table id="grid-clientes" class="table table-condensed table-hover table-striped" cellspacing="0" width="100%">
 									        <thead>
@@ -552,6 +554,39 @@
 										</div>
 									</div>
 							
+
+					<!-- ESTO ES PARA LA VISUALIZACIÓN DE NOTIFICACIONES CLIENTE -->
+							
+								<div class="modal fade" id="modalNotificaciones" tabindex="-1" role="dialog" aria-labelledby="addLabel">
+										 <div class="modal-dialog modal-xl" role="document">
+										    <div class="modal-content">
+										      <div class="modal-header">
+										      	<h4 class="modal-title" id="addLabel">NOTIFICACIONES CLIENTE</h4>
+										        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+										      </div>
+										      <form id='pintarNotificaciones'>
+										      		<br>
+															<table class='table table-bordered'>
+																<tbody>
+																	<tr>
+																		<td class="active">PQRS del Cliente</td>
+																		<td class="active"><input type="text" class="form-control" id="pqrscliente" placeholder="pQRS Cliente" disabled></td>
+																		<td class="active">Último Pedido</td>
+																		<td class="active"><input type="text" class="form-control" id="ultimopedidocliente" placeholder="Último pedido" disabled></td>
+																	</tr>
+																	<tr>
+																		<td class="active">Id Último Pedido</td>
+																		<td class="active"><input type="text" class="form-control" id="idultimopedido" placeholder="Id Último Pedido" disabled></td>
+																		<td class="active">Forma Pago Últ Ped</td>
+																		<td class="active"><input type="text" class="form-control" id="formapagoultpedido" placeholder="Forma de Pago Últ Pedido" disabled></td>
+																	</tr>
+																</tbody>
+															</table>
+											  </form>
+										    </div>
+										</div>
+								</div>
+							
 					<!-- ESTO ES PARA LA SININGREDIENTE -->
 						
 						
@@ -653,6 +688,7 @@
 		</div>
 	</body>
 	<script src="js/pedidos.js" type="text/javascript"></script>
+	<script src="js/pedidoszonatienda.js" type="text/javascript"></script>
 	<script src="js/geolocalizacion.js" type="text/javascript"></script>
 	<script src="js/jquery-confirm.min.js"></script>
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRtUQ2WV0L2gMnb9DKiFn1PTHJQLH3suA&callback=initMap&libraries=geometry">

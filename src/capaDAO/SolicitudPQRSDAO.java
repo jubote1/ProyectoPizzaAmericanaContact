@@ -219,5 +219,40 @@ public class SolicitudPQRSDAO {
 		}
 		return(respuesta);
 	}
+	
+	public static ArrayList<Integer> obtenerPQRSCliente(int idCliente)
+	{
+		Logger logger = Logger.getLogger("log_file");
+		String consulta = "select idsolicitudPQRS from solicitudPQRS where idCliente = " + idCliente;
+		logger.info(consulta);
+		ConexionBaseDatos con = new ConexionBaseDatos();
+		Connection con1 = con.obtenerConexionBDPrincipal();
+		ArrayList<Integer> pqrsCliente = new ArrayList();
+		try
+		{
+			Statement stm = con1.createStatement();
+			ResultSet rs = stm.executeQuery(consulta);
+			int pqrs = 0;
+			while(rs.next())
+			{
+				pqrs = rs.getInt("idsolicitudPQRS");
+				pqrsCliente.add(new Integer(pqrs));
+			}
+			rs.close();
+			stm.close();
+			con1.close();
+
+		}catch(Exception e){
+			logger.error(e.toString());
+			try
+			{
+				con1.close();
+			}catch(Exception e1)
+			{
+			}
+			
+		}
+		return(pqrsCliente);
+	}
 
 }

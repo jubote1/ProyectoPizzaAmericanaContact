@@ -4,6 +4,7 @@ import capaModelo.Tienda;
 import capaDAO.ClienteDAO;
 import capaDAO.MunicipioDAO;
 import capaDAO.PedidoDAO;
+import capaDAO.SolicitudPQRSDAO;
 import capaDAO.TiendaDAO;
 
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class ClienteCtrl {
 			cadaViajeJSON.put("numnomenclatura2", cliente.getNumNomenclatura2());
 			cadaViajeJSON.put("num3", cliente.getNum3());
 			cadaViajeJSON.put("nomenclatura", cliente.getNomenclatura());
+			cadaViajeJSON.put("zonatienda", cliente.getZonaTienda());
 			listJSON.add(cadaViajeJSON);
 		}
 		//String temp = listJSON.toJSONString();
@@ -358,6 +360,39 @@ public String InsertarClienteGeolocalizado(int idcliente,  String direccion, Str
 	Respuesta.put("resultado", resp);
 	listJSON.add(Respuesta);
 	return(listJSON.toJSONString());
+}
+
+public String obtenerNotificacionesCliente(int idCliente)
+{
+	JSONObject respuesta = new JSONObject();
+	ArrayList<Integer> pqrsCliente = SolicitudPQRSDAO.obtenerPQRSCliente(idCliente);
+	String[] infoPedido = PedidoDAO.obtenerUltimoPedidoCliente(idCliente);
+	if(pqrsCliente.size() > 0)
+	{
+		String pqrs = " Ha radicado PQRS ";
+		Integer cadaPQRS;
+		for(int i = 0; i < pqrsCliente.size(); i++)
+		{
+			cadaPQRS = pqrsCliente.get(i);
+			pqrs = pqrs + "," + cadaPQRS.toString();
+		}
+		respuesta.put("pqrs", pqrs);
+	}else
+	{
+		respuesta.put("pqrs", "NO");
+	}
+	//Validamos que tenga última fecha pedido
+	if(infoPedido[0]== "")
+	{
+		
+	}else
+	{
+		respuesta.put("idpedido", infoPedido[0]);
+		respuesta.put("ultimopedido", infoPedido[1]);
+		respuesta.put("formapago", infoPedido[2]);
+		respuesta.put("tiempopedido", infoPedido[3]);
+	}
+	return(respuesta.toJSONString());
 }
 
 }

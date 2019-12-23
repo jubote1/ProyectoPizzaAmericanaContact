@@ -22,7 +22,7 @@ public class MarcacionDAO {
 	 * Método que se encarga de retornar la información de todos los municipios definidos en el sistema.
 	 * @return Se retorna un ArrayList con todos los municipios definidos en el sistema
 	 */
-	public static ArrayList<Marcacion> obtenerMarcaciones()
+	public static ArrayList<Marcacion> obtenerMarcaciones(String adm)
 	{
 		Logger logger = Logger.getLogger("log_file");
 		ArrayList<Marcacion> marcaciones = new ArrayList<>();
@@ -31,7 +31,14 @@ public class MarcacionDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select * from marcacion where estado = 1";
+			String consulta = "";
+			if(adm.equals(new String("N")))
+			{
+				consulta = "select * from marcacion where estado = 1 and administrador = 'N'";
+			}else
+			{
+				consulta = "select * from marcacion where estado = 1";
+			}
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			while(rs.next()){

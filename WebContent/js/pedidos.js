@@ -49,6 +49,13 @@ var descuentoPedido = 0;
 var motivoDescuento = "";
 //Variable donde será almacaneda la distancia del cliente a la tienda en caso de que se pueda calcular
 var distanciaTienda = 0;
+//Variable que almacenara la notificacion cuando se selecciona un cliente existente
+var notif
+//Variable donde se almacena la zona del cliente
+var zonaCliente = "";
+//Variables que almacenaran parámetros para funcionamiento de página
+var apiGoogle = "";
+var ubicacionMapa = "";
 
 // A continuación  la ejecucion luego de cargada la pagina
 $(document).ready(function() {
@@ -93,6 +100,8 @@ $("#fechapedido").change(function(){
         administrador = 'N';
     }
 
+    //Obtenemos parametros generales
+    obtenerParametrosGenerales();
 	getListaTiendas();
 	//Obtenemos las homologaciones para los liquidos
 	getHomologacionGaseosaTienda();
@@ -254,6 +263,7 @@ $("#fechapedido").change(function(){
     // de cliente y adicionalmente la variale glogal de idcliente se capturara, adicionalmente se consumirá la API de google para buscar la
     //dirección. 
     $('#grid-clientes tbody').on('click', 'tr', function () {
+        //cerramos la notificacion en caso de que esté abierta
         datos = table.row( this ).data();
         $("#selectTiendas").val(datos.tienda);
         var idtien = $("#selectTiendas option:selected").attr('id');
@@ -281,6 +291,8 @@ $("#fechapedido").change(function(){
         $('#numNomen').val(datos.numnomenclatura1);
         $('#numNomen2').val(datos.numnomenclatura2);
         $('#num3').val(datos.num3);
+        // Asignamos la zona del cliente
+        zonaCliente = datos.zonatienda;
         var selMunicipio = $("#selectMunicipio").val();
         if (selMunicipio == '' || selMunicipio == null || selMunicipio == 'null')
         {
@@ -400,6 +412,82 @@ $("#fechapedido").change(function(){
         //En este punto luego de buscar la direccion del cliente, buscaremos si este tiene pedidos
         $('#ultimospedidos').attr('disabled', false);
         $('#transferircliente').attr('disabled', false);
+
+        //Intervendremos el momento en que se selecciona el cliente y crearemos un servicio que retornará un JSON con la información
+        switch (Notification.permission) {
+            case "granted":
+                //Colocamos la alerta que deseamos
+                    $.getJSON(server + 'ObtenerNotificacionesCliente?idcliente=' + idCliente , function(data2){
+                        var quejas;
+                        var ultimoPedido;
+                        var formaPago;
+                        var tiempoPedido;
+                        if(data2.pqrs == "NO")
+                        {
+                            quejas = "No ha radicado PQRS."
+                        }else{
+                            quejas = data2.pqrs;
+                        }
+                        if(data2.ultimopedido == undefined)
+                        {
+                            ultimoPedido = "";
+                        }
+                        else
+                        {
+                            ultimoPedido = "Último pedido: " + data2.ultimopedido + "\n ";
+                        }
+                        //
+                        if(data2.formapago == undefined)
+                        {
+                            formaPago = "";
+                        }
+                        else
+                        {
+                            formaPago = "Forma pago: " + data2.formapago + "\n ";
+                        }
+                        //
+                        if(data2.tiempopedido == undefined)
+                        {
+                            tiempoPedido = "";
+                        }
+                        else
+                        {
+                            tiempoPedido = "Tiempo Pedido: " + data2.tiempopedido;
+                        }
+                        var options = {
+                                body: quejas + "\n " + ultimoPedido + formaPago  + tiempoPedido ,
+                                icon: "images/LogoPizzaAmericana.jpg",
+                                tag: "cliente"
+                        };
+                             
+                        notif = new Notification("Información Cliente", options);
+                        setTimeout(notif.close.bind(notif), 20000);
+                        notif.onclick = function(event) 
+                        {
+                            event.preventDefault(); // prevent the browser from focusing the Notification's tab
+                            window.open('http://www.mozilla.org', '_blank');
+                        }
+                    });
+                    break;
+            case "denied":
+                    //alert("¡No tenemos permiso para enviar notificaciones, por favor habilitar para poder tenerlas!");
+                    Notification.requestPermission( function(status) {
+                        if (status == "granted")
+                        {
+
+                        }
+                    }); 
+                    break;
+            default:
+                    Notification.requestPermission( function(status) {
+                        if (status == "granted")
+                        {
+
+                        }
+                    });
+                    break;
+        }
+
      } );
 
 
@@ -581,12 +669,10 @@ $("#fechapedido").change(function(){
  	$("input[name=requiereDevuelta]:radio").click(function() { 
 
  		if($(this).val() == 'completo') {
- 			console.log("completo");
-			$("#valorpago").val($("#totalpedido").val());
+ 			$("#valorpago").val($("#totalpedido").val());
 			$('#valorpago').attr('disabled', true);
 			
  		}else  if($(this).val() == 'devuelta') {
- 			console.log("devuelta");
  			$('#valorpago').attr('disabled', false);
  			$("#valorpago").val('0');
  		}
@@ -892,6 +978,18 @@ function duplicarDetallePedido(iddetallepedido)
 
 }
 
+//Método para traer los parámetros generales para el funcionamiento de la página
+function obtenerParametrosGenerales()
+{
+    $.getJSON(server + 'GetParametro?parametro=UBICAMAPA' , function(data){
+        ubicacionMapa = data.valortexto;
+    });
+
+    $.getJSON(server + 'GetParametro?parametro=CLAVEAPIGOOGLE' , function(data1){
+        apiGoogle = data1.valortexto;
+    });
+}
+
 // Método que invoca el servicio para listar las tiendas donde se pondrán tomar domicilios.
 function getListaTiendas(){
 	$.getJSON(server + 'GetTiendas', function(data){
@@ -986,9 +1084,12 @@ function getListaMunicipios(){
 function getMarcaciones(){
 
     //En este punto vamos a validar si se es o no administrador con el fin de pintar o no este bloqueo
+    var adm = "N";
     if(administrador == 'S')
     {
-        $.getJSON(server + 'ObtenerMarcaciones', function(data){
+        adm = "S";
+    }
+        $.getJSON(server + 'ObtenerMarcaciones?adm=' + adm, function(data){
             marcaciones = data;
             var str = '<h2>Marcaciones Pedido</h2>';
             str += '<table class="table table-bordered">';
@@ -1015,7 +1116,7 @@ function getMarcaciones(){
             }
             $('#frmMarcaciones').html(str);
         });
-    }
+    
 }
 
 
@@ -1083,19 +1184,47 @@ function procesarMarcaciones(idPedMarcado){
 	}
 }
 
+function limpiarMarcaciones()
+{
+    for(var i = 0; i < marcaciones.length; i++)
+    {
+        var cadaMarcacion  = marcaciones[i];
+        $("#txtObsMarcacion"+cadaMarcacion.idmarcacion).val('');
+        $("#txtDescuento"+cadaMarcacion.idmarcacion).val('');
+        $("#selectMotivo"+cadaMarcacion.idmarcacion).val("vacio");
+        $('input:checkbox[name=checkMarca'+cadaMarcacion.idmarcacion+']').attr('checked',false);
+    }
+
+}
+
 function validarMarcaciones()
 {
+    var observacion = "";
+    var desc = "";
+    var motDesc = "";
 	for(var i = 0; i < marcaciones.length; i++)
 	{
 		var cadaMarcacion  = marcaciones[i];
 		if($('input:checkbox[name=checkMarca'+cadaMarcacion.idmarcacion+']').is(':checked'))
 		{
-			var observacion = "";
 			observacion = $("#txtObsMarcacion"+cadaMarcacion.idmarcacion).val();
 			if(observacion == '' || observacion == null)
 			{
 				return(false);
 			}
+            //Validamos si el descuento es mayor a cero en cuyo deberá tener algo seleccionado en el motivo del descuento
+            desc = $("#txtDescuento"+cadaMarcacion.idmarcacion).val();
+            if(desc == '' || desc == null)
+            {
+
+            }else
+            {
+                motDesc = $("#selectMotivo"+cadaMarcacion.idmarcacion).val();
+                if(motDesc == 'vacio')
+                {
+                    return(false);
+                }
+            }
 		}
 	}
 	return(true);
@@ -2446,7 +2575,8 @@ function ReiniciarPedido()
 															        $("#selectNomenclaturas").val('');
 															        $('#numNomen').val("");
 															        $('#numNomen2').val("");
-															        $('#num3').val("");
+															        $('#num3').val(""); "";
+                                                                    zonaCliente = "";
 															        $('#descDireccion').val("");
 															        $("#selectMunicipio").val("");
 															        //reiniciamos el arreglo de productos
@@ -2492,6 +2622,8 @@ function ReiniciarPedido()
 																	$('#ultimospedidos').attr('disabled', true);
 																	$('#transferircliente').attr('disabled', true);
 																	$('#validaDir').prop('checked', true);
+                                                                    //Se limpian las marcaciones de pedido en caso de que se tengan
+                                                                    limpiarMarcaciones();
 														}
 														else
 														{
@@ -2535,16 +2667,13 @@ function ReiniciarPedido()
 function ConfirmarPedido()
 {
 	//Antes de finalizar el pedido validamos que si estén correctas las marcaciones
-    if(administrador == 'S')
+    var validaMarcaciones = validarMarcaciones();
+    if(validaMarcaciones == false)
     {
-        var validaMarcaciones = validarMarcaciones();
-        if(validaMarcaciones == false)
-        {
-            $.alert('Una o unas de las marcaciones de pedido no tienen observación.');
-            return;
-        }
+        $.alert('Una o unas de las marcaciones de pedido no tienen observación o tiene descuento y no tiene el motivo de descuento');
+        return;
     }
-	if(idPedido == 0 )
+    if(idPedido == 0 )
 	{
 		$.alert("Para confirmar el pedido debe tener por lo menos un item agregado");
 		return;
@@ -2634,11 +2763,8 @@ function ConfirmarPedido()
 		    				success: function(data){
 		    						//En este punto realizamos la inserción de los marcadores
                                     //Incluimos validación de procesar marcaciones solo si se es administrador, sino no aplicaría
-                                    if(administrador == 'S')
-                                    {
-                                        procesarMarcaciones(idPedido);
-                                    }
-		    						resultado = data[0];
+                                    procesarMarcaciones(idPedido);
+                                    resultado = data[0];
 									var resJSON = JSON.stringify(resultado);
 									var urlTienda = resultado.url;
 									//Mandamos todos los párametros para la inserción de la tienda
@@ -2702,6 +2828,7 @@ function ConfirmarPedido()
 							        $('#numNomen').val("");
 							        $('#numNomen2').val("");
 							        $('#num3').val("");
+                                    zonaCliente = "";
 							        $('#descDireccion').val("");
 							        $("#selectMunicipio").val("");
 							        //reiniciamos el arreglo de productos
@@ -2735,6 +2862,7 @@ function ConfirmarPedido()
 									$('#limpiar').attr('disabled', false);
 									$('#validaDir').prop('checked', true);
 									$('#ultimospedidos').attr('disabled', true);
+                                    limpiarMarcaciones();
 								},
 								error: function(){
 								    alert('Se produjo un error en la inserción del Pedido, favor revisar logs y reintentar');
@@ -3099,6 +3227,31 @@ function agregarEncabezadoPedido()
 						
 											} 
 		});
+
+        //En este punto realizaremos la inserción de la nueva lógica para la validación de la zona de tiendas
+        var idtien = $("#selectTiendas option:selected").attr('id');
+        var manejaZonas = 'N';
+        //Recorremos las tiendas para saber si la seleccionada maneja o no zonas
+        for(var j = 0; j < tiendas.length; j++)
+        {
+            var cadaTienda = tiendas[j];
+            if(cadaTienda.idtienda == idtien)
+            {
+                manejaZonas = cadaTienda.manejazonas;
+                break;
+            }
+        }
+        //Validamos el resultado de si maneja zonas
+        if(manejaZonas == 'S')
+        {
+            //Validamos que el cliente no tenga asignada zona, en cuyo caso si deberíamos de buscar.
+            if(zonaCliente == '')
+            {
+
+                //En este punto deberíamos de realizar la ubicación del punto.
+            }
+        }
+
 		$("#NumPedido").val(idPedido);
 		$("#IdCliente").val(idClienteTemporal);
 		if ((idCliente > 0 ) && (idCliente == idClienteTemporal))
@@ -4109,7 +4262,7 @@ function geocodeResult(results, status) {
         // Dibujamos un marcador con la ubicación del primer resultado obtenido
         //url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/ZonasDeRepartoTotales.kml',
         var ctaLayer = new google.maps.KmlLayer({
-          url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/PizzaAmericana-ZonasDeRepartoTotales-Ver_03.kml',
+          url: ubicacionMapa,
           map: map,
           scrollwheel: false,
           zoom: 17
@@ -4139,7 +4292,7 @@ function geocodeSinServicio(lat, long)
 	});
 
     var ctaLayer = new google.maps.KmlLayer({
-		url: 'https://raw.githubusercontent.com/Andres-FA/KMLZonasDeReparto/master/PizzaAmericana-ZonasDeRepartoTotales-Ver_03.kml',
+		url: ubicacionMapa,
 		map: map,
 		scrollwheel: false,
 		zoom: 17
@@ -4323,6 +4476,7 @@ function limpiarSeleccionCliente()
         $('#numNomen').val("");
         $('#numNomen2').val("");
         $('#num3').val("");
+        zonaCliente = "";
         $('#descDireccion').val("");
         //reiniciamos el arreglo de productos
 		productos = "";
@@ -4460,6 +4614,26 @@ function consultarUltimosPedidos()
 	$('#ultimosPedidosCliente').modal('show');
 }
 
+function mostrarNotificaciones()
+{
+    $.getJSON(server + 'ObtenerNotificacionesCliente?idcliente=' + idCliente , function(data2){
+        if(data2.pqrs == "NO")
+        {
+
+        }else
+        {
+            $('#pqrscliente').val(data2.pqrs);
+            $('#ultimopedidocliente').val(data2.ultimopedido);
+            $('#idultimopedido').val(data2.idpedido);
+            $('#formapagoultpedido').val(data2.formapago);
+        }
+    });
+    $('div').click( function( e ) {
+        e.stopPropagation();
+    });
+    $('#modalNotificaciones').modal('show');
+}
+
 function transferirCliente()
 {
 	//Seleccionar la tienda origen
@@ -4482,7 +4656,7 @@ function transferirCliente()
     var idClienteTienda;
     var nombresEncode = encodeURIComponent(nombres.value);
     var apellidosEncode = encodeURIComponent(apellidos.value);
-    var nombreCompaniaEncode = encodeURIComponent(nombreCompania.value);;
+    var nombreCompaniaEncode = encodeURIComponent(nombreCompania.value);
     var direccionEncode;
     var validaDir = 'S';
     var dirTemp = $("#selectNomenclaturas").val() +  " "  + $("#numNomen").val() + " # " + $("#numNomen2").val() + " - " + $("#num3").val();

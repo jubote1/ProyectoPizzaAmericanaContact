@@ -10,6 +10,7 @@ import capaDAO.EstadoPedidoDAO;
 import capaDAO.ExcepcionPrecioDAO;
 import capaDAO.FormaPagoDAO;
 import capaDAO.MunicipioDAO;
+import capaDAO.ParametrosDAO;
 import capaDAO.PedidoDAO;
 import capaDAO.ProductoDAO;
 import capaDAO.ProductoNoExistenteDAO;
@@ -32,6 +33,7 @@ import capaModelo.SaborLiquido;
 import capaModelo.TiempoPedido;
 import capaModelo.Tienda;
 import capaModelo.Municipio;
+import capaModelo.Parametro;
 import capaModelo.FormaPago;
 import capaModelo.Marcacion;
 /**
@@ -319,9 +321,9 @@ public class ParametrosCtrl {
 			return listJSON.toJSONString();
 		}
 		
-		public String obtenerMarcaciones(){
+		public String obtenerMarcaciones(String adm){
 			JSONArray listJSON = new JSONArray();
-			ArrayList<Marcacion> marcaciones = MarcacionDAO.obtenerMarcaciones();
+			ArrayList<Marcacion> marcaciones = MarcacionDAO.obtenerMarcaciones(adm);
 			for (Marcacion mar : marcaciones) 
 			{
 				JSONObject cadaMarcacionJSON = new JSONObject();
@@ -955,6 +957,41 @@ public class ParametrosCtrl {
 				}
 				return listJSON.toJSONString();
 				
+			}
+			
+			//Manejo de tema de parámetros
+			public boolean EditarParametro(Parametro parametro)
+			{
+				boolean respuesta = ParametrosDAO.EditarParametro(parametro);
+				return(respuesta);
+			}
+			
+			public boolean eliminarParametro(String valorParametro)
+			{
+				boolean respuesta = ParametrosDAO.eliminarParametro(valorParametro);
+				return(respuesta);
+			}
+			
+			public boolean insertarParametro(Parametro parametro)
+			{
+				boolean respuesta = ParametrosDAO.insertarParametro(parametro);
+				return(respuesta);
+			}
+			
+			public String obtenerParametro(String valorParametro)
+			{
+				JSONObject ResultadoJSON = new JSONObject();
+				Parametro parametro = ParametrosDAO.obtenerParametro(valorParametro);
+				ResultadoJSON.put("valortexto", parametro.getValorTexto());
+				ResultadoJSON.put("valornumerico", parametro.getValorNumerico());
+				System.out.println(ResultadoJSON.toJSONString());
+				return ResultadoJSON.toJSONString();
+			}
+			
+			public ArrayList obtenerParametros()
+			{
+				ArrayList parametros = ParametrosDAO.obtenerParametros();
+				return parametros;
 			}
 			
 			
