@@ -6,18 +6,37 @@ public class OfertaCliente {
 	private int idOferta;
 	private String nombreOferta;
 	private int idCliente;
+	private String nombreCliente;
 	private String utilizada;
-	private String ingresoOferta;
-	private String usoOferta;
-	private String observacion;
 	private int PQRS;
-	private String codigoPromocion;
+	private String ingresoOferta;
 	private String usuarioIngreso;
+	private String usoOferta;
 	private String usuarioUso;
+	private String observacion;
+	private String codigoPromocion;
+	private String fechaMensaje;
 	private String fechaCaducidad;
-	
-		
-		
+	private int idClienteRedimio;
+
+	public String getFechaMensaje() {
+		return fechaMensaje;
+	}
+	public void setFechaMensaje(String fechaMensaje) {
+		this.fechaMensaje = fechaMensaje;
+	}
+	public int getIdClienteRedimio() {
+		return idClienteRedimio;
+	}
+	public void setIdClienteRedimio(int idClienteRedimio) {
+		this.idClienteRedimio = idClienteRedimio;
+	}
+	public String getNombreCliente() {
+		return nombreCliente;
+	}
+	public void setNombreCliente(String nombreCliente) {
+		this.nombreCliente = nombreCliente;
+	}
 	public String getFechaCaducidad() {
 		return fechaCaducidad;
 	}

@@ -2106,7 +2106,7 @@ public class PedidoDAO {
 		{
 			if(strIdMuni.equals(new String ("TODOS")))
 			{
-				consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and a.idtienda = " + idTienda;
+				consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso, a.total_neto from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and a.idtienda = " + idTienda;
 			}else
 			{
 				int idMunicipio;
@@ -2119,17 +2119,17 @@ public class PedidoDAO {
 				}
 				if(idMunicipio > 0)
 				{
-					consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and b.idmunicipio = " + idMunicipio + " and a.idtienda = " + idTienda;
+					consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso, a.total_neto from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and b.idmunicipio = " + idMunicipio + " and a.idtienda = " + idTienda;
 				}else
 				{
-					consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and a.idtienda = " + idTienda;
+					consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso, a.total_neto from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and a.idtienda = " + idTienda;
 				}
 			}
 		}else
 		{
 			if(strIdMuni.equals(new String ("TODOS")))
 			{
-				consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and a.idtienda = " + idTienda + " and fechainsercion >= '" + horaInicial + "' and fechainsercion <= '" + horaFinal +"'";
+				consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso, a.total_neto from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and a.idtienda = " + idTienda + " and fechainsercion >= '" + horaInicial + "' and fechainsercion <= '" + horaFinal +"'";
 			}else
 			{
 				int idMunicipio;
@@ -2142,10 +2142,10 @@ public class PedidoDAO {
 				}
 				if(idMunicipio > 0)
 				{
-					consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and b.idmunicipio = " + idMunicipio + " and a.idtienda = " + idTienda + " and fechainsercion >= '" + horaInicial + "' and fechainsercion <= '" + horaFinal +"'";
+					consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso, a.total_neto from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and b.idmunicipio = " + idMunicipio + " and a.idtienda = " + idTienda + " and fechainsercion >= '" + horaInicial + "' and fechainsercion <= '" + horaFinal +"'";
 				}else
 				{
-					consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and a.idtienda = " + idTienda + " and fechainsercion >= '" + horaInicial + "' and fechainsercion <= '" + horaFinal +"'";
+					consulta = "select a.idpedido id, b.direccion, c.nombre municipio, b.idcliente, b.latitud, b.longitud, b.telefono, b.nombre, b.apellido, a.fechapedido fecha_ingreso, a.total_neto from pedido a, cliente b, municipio c where a.idcliente = b.idcliente and c.idmunicipio = b.idmunicipio and  a.fechapedido >= '"+ fechaini + "' and a.fechapedido <= '" + fechafin + "' and a.idtienda = " + idTienda + " and fechainsercion >= '" + horaInicial + "' and fechainsercion <= '" + horaFinal +"'";
 				}
 			}
 		}
@@ -2167,6 +2167,7 @@ public class PedidoDAO {
 			String nombre = "";
 			String apellido = "";
 			String fechaIngreso ="";
+			double valor;
 			while(rs.next())
 			{
 				id = rs.getInt("id");
@@ -2179,8 +2180,9 @@ public class PedidoDAO {
 				nombre = rs.getString("nombre");
 				apellido = rs.getString("apellido");
 				fechaIngreso = rs.getString("fecha_ingreso");
+				valor = rs.getDouble("total_neto");
 				//Luego de tomada la información de la cantidad de pedidos, validamos que los pedidos llevados al cliente seran 0 o 1.
-				DireccionFueraZona dirFuera = new DireccionFueraZona(id, direccion, municipio, idCliente, latitud, longitud, telefono, nombre, apellido);
+				DireccionFueraZona dirFuera = new DireccionFueraZona(id, direccion, municipio, idCliente, latitud, longitud, telefono, nombre, apellido, valor);
 				dirFuera.setFechaIngreso(fechaIngreso);
 				consultaDirs.add(dirFuera);
 			}

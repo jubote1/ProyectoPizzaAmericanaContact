@@ -137,6 +137,8 @@ public class PromocionesCtrl {
 		ResultadoJSON.put("usooferta", oferCliente.getUsoOferta());
 		ResultadoJSON.put("observacion", oferCliente.getObservacion());
 		ResultadoJSON.put("pqrs", oferCliente.getPQRS());
+		ResultadoJSON.put("nombrecliente", oferCliente.getNombreCliente());
+		ResultadoJSON.put("codigopromocion", oferCliente.getCodigoPromocion());
 		listJSON.add(ResultadoJSON);
 		return(listJSON.toJSONString());
 	}
@@ -224,6 +226,9 @@ public class PromocionesCtrl {
 		JSONObject ResultadoJSON = new JSONObject();
 		ResultadoJSON.put("idoferta", oferta.getIdOferta());
 		ResultadoJSON.put("nombreoferta", oferta.getNombreOferta());
+		ResultadoJSON.put("idexcepcion", oferta.getIdExcepcion());
+		ResultadoJSON.put("descuentofijovalor", oferta.getDescuentoFijoValor());
+		ResultadoJSON.put("descuentofijoporcentaje", oferta.getDescuentoFijoPorcentaje());
 		ResultadoJSON.put("idexcepcion", oferta.getIdExcepcion());
 		listJSON.add(ResultadoJSON);
 		return(listJSON.toJSONString());
@@ -324,7 +329,7 @@ public class PromocionesCtrl {
 					vigente = true;
 				}
 			}
-			if(vigente)
+			if(vigente && ofertaCliente.getUtilizada().equals(new String("N")))
 			{
 				ofertaJSON.put("respuesta", "OK");
 			}else
@@ -407,21 +412,25 @@ public class PromocionesCtrl {
 				
 				// Retornamos el mensaje para hacerle tratamiento mensaje 2
 				mensaje2 = mensaje.getMensaje2();
-				//Validamos el mensaje 1 que no sea nulo y que tenga longitud
-				if((!mensaje2.equals(null)) && (mensaje2.trim().length() > 0))
+				if(mensaje2 != null)
 				{
-					//Buscamos dentro del caracter los comodines para reemplazarlos
-					//#NOMBRECLIENTE  #APELLIDOCLIENTE #CODIGODESCUENTO
-					mensaje2 = mensaje2.replace("#NOMBRECLIENTE", mensaje.getNombreCliente());
-					mensaje2 = mensaje2.replace("#APELLIDOCLIENTE", mensaje.getApellidoCliente());
-					mensaje2 = mensaje2.replace("#CODIGODESCUENTO", mensaje.getCodigoPromocion());
-					//Validamos la longitud del mensaje y si cumple lo enviaremos
-					if(mensaje1.length() <= 160)
+					//Validamos el mensaje 1 que no sea nulo y que tenga longitud
+					if((!mensaje2.equals(null)) && (mensaje2.trim().length() > 0))
 					{
-						//Realizaríamos el llamado al programa PHP
-						resultado =  ejecutarPHPEnvioMensaje( "57"+ telEnviarMensaje, mensaje1);
+						//Buscamos dentro del caracter los comodines para reemplazarlos
+						//#NOMBRECLIENTE  #APELLIDOCLIENTE #CODIGODESCUENTO
+						mensaje2 = mensaje2.replace("#NOMBRECLIENTE", mensaje.getNombreCliente());
+						mensaje2 = mensaje2.replace("#APELLIDOCLIENTE", mensaje.getApellidoCliente());
+						mensaje2 = mensaje2.replace("#CODIGODESCUENTO", mensaje.getCodigoPromocion());
+						//Validamos la longitud del mensaje y si cumple lo enviaremos
+						if(mensaje2.length() <= 160)
+						{
+							//Realizaríamos el llamado al programa PHP
+							resultado =  ejecutarPHPEnvioMensaje( "57"+ telEnviarMensaje, mensaje2);
+						}
 					}
 				}
+				
 				//Validamos el resultado para dar por enviado el mensaje, cuando el mensaje es enviado debe tener un String con true
 				if(resultado.contains("true"))
 				{
@@ -443,7 +452,7 @@ public class PromocionesCtrl {
 	      String line;
 	      //Variable con ruta del script
 	      String rutaPHPEnviarMensaje = ParametrosDAO.retornarValorAlfanumerico("RUTAPHPENVIARMENSAJE");
-	      
+	      System.out.println("php " + rutaPHPEnviarMensaje + " " + telefono + " '" + mensaje + "'");
 	      Process p = Runtime.getRuntime().exec("php " + rutaPHPEnviarMensaje + " " + telefono + " \"" + mensaje + "\"");
 	      BufferedReader input =
 	        new BufferedReader

@@ -10,6 +10,7 @@ var table;
 var dtpedido;
 var dtEncabezadoPedido;
 var dtDetallePedido;
+var dtOferta;
 var productos;
 var excepciones;
 var idPedido = 0;
@@ -56,6 +57,10 @@ var zonaCliente = "";
 //Variables que almacenaran parámetros para funcionamiento de página
 var apiGoogle = "";
 var ubicacionMapa = "";
+//Variables que se manejarán para el tema de descuentos
+var descuentoPesos = 0;
+var descuentoPorcentaje = 0;
+var idOfertaClienteActual = 0;
 
 // A continuación  la ejecucion luego de cargada la pagina
 $(document).ready(function() {
@@ -147,6 +152,17 @@ $("#fechapedido").change(function(){
             { "mData": "memcode"  , "visible": false }
         ]
     	} );
+
+    // Se realiza la creación del DATATABLE DE OFERTAS
+    dtOferta = $('#grid-oferta').DataTable( {
+            "aoColumns": [
+            { "mData": "idofertacliente" },
+            { "mData": "codigopromocion" },
+            { "mData": "nombreoferta" },
+            { "mData": "nombrecliente" },
+        ]
+        } );
+
 
     // Se realiza la creación del datatable detalle de pedido
 
@@ -832,13 +848,8 @@ function eliminarDetallePedido(iddetallepedido)
 								    	}
 								    	$.getJSON(server + 'ObtenerTotalPedido?idpedido=' + idPedido, function(data){
 											var valorTotalDespues = data[0];
-											totalpedido = valorTotalDespues.valortotal;
-											$('#totalpedido').val(valorTotalDespues.valortotal);
-											if ($("input:radio[name=requiereDevuelta]:checked").val() == "completo")
-											{
-												$("#valorpago").val(valorTotalDespues.valortotal);
-											}
-	    									$("#valordevolver").val($("#valorpago").val() - $("#totalpedido").val() );
+											totalpedidogeneral = valorTotalDespues.valortotal;
+											validarDescuentoOferta();
 										});
 										contadorItem = contadorItem - 1;
 							    	}
@@ -951,13 +962,8 @@ function duplicarDetallePedido(iddetallepedido)
 							    	}
 									$.getJSON(server + 'ObtenerTotalPedido?idpedido=' + idPedido, function(data){
 											var valorTotalDespues = data[0];
-											totalpedido = valorTotalDespues.valortotal;
-											$('#totalpedido').val(valorTotalDespues.valortotal);
-											if ($("input:radio[name=requiereDevuelta]:checked").val() == "completo")
-											{
-												$("#valorpago").val(valorTotalDespues.valortotal);
-											}
-	    									$("#valordevolver").val($("#valorpago").val() - $("#totalpedido").val() );
+											totalpedidogeneral = valorTotalDespues.valortotal;
+                                            validarDescuentoOferta();
 									});
 							    	contadorItem = contadorItem + 1;
 								}
@@ -1145,6 +1151,25 @@ function validarDescuento( descuentoIng)
         totalpedido = totalpedido - descTemp;
     }
 
+    $('#totalpedido').val(totalpedido);
+    if ($("input:radio[name=requiereDevuelta]:checked").val() == "completo")
+    {
+        $("#valorpago").val(totalpedido);
+    }
+    $("#valordevolver").val($("#valorpago").val() - $("#totalpedido").val() );
+}
+
+function validarDescuentoOferta()
+{
+    if(descuentoPesos >  0)
+    {
+        descuentoPedido = descuentoPesos;
+    }else(descuentoPorcentaje > 0)
+    {
+        descuentoPedido = (totalpedidogeneral*descuentoPorcentaje)/100;
+    }
+    totalpedido = totalpedidogeneral;
+    totalpedido = totalpedido - descuentoPedido; 
     $('#totalpedido').val(totalpedido);
     if ($("input:radio[name=requiereDevuelta]:checked").val() == "completo")
     {
@@ -2132,6 +2157,7 @@ function agregarGaseosa()
 	$("#valordevolver").val($("#valorpago").val() - $("#totalpedido").val() );
 	marcadorGaseosas = 0;
 	$('#addGaseosa').modal('hide');
+    validarDescuentoOferta();
 }
 
 function getOtrosAdicionales()
@@ -2289,6 +2315,7 @@ function AgregarAdicionales()
 	$("#valordevolver").val($("#valorpago").val() - $("#totalpedido").val() );
 	marcadorAdicionales = 0;
 	$('#addAdicionales').modal('hide');
+    validarDescuentoOferta();
 }
 
 function adicionarDetalleProducto(codprod,especialidad1,cantidad,especialidad2,valorunitario, valortotal,adicion, observacion,idsabortipoliquido,excepcionPrecio,pizza,otroProd,especial1,especial2,liquido, indDup, indAvanz)
@@ -2596,6 +2623,15 @@ function ReiniciarPedido()
 															    		table = $('#grid-pedido').DataTable();
 															    		table.clear().draw();
 															    	}
+
+                                                                    if ( $.fn.dataTable.isDataTable( '#grid-oferta' ) ) {
+                                                                        table = $('#grid-oferta').DataTable();
+                                                                        table.clear().draw();
+                                                                    }
+                                                                    descuentoPesos = 0;
+                                                                    descuentoPorcentaje = 0;
+                                                                    idOfertaClienteActual = 0;
+
 															    	$('input:radio[name=adicion]')[1].checked = true;
 															    	totalpedido = 0;
                                                                     totalpedidogeneral = 0;
@@ -2781,6 +2817,13 @@ function ConfirmarPedido()
 												var resPedPixel = data1[0];
 												if(resPedPixel.numerofactura > 0)
 						    					{
+                                                    //Revisamos si hay código promocional para marcarlo como utilizado
+                                                    if(idOfertaClienteActual != 0)
+                                                    {
+                                                        $.getJSON(server + 'GetUsarCodigoPromocional?idofertacliente='+ idOfertaClienteActual , function(data2){
+
+                                                        });
+                                                    }
 						    						//Debemos de insertar el número de pedido Pixel y cambiamos el estado del pedido a enviado
 						    						$.getJSON(server + 'ActualizarNumeroPedidoPixel?idpedido=' + resPedPixel.idpedido + '&numpedidopixel=' + resPedPixel.numerofactura +  '&creacliente=' + resPedPixel.creacliente +  '&membercode=' + resPedPixel.membercode + '&idcliente=' + resPedPixel.idcliente, function(data2){
 
@@ -2848,6 +2891,14 @@ function ConfirmarPedido()
 							    		table = $('#grid-pedido').DataTable();
 							    		table.clear().draw();
 							    	}
+
+                                    if ( $.fn.dataTable.isDataTable( '#grid-oferta' ) ) {
+                                        table = $('#grid-oferta').DataTable();
+                                        table.clear().draw();
+                                    }
+                                    descuentoPesos = 0;
+                                    descuentoPorcentaje = 0;
+                                    idOfertaClienteActual = 0;
 							    	$('input:radio[name=adicion]')[1].checked = true;
 							    	totalpedido = 0;
                                     totalpedidogeneral = 0;
@@ -4108,7 +4159,7 @@ function agregarProducto()
 	}
 
 // PARA LOS BOTONES DE CAMBIAR CANTIDADES
-
+    validarDescuentoOferta();
 
 
 
@@ -4748,3 +4799,168 @@ function limpiarModalOtrosPedidos()
 	$('#formapagoClick').val('');
 }
 
+function ingresarCodigoPromocion()
+{
+    if(dtOferta.data().count() > 0)
+    {
+        $.alert('No se puede tener más de una oferta para un mismo pedido, si desea puede borrar la actual y seleccionar una nueva.');
+        return;
+    }
+    $('#registrarOferta').modal('show');
+}
+
+
+function salirCodigoPromocion()
+{
+    $('#registrarOferta').modal('hide');
+}
+
+function validarCodigoPromocion()
+{
+    //Realizamos un limpiado de los campos
+    limpiarCamposOfertaInc();
+    //Capturamos el código promocional que vamos a validar
+    var codigoPromocional = $('#codigopromocional').val();
+    $.ajax({ 
+                url: server + 'GetValidarCodigoPromocional?codigopromocional='+ codigoPromocional , 
+                dataType: 'json',
+                type: 'get', 
+                async: false, 
+                success: function(data2)
+                {
+                    if(data2.respuesta == 'OK')
+                    {
+                        if(data2.utilizado == 'N')
+                        {
+                            $('#estadocodigo').val('CÓDIGO PROMOCIONAL DISPONIBLE');
+                            $('#usarcodigo').attr('disabled', false);
+
+                        } else if(data2.utilizado == 'S')
+                        {
+                            $('#estadocodigo').val('CÓDIGO PROMOCIONAL YA UTILIZADO');
+                            $('#usarcodigo').attr('disabled', true);
+                        }
+                        $('#ingresooferta').val(data2.ingresooferta);
+                        $('#usooferta').val(data2.usooferta);
+                        $('#fechacaducidad').val(data2.fechacaducidad);
+                        
+                    }
+                    else if(data2.respuesta == 'NOK')
+                    {
+                        $('#estadocodigo').val('CÓDIGO PROMOCIONAL NO EXISTE');
+                        $('#usarcodigo').attr('disabled', true);
+                    }else if(data2.respuesta == 'VEN')
+                    {
+                        $('#estadocodigo').val('CÓDIGO PROMOCIONAL ESTA VENCIDO');
+                        $('#ingresooferta').val(data2.ingresooferta);
+                        $('#usooferta').val(data2.usooferta);
+                        $('#fechacaducidad').val(data2.fechacaducidad);
+                        $('#usarcodigo').attr('disabled', true);
+                    }
+                } 
+            });
+}
+
+function limpiarCamposOferta()
+{
+    $('#estadocodigo').val('');
+    $('#ingresooferta').val('');
+    $('#usooferta').val('');
+    $('#codigopromocional').val('');
+    $('#fechacaducidad').val('');                           
+}
+
+function limpiarCamposOfertaInc()
+{
+    $('#estadocodigo').val('');
+    $('#ingresooferta').val('');
+    $('#usooferta').val('');                                    
+}
+
+function incluirCodigo()
+{
+    //Capturamos el código promocional que vamos a validar
+    var codigoPromocional = $('#codigopromocional').val();
+    $.ajax({ 
+                url: server + 'GetValidarCodigoPromocional?codigopromocional='+ codigoPromocional, 
+                dataType: 'json',
+                type: 'get', 
+                async: false, 
+                success: function(data2)
+                {
+                    if(data2.respuesta == 'OK')
+                    {
+                        if(data2.utilizado == 'N')
+                        {
+
+                            //En este punto realizaríamos la inclusión de la oferta pero necesitamos recuperar la inforamción de dicha oferta
+                            idOfertaClienteActual = data2.idofertacliente;
+                            motivoDescuento = "Uso de código promocional " + codigoPromocional;
+                             $.ajax({ 
+                                url: server + 'GetCodigoPromocional?idofertacliente='+ data2.idofertacliente , 
+                                dataType: 'json',
+                                type: 'get', 
+                                async: false, 
+                                success: function(data3)
+                                {
+                                    var ofertaCliente = data3[0];
+                                    dtOferta.row.add({
+                                        "idofertacliente": ofertaCliente.idofertacliente,
+                                        "codigopromocion": ofertaCliente.codigopromocion,
+                                        "nombreoferta": ofertaCliente.nombreoferta,
+                                        "nombrecliente": ofertaCliente.nombrecliente
+                                    }).draw();
+                                    //En este punto vamos a realizar el llenado del descuento de acuerdo a la oferta
+                                    $.ajax({ 
+                                            url: server + 'CRUDOferta?idoperacion=4&idoferta='+ ofertaCliente.idoferta , 
+                                            dataType: 'json',
+                                            type: 'get', 
+                                            async: false, 
+                                            success: function(data4)
+                                            {
+                                                var oferta = data4[0];
+                                               descuentoPesos = oferta.descuentofijovalor;
+                                               descuentoPorcentaje = oferta.descuentofijoporcentaje;
+                                               validarDescuentoOferta();
+                                               limpiarCamposOferta();
+                                               $('#usarcodigo').attr('disabled', true);
+                                            } 
+                                        });
+                                    
+                                } 
+                            });
+
+                        } else if(data2.utilizado == 'S')
+                        {
+                            
+                        }
+                        
+                        
+                    }
+                    else if(data2.respuesta == 'NOK')
+                    {
+                        $('#estadocodigo').val('CÓDIGO PROMOCIONAL NO EXISTE');
+                        
+                    }
+                    $('#registrarOferta').modal('hide');
+                }
+
+    });
+}
+
+function eliminarCodigoPromocion()
+{
+    if(dtOferta.data().count() > 0)
+    {
+        if ( $.fn.dataTable.isDataTable( '#grid-oferta' ) ) {
+            table = $('#grid-oferta').DataTable();
+            table.clear().draw();
+            descuentoPesos = 0;
+            descuentoPorcentaje = 0;
+            idOfertaClienteActual = 0;
+        }
+    }else
+    {
+        $.alert('No hay ofertas ingresadas para eliminar.');
+    }
+}

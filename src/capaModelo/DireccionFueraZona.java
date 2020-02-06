@@ -8,13 +8,19 @@ public class DireccionFueraZona {
 	private int idCliente;
 	private double latitud;
 	private double longitud;
+	private double valor;
 	private String Telefono;
 	private String nombre;
 	private String apellido;
 	private String fechaIngreso;
 	
 	
-	
+	public double getValor() {
+		return valor;
+	}
+	public void setValor(double valor) {
+		this.valor = valor;
+	}
 	public String getFechaIngreso() {
 		return fechaIngreso;
 	}
@@ -76,7 +82,7 @@ public class DireccionFueraZona {
 		this.apellido = apellido;
 	}
 	public DireccionFueraZona(int id, String direccion, String municipio, int idCliente, double latitud, double longitud,
-			String telefono, String nombre, String apellido) {
+			String telefono, String nombre, String apellido, double valor) {
 		super();
 		this.id = id;
 		this.direccion = direccion;
@@ -87,5 +93,6 @@ public class DireccionFueraZona {
 		Telefono = telefono;
 		this.nombre = nombre;
 		this.apellido = apellido;
+		this.valor = valor;
 	}
 }

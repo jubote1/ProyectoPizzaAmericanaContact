@@ -906,6 +906,7 @@ public class PedidoCtrl {
 			ResultadoJSON.put("nombre", dirTemp.getNombre());
 			ResultadoJSON.put("apellido", dirTemp.getApellido());
 			ResultadoJSON.put("fechapedido", dirTemp.getFechaIngreso());
+			ResultadoJSON.put("valor", dirTemp.getValor());
 			listJSON.add(ResultadoJSON);
 		}
 		//Tendremos una tabla temporal para reportes clientes y pedidos dentro de un poligono

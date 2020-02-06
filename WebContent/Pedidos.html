@@ -227,6 +227,70 @@
 									</td>
 					<tr>
 				</table>
+				<div>
+        				<table id="grid-oferta" class="table table-condensed table-hover table-striped" cellspacing="0" width="100%">
+								        <thead>
+								            <tr>
+								                <th data-column-id="idofertacliente">Id Oferta Cliente</th>
+								                <th data-column-id="codigopromocion">Código Promoción</th>
+								                <th data-column-id="nombreoferta">Nombre Oferta</th>
+								                <th data-column-id="nombrecliente">Cliente Asignado</th>
+								            </tr>
+								        </thead>
+								      	<tbody>
+								      			
+								      	</tbody>
+						</table>
+						<!-- ESTO ES PARA INGRESAR EL CÓDIGO PROMOCIÓN -->
+						<div class="modal fade" id="registrarOferta" tabindex="-1" role="dialog" aria-labelledby="addLabel">
+							 <div class="modal-dialog modal-xl" role="document">
+							    <div class="modal-content">
+							      <div class="modal-header">
+							      	<h4 class="modal-title" id="addLabel">Ingresar Oferta</h4>
+							       </div>
+							      <form id='regOferta'>
+							      	<table class="table table-bordered">
+										<tbody>
+												
+												<tr>
+														<td class="active">Ingresar Código Promocional</td>
+														<td><input type="text" id="codigopromocional" name="codigopromocional" class="form-control" placeholder="Ingresar Código Promocional"  maxlength="10"></td>
+												</tr>
+
+												<tr>
+														<td class="active">Estado de Código Promocional</td>
+														<td><input type="text" id="estadocodigo" name="estadocodigo" class="form-control" placeholder="Estado del codigo promocional"  disabled></td>
+												</tr>
+
+												<tr>
+														<td class="active">Ingreso Oferta</td>
+														<td><input type="text" id="ingresooferta" name="ingresooferta" class="form-control" placeholder="Fecha Ingreso Oferta"  disabled></td>
+												</tr>
+
+												<tr>
+														<td class="active">Uso Oferta</td>
+														<td><input type="text" id="usooferta" name="usooferta" class="form-control" placeholder="Fecha Uso Oferta"  disabled></td>
+												</tr>
+
+												<tr>
+														<td class="active">Fecha Caducidad</td>
+														<td><input type="text" id="fechacaducidad" name="fechacaducidad" class="form-control"  placeholder="Fecha Uso Oferta"  disabled></td>
+												</tr>
+												
+										</tbody>
+									</table>
+									<div class="container"><h2><b></b></h2>
+										<input type="button" id="validarcodigo" name="validarcodigo" class="btn btn-primary btn-lg" value="Validar Código" onclick="validarCodigoPromocion()">
+										<input type="button" id="usarcodigo" name="usarcodigo" class="btn btn-success btn-lg" value="Usar Código" onclick="incluirCodigo()" disabled>
+										<input type="button" id="salir" name="salir" class="btn btn-success btn-lg" value="Salir" onclick="salirCodigoPromocion()">
+									</div>
+								  </form>
+							    </div>
+							</div>
+						</div>
+				</div>
+				<button type="button" class="btn btn-success btn-md" onclick="ingresarCodigoPromocion()"><i class="fas fa-cart-plus fa-3x"></i> Agregar Oferta</button>	
+				<button type="button" class="btn btn-warning btn-md" onclick="eliminarCodigoPromocion()"><i class="fas fa-cart-plus fa-3x"></i> Eliminar oferta</button>	
 				<table class="table table-bordered">
 					<thead>
 						<h2><b>División Pizza</b></h2>

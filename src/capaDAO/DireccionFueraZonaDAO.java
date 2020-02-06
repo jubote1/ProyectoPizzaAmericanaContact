@@ -100,7 +100,7 @@ public class DireccionFueraZonaDAO {
 				//Luego de tomada la información de la cantidad de pedidos, validamos que los pedidos llevados al cliente seran 0 o 1.
 				if (pedidos <= 1)
 				{
-					DireccionFueraZona dirFuera = new DireccionFueraZona(id, direccion, municipio, idCliente, latitud, longitud, telefono, nombre, apellido);
+					DireccionFueraZona dirFuera = new DireccionFueraZona(id, direccion, municipio, idCliente, latitud, longitud, telefono, nombre, apellido,0);
 					dirFuera.setFechaIngreso(fechaIngreso);
 					consultaDirs.add(dirFuera);
 				}

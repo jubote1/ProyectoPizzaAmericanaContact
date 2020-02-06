@@ -235,11 +235,14 @@ public class OfertaClienteDAO {
 		try
 		{
 			Statement stm = con1.createStatement();
-			String consulta = "select * from  oferta_cliente  where idofertacliente = " + idOfertaCliente; 
+			String consulta = "select a.*, b.nombre_oferta, c.idcliente, c.nombre nombre_cliente from  oferta_cliente a, oferta b, cliente c  where a.idoferta = b.idoferta and a.idcliente = c.idcliente and a.idofertacliente = " + idOfertaCliente; 
 			logger.info(consulta);
 			ResultSet rs = stm.executeQuery(consulta);
 			int idCliente;
 			int idOferta;
+			String nombreOferta;
+			String nombreCliente;
+			String codigoPromocion;
 			String utilizada;
 			String ingresoOferta;
 			String usoOferta;
@@ -255,7 +258,13 @@ public class OfertaClienteDAO {
 				observacion = rs.getString("observacion");
 				PQRS = rs.getInt("PQRS");
 				usuarioIngreso = rs.getString("usuario_ingreso");
+				nombreOferta = rs.getString("nombre_oferta");
+				nombreCliente = rs.getString("nombre_cliente");
+				codigoPromocion = rs.getString("codigo_promocion");
 				ofertaTemp = new OfertaCliente(idOfertaCliente, idOferta, idCliente, utilizada, PQRS,ingresoOferta, usoOferta, observacion, usuarioIngreso);
+				ofertaTemp.setNombreOferta(nombreOferta);
+				ofertaTemp.setNombreCliente(nombreCliente);
+				ofertaTemp.setCodigoPromocion(codigoPromocion);
 				break;
 			}
 			stm.close();

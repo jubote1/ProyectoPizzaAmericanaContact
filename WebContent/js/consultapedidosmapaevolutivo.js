@@ -227,6 +227,7 @@ function ubicarDireccionesPedidos()
 			        });
 					var infowindow = new google.maps.InfoWindow();
 					var marker, i;
+					var valorPedidos = 0;
 					for(i = 0; i < data2.length;i++){
 						cantidadPedidos = cantidadPedidos + 1; 
 						var cadaDirFuera  = data2[i];
@@ -252,13 +253,14 @@ function ubicarDireccionesPedidos()
 					            	infowindow.open(map, marker);
 					          	}
 					        })(marker, i));
-					        cantidadPedidosZona = cantidadPedidosZona + 1; 
+					        cantidadPedidosZona = cantidadPedidosZona + 1;
+					        valorPedidos = valorPedidos + cadaDirFuera.valor;
 					    }
 
 						
 				    }
 				    //muestro el resultado del proceso
-				    $.alert('CANTIDAD DE PEDIDOS ' +  cantidadPedidos + ' DE LOS CUALES EN LA ZONA ESTÁN ' + cantidadPedidosZona);
+				    $.alert('CANTIDAD DE PEDIDOS ' +  cantidadPedidos + ' DE LOS CUALES EN LA ZONA ESTÁN ' + cantidadPedidosZona + '. El valor de dichos pedidos es ' + valorPedidos);
 				} 
 			});
 	        

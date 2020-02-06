@@ -926,7 +926,7 @@ public class ParametrosCtrl {
 			
 			public String insertarDirFueraZona(String direccion, String municipio, int idCliente, double latitud, double longitud, String telefono, String nombre, String apellido)
 			{
-				DireccionFueraZona dirFuera = new DireccionFueraZona(0, direccion, municipio, idCliente, latitud, longitud, telefono, nombre, apellido);
+				DireccionFueraZona dirFuera = new DireccionFueraZona(0, direccion, municipio, idCliente, latitud, longitud, telefono, nombre, apellido,0);
 				int id = DireccionFueraZonaDAO.insertarDirFueraZona(dirFuera);
 				JSONArray listJSON = new JSONArray();
 				JSONObject Respuesta = new JSONObject();

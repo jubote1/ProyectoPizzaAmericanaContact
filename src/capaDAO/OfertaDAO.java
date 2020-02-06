@@ -195,9 +195,12 @@ public class OfertaDAO {
 			int idExcepcion = 0;
 			int diasCaducidad = 0;
 			String tipoCaducidad = "";
+			double descuentoFijoPorcentaje = 0, descuentoFijoValor = 0;
 			while(rs.next()){
 				nombreOferta = rs.getString("nombre_oferta");
 				idExcepcion = rs.getInt("idexcepcion");
+				descuentoFijoPorcentaje = rs.getDouble("descuento_fijo_porcentaje");
+				descuentoFijoValor = rs.getDouble("descuento_fijo_valor");
 				try {
 					diasCaducidad = rs.getInt("dias_caducidad");
 					
@@ -211,6 +214,8 @@ public class OfertaDAO {
 			ofertaTemp = new Oferta(idOferta, nombreOferta, idExcepcion);
 			ofertaTemp.setDiasCaducidad(diasCaducidad);
 			ofertaTemp.setTipoCaducidad(tipoCaducidad);
+			ofertaTemp.setDescuentoFijoPorcentaje(descuentoFijoPorcentaje);
+			ofertaTemp.setDescuentoFijoValor(descuentoFijoValor);
 			stm.close();
 			con1.close();
 		}
